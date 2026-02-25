@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>LuxeDrive | Premium Car Rental</title>
+    <title>RentUs | Premium Car Rental</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,12 +14,12 @@
     <!-- Styles -->
     <style>
         :root {
-            --bg-color: #050505;
-            --text-main: #fcfcfc;
-            --text-muted: #a1a1aa;
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
             --accent: #eab308; /* Yellow/Gold accent for a premium feel */
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(0, 0, 0, 0.08);
             --glass-blur: blur(12px);
         }
 
@@ -43,7 +43,6 @@
             transition: color 0.3s ease;
         }
 
-        /* --- Navbar --- */
         nav {
             position: fixed;
             top: 0;
@@ -53,7 +52,7 @@
             justify-content: space-between;
             align-items: center;
             z-index: 100;
-            background: rgba(5, 5, 5, 0.5);
+            background: rgba(248, 250, 252, 0.85);
             backdrop-filter: var(--glass-blur);
             border-bottom: 1px solid var(--glass-border);
         }
@@ -114,7 +113,7 @@
 
         .btn-outline:hover {
             background: var(--glass-bg);
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(0, 0, 0, 0.15);
         }
 
         /* --- Hero Section --- */
@@ -135,7 +134,7 @@
             height: 100%;
             object-fit: cover;
             z-index: -2;
-            opacity: 0.4;
+            opacity: 0.8;
             transform: scale(1.05); /* Slight zoom for image */
             animation: slowZoom 20s infinite alternate linear;
         }
@@ -151,7 +150,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(5,5,5,0.2) 0%, rgba(5,5,5,1) 100%);
+            background: linear-gradient(180deg, rgba(248,250,252,0.4) 0%, #f8fafc 100%);
             z-index: -1;
         }
 
@@ -239,15 +238,15 @@
             position: absolute;
             top: 0; left: -100%;
             width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
             transition: 0.5s;
             transform: skewX(-25deg);
         }
 
         .car-card:hover {
             transform: translateY(-10px);
-            border-color: rgba(255, 255, 255, 0.15);
-            background: rgba(255,255,255,0.05);
+            border-color: rgba(0, 0, 0, 0.15);
+            background: rgba(255,255,255,0.9);
         }
         
         .car-card:hover::before {
@@ -278,14 +277,14 @@
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background: rgba(0,0,0,0.6);
+            background: #0f172a;
             backdrop-filter: blur(4px);
             padding: 0.25rem 0.75rem;
             border-radius: 50px;
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--accent);
-            border: 1px solid rgba(234, 179, 8, 0.3);
+            border: 1px solid rgba(234, 179, 8, 0.5);
         }
 
         .car-name {
@@ -338,7 +337,7 @@
         /* --- How it Works --- */
         .how-it-works {
             padding: 6rem 5%;
-            background: linear-gradient(0deg, #0a0a0a 0%, var(--bg-color) 100%);
+            background: linear-gradient(0deg, #e2e8f0 0%, var(--bg-color) 100%);
         }
 
         .steps-container {
@@ -388,7 +387,7 @@
 
         /* --- Footer --- */
         footer {
-            background-color: #000;
+            background-color: #f1f5f9;
             padding: 4rem 5% 2rem;
             border-top: 1px solid var(--glass-border);
         }
@@ -463,7 +462,7 @@
 
     <!-- Navigation -->
     <nav>
-        <div class="logo">Luxe<span>Drive</span></div>
+        <div class="logo">Rent<span>Us</span></div>
         <div class="nav-links">
             <a href="#fleet">Our Fleet</a>
             <a href="#how-it-works">How it Works</a>
@@ -485,12 +484,12 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <!-- Using a high quality Unsplash image of a sports car at night -->
-        <img src="https://images.unsplash.com/photo-1542282088-fe8426682b8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="Luxury Sports Car" class="hero-bg">
+        <!-- Using a high quality Unsplash image of a bright luxury car -->
+        <img src="https://images.unsplash.com/photo-1502877338535-766e1452684a?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="Luxury Sports Car" class="hero-bg">
         <div class="hero-gradient"></div>
         
         <div class="hero-content">
-            <h1 class="hero-title">Experience <span>True Luxury</span> on the Road.</h1>
+            <h1 class="hero-title"> Experience<span>Rent Us</span> on the Road.</h1>
             <p class="hero-subtitle">Elevate your journey with our exclusive collection of premium vehicles. Uncompromised comfort, breathtaking performance.</p>
             <div class="hero-actions">
                 <a href="#fleet" class="btn-primary">Reserve Now</a>
@@ -631,7 +630,7 @@
     <footer>
         <div class="footer-grid">
             <div>
-                <div class="logo footer-logo">Luxe<span>Drive</span></div>
+                <div class="logo footer-logo">Rent<span>Us</span></div>
                 <p class="footer-desc">Redefining luxury car rentals with uncompromised quality, exceptional service, and a passion for driving excellence.</p>
             </div>
             <div>
@@ -655,15 +654,15 @@
             <div>
                 <h4 class="footer-heading">Locations</h4>
                 <ul class="footer-links">
-                    <li><a href="#">New York</a></li>
-                    <li><a href="#">Los Angeles</a></li>
-                    <li><a href="#">Miami</a></li>
-                    <li><a href="#">London</a></li>
+                    <li><a href="#">Manila</a></li>
+                    <li><a href="#">Lipa</a></li>
+                    <li><a href="#">Quezon</a></li>
+                    <li><a href="#">Cavite</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} LuxeDrive Premium Rentals. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} RentUS Premium Rentals. All rights reserved.</p>
         </div>
     </footer>
 
