@@ -1,0 +1,51 @@
+<!-- Sidebar start -->
+<div class="dlabnav">
+    <div class="dlabnav-scroll">
+        <ul class="metismenu" id="menu">
+            <li class="active">
+                <a href="{{ url('/dashboard') }}" aria-expanded="false">
+                    <i class="fas fa-home"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" aria-expanded="false">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="nav-text">Bookings</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" aria-expanded="false">
+                    <i class="fas fa-car"></i>
+                    <span class="nav-text">Cars</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" aria-expanded="false">
+                    <i class="fas fa-building"></i>
+                    <span class="nav-text">Properties</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" aria-expanded="false">
+                    <i class="fas fa-credit-card"></i>
+                    <span class="nav-text">Payments</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" aria-expanded="false">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-text">Accounts/Affiliates</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" aria-expanded="false">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="nav-text">Reports</span>
+                </a>
+            </li>
+        </ul>
+        
+    </div>
+</div>
+<!-- Sidebar end -->
