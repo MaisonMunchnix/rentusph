@@ -3,7 +3,7 @@
     <div class="dlabnav-scroll">
         <ul class="metismenu" id="menu">
             <li class="active">
-                <a href="{{ url('/dashboard') }}" aria-expanded="false">
+                <a href="{{ route('admin') }}" aria-expanded="false">
                     <i class="fas fa-home"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>

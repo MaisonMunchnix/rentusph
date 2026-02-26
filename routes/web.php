@@ -25,8 +25,8 @@ Route::get('/forgot-password', function () { return view('auth.forgot-password')
 
 // Admin Dashboard
 Route::get('/dashboard', function () {
-    return view('dashboard.index');
-})->name('dashboard');
+    return view('admin.index');
+})->name('admin');
 
 // Authentication API / Endpoints
 Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
