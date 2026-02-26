@@ -19,7 +19,7 @@
                     <div class="card mb-0 h-auto">
                         <div class="card-body">
                             <div class="text-center mb-3">
-                                <a href="{{ url('/') }}"><img class="logo-auth" src="{{ asset('images/logo-full.png') }}" alt="Logo"></a>
+                                <a href="{{ url('/') }}"><img class="logo-auth" src="{{ asset('images/rentus.png') }}" alt="Logo"></a>
                             </div>
                             <h4 class="text-center mb-4">Customer sign up</h4>
                             <form action="{{ url('register') }}" method="POST">
