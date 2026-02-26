@@ -589,15 +589,16 @@
                     <div class="header-left">
                         <ul class="nav-links flex-row d-md-flex d-none" style="list-style: none; gap: 2rem; margin-bottom: 0; padding-left: 1rem;">
                             <li><a href="#fleet" style="font-weight: 600; font-size: 1.1rem;">Our Fleet</a></li>
+                            <li><a href="#properties" style="font-weight: 600; font-size: 1.1rem;">Properties</a></li>
                             <li><a href="#how-it-works" style="font-weight: 600; font-size: 1.1rem;">How it Works</a></li>
                             <li><a href="#footer" style="font-weight: 600; font-size: 1.1rem;">Reach Us</a></li>
                         </ul>
                     </div>
                     <div class="header-right d-flex align-items-center">
                         <div class="header-cta-group ms-auto">
-                            <a href="#fleet" class="btn btn-outline btn-sm">Book Now</a>
-                            <a href="#" class="btn btn-primary btn-sm">Register</a>
-                            <a href="#" class="btn btn-outline btn-sm">Log in</a>
+                            <a href="{{ route('register.affiliate') }}" class="btn btn-outline btn-sm">Be a Partner</a>
+                            <a href="{{ route('register.customer') }}" class="btn btn-primary btn-sm">Register</a>
+                            <a href="{{ route('login') }}" class="btn btn-outline btn-sm">Log in</a>
                         </div>
                     </div>
                 </div>
@@ -621,7 +622,7 @@
             </h1>
             <p class="hero-subtitle">Effortless Renting. Endless Possibilities</p>
             <div class="hero-actions">
-                <a href="#fleet" class="btn btn-primary">Reserve Now</a>
+                <a href="{{ route('register.customer') }}" class="btn btn-primary">Book Now</a>
                 <a href="#how-it-works" class="btn btn-outline">Learn More</a>
             </div>
         </div>
@@ -754,6 +755,103 @@
         </div>
     </section>
 
+    <!-- Property Rentals -->
+    <section id="properties" class="fleet" style="background-color: #f8fafc;">
+        <div class="section-header">
+            <h2 class="section-title">Premier Stays</h2>
+            <p class="section-subtitle">Discover our handpicked collection of premium properties, from modern urban condos to serene beachfront villas.</p>
+        </div>
+
+        <div class="fleet-grid">
+            <!-- Property 1: Urban Condo -->
+            <div class="car-card">
+                <div class="car-image-container">
+                    <div class="car-tag">City Living</div>
+                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Modern Penthouse" class="car-image">
+                </div>
+                <h3 class="car-name">Skyline Executive Suite</h3>
+                <div class="car-specs">
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        Condo
+                    </span>
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M2 14h20M2 8h20M2 2h20"></path></svg>
+                        2 BR
+                    </span>
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
+                        Fully Furnished
+                    </span>
+                </div>
+                <div class="car-footer">
+                    <div class="car-price">
+                        <span>₱5,500</span><small>/night</small>
+                    </div>
+                    <a href="{{ route('register.customer') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book Stay</a>
+                </div>
+            </div>
+
+            <!-- Property 2: Beachfront Villa -->
+            <div class="car-card">
+                <div class="car-image-container">
+                    <div class="car-tag">Beach Escape</div>
+                    <img src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Beachfront Villa" class="car-image">
+                </div>
+                <h3 class="car-name">Azure Beachfront Villa</h3>
+                <div class="car-specs">
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        Villa
+                    </span>
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M2 14h20M2 8h20M2 2h20"></path></svg>
+                        4 BR
+                    </span>
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 5l7 7 7-7"></path></svg>
+                        Private Pool
+                    </span>
+                </div>
+                <div class="car-footer">
+                    <div class="car-price">
+                        <span>₱12,000</span><small>/night</small>
+                    </div>
+                    <a href="{{ route('register.customer') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book Stay</a>
+                </div>
+            </div>
+
+            <!-- Property 3: Vacation Home -->
+            <div class="car-card">
+                <div class="car-image-container">
+                    <div class="car-tag">Staycation</div>
+                    <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Vacation Home" class="car-image">
+                </div>
+                <h3 class="car-name">Serene Hilltop Retreat</h3>
+                <div class="car-specs">
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        House
+                    </span>
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M2 14h20M2 8h20M2 2h20"></path></svg>
+                        3 BR
+                    </span>
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                        Scenic View
+                    </span>
+                </div>
+                <div class="car-footer">
+                    <div class="car-price">
+                        <span>₱7,500</span><small>/night</small>
+                    </div>
+                    <a href="{{ route('register.customer') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book Stay</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- How It Works -->
     <section id="how-it-works" class="how-it-works">
         <div class="section-header">
@@ -812,6 +910,12 @@
                         <span>0220, Batangas City, Philippines, 4200</span>
                     </li>
                 </ul>
+                <div style="margin-top: 1.5rem;">
+                    <a href="{{ route('register.affiliate') }}" style="color: var(--accent); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
+                        Affiliate Program
+                    </a>
+                </div>
             </div>
         </div>
         <div id="footer" class="footer-bottom">

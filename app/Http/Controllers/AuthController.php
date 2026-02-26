@@ -32,10 +32,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return response()->json([
-            'message' => 'Registration successful',
-            'user' => $user
-        ], 201);
+        return redirect()->intended('/dashboard');
     }
 
     public function login(Request $request)
@@ -48,10 +45,7 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             $request->session()->regenerate();
 
-            return response()->json([
-                'message' => 'Login successful',
-                'user' => Auth::user()
-            ]);
+            return redirect()->intended('/dashboard');
         }
 
         throw ValidationException::withMessages([

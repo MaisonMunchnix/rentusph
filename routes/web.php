@@ -23,6 +23,11 @@ Route::get('/register/customer', function () { return view('auth.customer-regist
 Route::get('/register/affiliate', function () { return view('auth.affiliate-registration'); })->name('register.affiliate');
 Route::get('/forgot-password', function () { return view('auth.forgot-password'); })->name('password.request');
 
+// Admin Dashboard
+Route::get('/dashboard', function () {
+    return view('dashboard.index');
+})->name('dashboard');
+
 // Authentication API / Endpoints
 Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);

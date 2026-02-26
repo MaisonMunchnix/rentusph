@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <!-- FAVICONS ICON -->
-    <link rel="shortcut icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+    <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('images/rentus.svg') }}">
     <link href="{{ asset('vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 </head>
@@ -19,7 +19,7 @@
                     <div class="card mb-0 h-auto">
                         <div class="card-body">
                             <div class="text-center mb-3">
-                                <a href="{{ url('/') }}"><img class="logo-auth" src="{{ asset('images/rentus.png') }}" alt="Logo"></a>
+                                <a href="{{ url('/') }}"><img class="logo-auth" src="{{ asset('images/logo-full.png') }}" alt="Logo"></a>
                             </div>
                             <h4 class="text-center mb-4">Sign in your account</h4>
                             <form action="{{ url('login') }}" method="POST">
