@@ -23,10 +23,18 @@ Route::get('/register/customer', function () { return view('auth.customer-regist
 Route::get('/register/affiliate', function () { return view('auth.affiliate-registration'); })->name('register.affiliate');
 Route::get('/forgot-password', function () { return view('auth.forgot-password'); })->name('password.request');
 
-// Admin Dashboard
+// Role-based Dashboard
 Route::get('/dashboard', function () {
-    return view('admin.index');
-})->name('admin')->middleware(['auth', 'admin', 'affiliate.status']);
+    if (Auth::user()->role === 'admin') {
+        return view('admin.index');
+    }
+    return view('affiliate.index');
+})->name('dashboard')->middleware(['auth', 'affiliate.status']);
+
+// Admin Dashboard Redirect (legacy name support)
+Route::get('/admin-dashboard', function() {
+    return redirect()->route('dashboard');
+})->name('admin');
 
 // Pending Affiliate View
 Route::get('/pending-review', function () {
@@ -47,6 +55,13 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/properties/{property}', [\App\Http\Controllers\PropertyController::class, 'update'])->name('properties.update');
     Route::delete('/properties/{property}', [\App\Http\Controllers\PropertyController::class, 'destroy'])->name('properties.destroy');
     Route::patch('/properties/{property}/toggle-status', [\App\Http\Controllers\PropertyController::class, 'toggleStatus'])->name('properties.toggle-status');
+
+    // Affiliate Management
+    Route::get('/affiliate-management', [\App\Http\Controllers\AffiliateManagementController::class, 'index'])->name('affiliates.index');
+    Route::post('/affiliates', [\App\Http\Controllers\AffiliateManagementController::class, 'store'])->name('affiliates.store');
+    Route::patch('/affiliates/{user}/approve', [\App\Http\Controllers\AffiliateManagementController::class, 'approve'])->name('affiliates.approve');
+    Route::patch('/affiliates/{user}/reject', [\App\Http\Controllers\AffiliateManagementController::class, 'reject'])->name('affiliates.reject');
+    Route::delete('/affiliates/{user}', [\App\Http\Controllers\AffiliateManagementController::class, 'destroy'])->name('affiliates.destroy');
 });
 
 // Authentication API / Endpoints

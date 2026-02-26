@@ -32,10 +32,10 @@
                     <span class="nav-text">Payments</span>
                 </a>
             </li>
-            <li>
-                <a href="#" aria-expanded="false">
+            <li class="{{ request()->is('affiliate-management*') ? 'active' : '' }}">
+                <a href="{{ route('affiliates.index') }}" aria-expanded="false">
                     <i class="fas fa-users"></i>
-                    <span class="nav-text">Accounts/Affiliates</span>
+                    <span class="nav-text">Partners</span>
                 </a>
             </li>
             <li>
