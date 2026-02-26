@@ -9,114 +9,38 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Arvo:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-    <!-- Styles -->
+	<!-- FAVICONS ICON -->
+	<link rel="shortcut icon" type="image/svg+xml" href="{{ asset('images/rentus.svg') }}">
+	<link href="{{ asset('vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
+	<link href="{{ asset('vendor/owl-carousel/owl.carousel.css') }}" rel="stylesheet">
+	<link rel="stylesheet" href="{{ asset('vendor/nouislider/nouislider.min.css') }}">
+	
+	<!-- Style css -->
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+
+    <!-- Custom Landing Page Enhancements -->
     <style>
+        /* Maintain some specific rentusph variables just in case */
         :root {
-            --bg-color: #f8fafc;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent: #eab308; /* Yellow/Gold accent for a premium feel */
+            --accent: #eab308;
             --glass-bg: rgba(255, 255, 255, 0.6);
             --glass-border: rgba(0, 0, 0, 0.08);
             --glass-blur: blur(12px);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+            font-family: 'Outfit', sans-serif !important;
         }
 
-        a {
-            text-decoration: none;
-            color: inherit;
-            transition: color 0.3s ease;
+        h1, h2, h3, h4, h5, h6, 
+        .section-title, .car-name, .step-title,
+        .btn, .nav-links li a {
+            font-family: 'Outfit', sans-serif !important;
         }
 
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 1.5rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            background: rgba(248, 250, 252, 0.85);
-            backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-        
-        .logo span {
-            color: var(--accent);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a:not(.btn-primary):hover {
-            color: var(--accent);
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none; /* simple mobile hide for now */
-            }
-        }
-
-        /* --- Buttons --- */
-        .btn-primary {
-            background-color: var(--accent);
-            color: #000;
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            display: inline-block;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(234, 179, 8, 0.2);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            color: var(--text-main);
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            border: 1px solid var(--glass-border);
-            display: inline-block;
-            transition: all 0.3s ease;
-            backdrop-filter: var(--glass-blur);
-        }
-
-        .btn-outline:hover {
-            background: var(--glass-bg);
-            border-color: rgba(0, 0, 0, 0.15);
-        }
-
-        /* --- Hero Section --- */
+        /* --- Layout & Sections --- */
         .hero {
             position: relative;
             min-height: 100vh;
@@ -124,6 +48,34 @@
             align-items: center;
             padding: 0 5%;
             overflow: hidden;
+        }
+
+        /* --- Logo-inspired Typography --- */
+        .font-logo-slab {
+            font-family: 'Arvo', serif !important;
+            font-weight: 700;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .hero-title .text-rent {
+            font-family: 'Arvo', serif !important;
+            font-weight: 700;
+        }
+
+        .hero-title .text-explore {
+            font-family: 'Arvo', serif !important;
+            color: var(--accent);
+            display: block;
+            font-size: 0.9em;
+            font-weight: 700;
+            margin-top: 0.5rem;
         }
 
         .hero-bg {
@@ -135,7 +87,7 @@
             object-fit: cover;
             z-index: -2;
             opacity: 0.8;
-            transform: scale(1.05); /* Slight zoom for image */
+            transform: scale(1.05);
             animation: slowZoom 20s infinite alternate linear;
         }
 
@@ -150,7 +102,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(248,250,252,0.4) 0%, #f8fafc 100%);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%);
             z-index: -1;
         }
 
@@ -179,7 +131,7 @@
 
         .hero-subtitle {
             font-size: 1.125rem;
-            color: var(--text-muted);
+            color: #64748b;
             margin-bottom: 2.5rem;
             line-height: 1.6;
             max-width: 500px;
@@ -193,7 +145,6 @@
         /* --- Featured Fleet Section --- */
         .fleet {
             padding: 8rem 5%;
-            background-color: var(--bg-color);
             position: relative;
         }
 
@@ -209,7 +160,6 @@
         }
 
         .section-subtitle {
-            color: var(--text-muted);
             font-size: 1.1rem;
             max-width: 600px;
             margin: 0 auto;
@@ -296,7 +246,6 @@
         .car-specs {
             display: flex;
             justify-content: space-between;
-            color: var(--text-muted);
             font-size: 0.9rem;
             margin-bottom: 1.5rem;
             padding-bottom: 1.5rem;
@@ -326,18 +275,16 @@
         .car-price span {
             font-size: 1.25rem;
             font-weight: 800;
-            color: var(--text-main);
         }
 
         .car-price small {
-            color: var(--text-muted);
             font-weight: 400;
         }
 
         /* --- How it Works --- */
         .how-it-works {
             padding: 6rem 5%;
-            background: linear-gradient(0deg, #e2e8f0 0%, var(--bg-color) 100%);
+            background: linear-gradient(0deg, #e2e8f0 0%, #f8fafc 100%);
         }
 
         .steps-container {
@@ -380,7 +327,6 @@
         }
 
         .step-desc {
-            color: var(--text-muted);
             font-size: 0.95rem;
             line-height: 1.6;
         }
@@ -394,7 +340,7 @@
 
         .footer-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
+            grid-template-columns: 1.5fr 1fr;
             gap: 3rem;
             margin-bottom: 3rem;
         }
@@ -411,14 +357,15 @@
         }
 
         .footer-logo {
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
         }
         
         .footer-desc {
-            color: var(--text-muted);
             line-height: 1.6;
             margin-bottom: 1.5rem;
-            max-width: 300px;
+            max-width: 500px;
         }
 
         .footer-heading {
@@ -429,14 +376,11 @@
 
         .footer-links {
             list-style: none;
+            padding-left: 0;
         }
 
         .footer-links li {
             margin-bottom: 0.75rem;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
         }
 
         .footer-links a:hover {
@@ -447,40 +391,222 @@
             padding-top: 2rem;
             border-top: 1px solid var(--glass-border);
             text-align: center;
-            color: var(--text-muted);
             font-size: 0.9rem;
         }
-
-        .badge-auth {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
+        /* --- Header & Navigation --- */
+        .nav-header {
+            background-color: #0a0a0a !important;
+            width: 250px;
+            border: none !important;
+            box-shadow: none !important;
         }
+
+        .header {
+            background-color: #0a0a0a !important;
+            padding-left: 250px;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .header-content {
+            padding-left: 0;
+        }
+
+        .nav-links li a, 
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links li a:hover, 
+        .navbar-nav .nav-link:hover {
+            color: var(--accent) !important;
+        }
+
+        .btn-primary {
+            background-color: var(--accent) !important;
+            border-color: var(--accent) !important;
+            color: #0a0a0a !important;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        /* --- Premium Refinements --- */
+        body {
+            background-color: #fdfdfd; 
+            color: #1a1a1a;
+            letter-spacing: -0.01em;
+        }
+
+        /* CTA Buttons in Header - Simplified */
+        .header-cta-group {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .header-cta-group .btn {
+            white-space: nowrap;
+        }
+
+        /* Refined Typography */
+        .hero-title {
+            font-size: clamp(3.5rem, 8vw, 6.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8) !important;
+            max-width: 450px;
+            border-left: 3px solid var(--accent);
+            padding-left: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* Buttons Polish - Unified Language */
+        .btn {
+            padding: 0.6rem 1.75rem !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--accent) !important;
+            color: #000 !important;
+            border: 1.5px solid var(--accent) !important;
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(234, 179, 8, 0.3);
+            background: #facc15 !important; /* Slightly brighter yellow on hover */
+        }
+
+        .btn-outline {
+            border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+            color: #fff !important;
+            background: transparent !important;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent) !important;
+            color: var(--accent) !important;
+            background: rgba(234, 179, 8, 0.05) !important;
+            transform: translateY(-2px);
+        }
+
+        /* Hover Navigation */
+        .header-left .nav-links a {
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .header-left .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .header-left .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* --- Footer Polish --- */
+        footer {
+            background-color: #0a0a0a !important;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 4rem 5% 2rem !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-heading {
+            color: #fff;
+            font-family: 'Arvo', serif;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            letter-spacing: 0.02em;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            font-weight: 400;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            margin-top: 5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+
+
     </style>
 </head>
 <body>
 
-    <!-- Navigation -->
-    <nav>
-        <div class="logo">Rent<span>Us</span></div>
-        <div class="nav-links">
-            <a href="#fleet">Our Fleet</a>
-            <a href="#how-it-works">How it Works</a>
-            <a href="#about">About us</a>
+    <!--**********************************
+        Nav header start
+    ***********************************-->
+    <div class="nav-header">
+        <a href="{{ url('/') }}" class="brand-logo" style="justify-content: flex-start; padding-left: 1.5rem;">
+            <img src="{{ asset('images/rentus.png') }}" alt="RentUs Logo" style="height: 50px; width: auto; object-fit: contain;">
+        </a>
+    </div>
+    <!--**********************************
+        Nav header end
+    ***********************************-->
+
+    <!--**********************************
+        Header start
+    ***********************************-->
+    <div class="header">
+        <div class="header-content">
+            <nav class="navbar navbar-expand" style="border: none !important; box-shadow: none !important;">
+                <div class="collapse navbar-collapse justify-content-between">
+                    <div class="header-left">
+                        <ul class="nav-links flex-row d-md-flex d-none" style="list-style: none; gap: 2rem; margin-bottom: 0; padding-left: 1rem;">
+                            <li><a href="#fleet" style="font-weight: 600; font-size: 1.1rem;">Our Fleet</a></li>
+                            <li><a href="#how-it-works" style="font-weight: 600; font-size: 1.1rem;">How it Works</a></li>
+                            <li><a href="#footer" style="font-weight: 600; font-size: 1.1rem;">Reach Us</a></li>
+                        </ul>
+                    </div>
+                    <div class="header-right d-flex align-items-center">
+                        <div class="header-cta-group ms-auto">
+                            <a href="#fleet" class="btn btn-outline btn-sm">Book Now</a>
+                            <a href="#" class="btn btn-primary btn-sm">Register</a>
+                            <a href="#" class="btn btn-outline btn-sm">Log in</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
         </div>
-        <div class="badge-auth">
-            @if (Route::has('login'))
-                @auth
-                    <a href="{{ url('/home') }}" class="btn-outline">Dashboard</a>
-                @else
-                    <a href="{{ route('login') }}" style="color:var(--text-main); font-weight:600;">Log in</a>
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="btn-primary">Sign up</a>
-                    @endif
-                @endif
-            @endif
-        </div>
-    </nav>
+    </div>
+    <!--**********************************
+        Header end
+    ***********************************-->
 
     <!-- Hero Section -->
     <section class="hero">
@@ -489,30 +615,34 @@
         <div class="hero-gradient"></div>
         
         <div class="hero-content">
-            <h1 class="hero-title"> Experience<span>Rent Us</span> on the Road.</h1>
-            <p class="hero-subtitle">Elevate your journey with our exclusive collection of premium vehicles. Uncompromised comfort, breathtaking performance.</p>
+            <h1 class="hero-title" style="text-transform: none;"> 
+                <span class="text-rent">Rent</span> Today,
+                <span class="text-explore">Explore Tomorrow</span>
+            </h1>
+            <p class="hero-subtitle">Effortless Renting. Endless Possibilities</p>
             <div class="hero-actions">
-                <a href="#fleet" class="btn-primary">Reserve Now</a>
-                <a href="#how-it-works" class="btn-outline">Learn More</a>
+                <a href="#fleet" class="btn btn-primary">Reserve Now</a>
+                <a href="#how-it-works" class="btn btn-outline">Learn More</a>
             </div>
         </div>
+
     </section>
 
     <!-- Featured Fleet -->
     <section id="fleet" class="fleet">
         <div class="section-header">
-            <h2 class="section-title">The Premium Fleet</h2>
-            <p class="section-subtitle">Select from our meticulously maintained range of high-end vehicles tailored for any occasion.</p>
+            <h2 class="section-title">Our Premium Fleet</h2>
+            <p class="section-subtitle">Choose from our reliable and well-maintained vehicles, perfect for Philippine roads and any travel need.</p>
         </div>
 
         <div class="fleet-grid">
-            <!-- Car 1 -->
+            <!-- Car 1: Toyota Vios -->
             <div class="car-card">
                 <div class="car-image-container">
                     <div class="car-tag">Most Popular</div>
-                    <img src="https://images.unsplash.com/photo-1611859328053-12fede78bd2a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Porsche 911" class="car-image">
+                    <img src="https://imgcdn.zigwheels.ph/large/gallery/exterior/30/1943/toyota-vios-front-side-view-752875.jpg" alt="Toyota Vios" class="car-image">
                 </div>
-                <h3 class="car-name">Porsche 911 Carrera</h3>
+                <h3 class="car-name">Toyota Vios</h3>
                 <div class="car-specs">
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -520,7 +650,7 @@
                     </span>
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        2 Seats
+                        5 Seats
                     </span>
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
@@ -529,18 +659,19 @@
                 </div>
                 <div class="car-footer">
                     <div class="car-price">
-                        <span>$290</span><small>/day</small>
+                        <span>₱1,800</span><small>/day</small>
                     </div>
-                    <a href="#" class="btn-outline" style="padding: 0.5rem 1rem;">Book</a>
+                    <a href="#" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
                 </div>
             </div>
 
-            <!-- Car 2 -->
+            <!-- Car 2: Toyota Innova -->
             <div class="car-card">
                 <div class="car-image-container">
-                    <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0be2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Mercedes S-Class" class="car-image">
+                    <div class="car-tag">Family Choice</div>
+                    <img src="https://images.topgear.com.ph/topgear/images/2023/02/22/toyota-innova-facelift-2023-1677055189.jpg" alt="Toyota Innova" class="car-image">
                 </div>
-                <h3 class="car-name">Mercedes S-Class</h3>
+                <h3 class="car-name">Toyota Innova</h3>
                 <div class="car-specs">
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -548,28 +679,28 @@
                     </span>
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        5 Seats
+                        8 Seats
                     </span>
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                        Electric
+                        Diesel
                     </span>
                 </div>
                 <div class="car-footer">
                     <div class="car-price">
-                        <span>$350</span><small>/day</small>
+                        <span>₱3,500</span><small>/day</small>
                     </div>
-                    <a href="#" class="btn-outline" style="padding: 0.5rem 1rem;">Book</a>
+                    <a href="#" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
                 </div>
             </div>
 
-            <!-- Car 3 -->
+            <!-- Car 3: Mitsubishi Montero Sport -->
             <div class="car-card">
                 <div class="car-image-container">
-                    <div class="car-tag">New Arrival</div>
-                    <img src="https://images.unsplash.com/photo-1503376712396-6e8e815e1978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Range Rover" class="car-image">
+                    <div class="car-tag">Premium SUV</div>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Mitsubishi_Pajero_Sport_%283rd_generation%29_1X7A0409.jpg" alt="Mitsubishi Montero" class="car-image">
                 </div>
-                <h3 class="car-name">Range Rover Velar</h3>
+                <h3 class="car-name">Mitsubishi Montero Sport</h3>
                 <div class="car-specs">
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -577,18 +708,47 @@
                     </span>
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        5 Seats
+                        7 Seats
                     </span>
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                        Hybrid
+                        Diesel
                     </span>
                 </div>
                 <div class="car-footer">
                     <div class="car-price">
-                        <span>$210</span><small>/day</small>
+                        <span>₱4,500</span><small>/day</small>
                     </div>
-                    <a href="#" class="btn-outline" style="padding: 0.5rem 1rem;">Book</a>
+                    <a href="#" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
+                </div>
+            </div>
+
+            <!-- Car 4: Toyota Hiace GL Grandia -->
+            <div class="car-card">
+                <div class="car-image-container">
+                    <div class="car-tag">Group Travel</div>
+                    <img src="https://toyotasantarosa.com.ph/wp-content/uploads/2020/08/hiace18.jpg" alt="Toyota Hiace" class="car-image">
+                </div>
+                <h3 class="car-name">Toyota Hiace GL Grandia</h3>
+                <div class="car-specs">
+                    <span>
+                        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        Manual
+                    </span>
+                    <span>
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        12 Seats
+                    </span>
+                    <span>
+                        <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                        Diesel
+                    </span>
+                </div>
+                <div class="car-footer">
+                    <div class="car-price">
+                        <span>₱5,500</span><small>/day</small>
+                    </div>
+                    <a href="#" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
                 </div>
             </div>
         </div>
@@ -614,7 +774,7 @@
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
                 </div>
                 <h3 class="step-title">2. Select Your Car</h3>
-                <p class="step-desc">Browse our curated collection of luxury and sports vehicles to find your perfect match.</p>
+                <p class="step-desc">Browse our diverse collection of reliable vehicles to find the best match for your journey.</p>
             </div>
             <div class="step">
                 <div class="step-icon">
@@ -626,45 +786,61 @@
         </div>
     </section>
 
+
     <!-- Footer -->
     <footer>
         <div class="footer-grid">
             <div>
-                <div class="logo footer-logo">Rent<span>Us</span></div>
-                <p class="footer-desc">Redefining luxury car rentals with uncompromised quality, exceptional service, and a passion for driving excellence.</p>
+                <a href="{{ url('/') }}" class="brand-logo footer-logo" style="margin-bottom: 1rem; display: block;">
+                    <img src="{{ asset('images/rentus.png') }}" alt="RentUs Logo" style="height: 45px; width: auto; object-fit: contain;">
+                </a>
+                <p class="footer-desc">Cars & Property Rental services. SEC registered to operate Cars, property & other rental services in the Philippines. Started operating as DTI 2019 in Batangas. A community (RENT-US) of rentals! Serving you anywhere you go!</p>
             </div>
             <div>
-                <h4 class="footer-heading">Company</h4>
-                <ul class="footer-links">
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">Contact</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-heading">Support</h4>
-                <ul class="footer-links">
-                    <li><a href="#">Help Center</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">FAQ</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-heading">Locations</h4>
-                <ul class="footer-links">
-                    <li><a href="#">Manila</a></li>
-                    <li><a href="#">Lipa</a></li>
-                    <li><a href="#">Quezon</a></li>
-                    <li><a href="#">Cavite</a></li>
+                <h4 class="footer-heading">Reach Us</h4>
+                <ul class="footer-links" style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent); position: relative; top: 3px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        <span>+63 915 047 5208<br>+63 915 0475 207<br>(043) 784-014</span>
+                    </li>
+                    <li style="margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent); position: relative; top: 3px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <span>rentusph@gmail.com</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent); position: relative; top: 3px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>0220, Batangas City, Philippines, 4200</span>
+                    </li>
                 </ul>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} RentUS Premium Rentals. All rights reserved.</p>
+        <div id="footer" class="footer-bottom">
+            <p>&copy; {{ date('Y') }} RentUS. All rights reserved.</p>
         </div>
     </footer>
 
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <!-- Required vendors -->
+    <script src="{{ asset('vendor/global/global.min.js') }}"></script>
+	<script src="{{ asset('vendor/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
+
+	<!-- counter -->
+	<script src="{{ asset('vendor/counter/counter.min.js') }}"></script>
+	<script src="{{ asset('vendor/counter/waypoint.min.js') }}"></script>
+	
+	<!-- Apex Chart -->
+	<script src="{{ asset('vendor/apexchart/apexchart.js') }}"></script>
+	<script src="{{ asset('vendor/chart-js/chart.bundle.min.js') }}"></script>
+	<!-- Chart piety plugin files -->
+    <script src="{{ asset('vendor/peity/jquery.peity.min.js') }}"></script>
+	
+	<script src="{{ asset('vendor/owl-carousel/owl.carousel.js') }}"></script>
+	
+    <script src="{{ asset('js/custom.min.js') }}"></script>
+	<script src="{{ asset('js/dlabnav-init.js') }}"></script>
+	<script src="{{ asset('js/demo.js') }}"></script>
+    <script src="{{ asset('js/styleSwitcher.js') }}"></script>
 </body>
 </html>
