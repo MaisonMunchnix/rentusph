@@ -76,10 +76,66 @@
             height: 50px !important;
             width: auto !important;
         }
+
+        /* Card Customization (iOS Style) */
+        [data-theme-version="dark"] .card,
+        [data-theme-version="dark"] .card-body,
+        .card,
+        .card-body {
+            background-color: #ffffff !important;
+            color: #312a2a !important;
+            border-radius: 1.25rem !important;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
+            border: 1px solid rgba(0, 0, 0, 0.05) !important;
+            transition: none !important;
+            transform: none !important;
+        }
+
+        /* Ensure content area is light */
+        [data-theme-version="dark"] .content-body,
+        .content-body {
+            background-color: #f8f9fa !important;
+        }
+
+        [data-theme-version="dark"] .card-title,
+        [data-theme-version="dark"] .card-header,
+        .card-title,
+        .card-header {
+            background-color: #ffffff !important;
+            color: #312a2a !important;
+            border-bottom: none !important;
+            border-radius: 1.25rem 1.25rem 0 0 !important;
+        }
+
+        .card:hover {
+            transform: none !important;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Footer & Layout Clean-up */
+        #main-wrapper {
+            background-color: #f8f9fa !important;
+        }
+
+        .footer {
+            background-color: #ffffff !important;
+            border-top: none !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        .footer .copyright {
+            background-color: #ffffff !important;
+        }
     </style>
     {{ $styles ?? '' }}
 </head>
-<body>
+<body data-theme-version="light">
+    <script>
+        // Force light mode by clearing cookies and preventing JS overrides
+        document.cookie = "version=light; path=/";
+        localStorage.removeItem('version');
+    </script>
     <div id="preloader">
         <div class="lds-ripple">
             <div></div>
@@ -102,7 +158,7 @@
         <!-- Footer start -->
         <div class="footer">
             <div class="copyright">
-                <p>Copyright © Designed &amp; Developed by RentUs 2026</p>
+                <p>Copyright © Designed &amp; Developed by Intracode 2026</p>
             </div>
         </div>
         <!-- Footer end -->

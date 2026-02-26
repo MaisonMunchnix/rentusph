@@ -19,12 +19,7 @@
                 <div class="header-left">
                 </div>
                 <ul class="navbar-nav header-right d-flex align-items-center">
-                    <li class="nav-item dropdown notification_dropdown">
-                        <a class="nav-link bell dz-theme-mode" href="javascript:void(0);" style="color: rgba(255, 255, 255, 0.9) !important;">
-                            <i id="icon-light" class="fas fa-sun"></i>
-                            <i id="icon-dark" class="fas fa-moon"></i>
-                        </a>
-                    </li>
+
                     <li class="nav-item dropdown header-profile">
                         <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown">
                             <img src="{{ asset('images/user.jpg') }}" width="56" alt="">

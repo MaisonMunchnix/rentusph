@@ -5,11 +5,11 @@
                 <div class="col-xl-6">
                     <div class="row">
                         <div class="col-xl-12">
-                            <div class="card tryal-gradient" style="background: linear-gradient(212.43deg, #eab308 19.43%, #fbbf24 87.63%);">
+                            <div class="card">
                                 <div class="card-body tryal row">
                                     <div class="col-xl-7 col-sm-7">
-                                        <h2 class="mb-0 text-white">Welcome back, Admin!</h2>
-                                        <span class="text-white opacity-75">Your rental fleet and properties are performing well today. Check the latest statistics below.</span>
+                                        <h2 class="mb-0 text-dark">Welcome back, Admin!</h2>
+                                        <span class="text-muted">Your rental fleet and properties are performing well today. Check the latest statistics below.</span>
                                     </div>
                                     <div class="col-xl-5 col-sm-5">
                                         <img src="{{ asset('images/chart.png') }}" alt="" class="sd-shape">
