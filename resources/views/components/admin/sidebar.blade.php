@@ -14,14 +14,14 @@
                     <span class="nav-text">Bookings</span>
                 </a>
             </li>
-            <li>
-                <a href="#" aria-expanded="false">
+            <li class="{{ request()->is('cars*') ? 'active' : '' }}">
+                <a href="{{ route('cars.index') }}" aria-expanded="false">
                     <i class="fas fa-car"></i>
                     <span class="nav-text">Cars</span>
                 </a>
             </li>
-            <li>
-                <a href="#" aria-expanded="false">
+            <li class="{{ request()->is('properties*') ? 'active' : '' }}">
+                <a href="{{ route('properties.index') }}" aria-expanded="false">
                     <i class="fas fa-building"></i>
                     <span class="nav-text">Properties</span>
                 </a>
