@@ -16,10 +16,12 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:affiliated,customer',
+            'role' => 'required|in:affiliate,customer',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
         ]);
+
+        $status = $request->role === 'affiliate' ? 'pending' : 'approved';
 
         $user = User::create([
             'name' => $request->name,
@@ -28,9 +30,14 @@ class AuthController extends Controller
             'role' => $request->role,
             'phone' => $request->phone,
             'address' => $request->address,
+            'status' => $status,
         ]);
 
         Auth::login($user);
+
+        if ($user->status === 'pending') {
+            return redirect('/pending-review');
+        }
 
         return redirect()->intended('/dashboard');
     }
@@ -60,6 +67,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Logged out successfully']);
+        return redirect('/');
     }
 }

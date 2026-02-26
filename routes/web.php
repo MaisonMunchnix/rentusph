@@ -26,9 +26,14 @@ Route::get('/forgot-password', function () { return view('auth.forgot-password')
 // Admin Dashboard
 Route::get('/dashboard', function () {
     return view('admin.index');
-})->name('admin');
+})->name('admin')->middleware(['auth', 'admin', 'affiliate.status']);
+
+// Pending Affiliate View
+Route::get('/pending-review', function () {
+    return view('pending-affiliate.index');
+})->middleware('auth')->name('pending-review');
 
 // Authentication API / Endpoints
 Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
-Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->middleware('auth');
+Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout']);

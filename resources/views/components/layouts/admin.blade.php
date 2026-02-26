@@ -127,6 +127,44 @@
         .footer .copyright {
             background-color: #ffffff !important;
         }
+
+        /* Sidebar Logout Positioning */
+        .dlabnav-scroll {
+            height: calc(100vh - 80px) !important; /* Adjust based on header height */
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        .sidebar-footer {
+            margin-top: auto !important;
+            padding: 1.5rem !important;
+        }
+
+        .logout-btn {
+            border-radius: 0.75rem !important;
+            font-weight: 500 !important;
+            padding: 0.75rem !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .logout-btn:hover {
+            background-color: #ff5e5e !important;
+            color: white !important;
+            border-color: #ff5e5e !important;
+        }
+
+        /* Hide text when sidebar is collapsed */
+        [data-sidebar-style="compact"] .logout-btn span,
+        [data-sidebar-style="mini"] .logout-btn span {
+            display: none !important;
+        }
+
+        [data-sidebar-style="compact"] .logout-btn,
+        [data-sidebar-style="mini"] .logout-btn {
+            padding: 0.75rem 0 !important;
+            width: 45px !important;
+            margin: 0 auto !important;
+        }
     </style>
     {{ $styles ?? '' }}
 </head>

@@ -19,13 +19,13 @@
                     <div class="card mb-0 h-auto">
                         <div class="card-body">
                             <div class="text-center mb-3">
-                                <a href="{{ url('/') }}"><img class="logo-auth" src="{{ asset('images/rentus-logo.png') }}" alt="RentUs Logo" style="max-width: 200px;"></a>
+                                <a href="{{ url('/') }}"><img class="logo-auth" src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs Logo" style="max-width: 200px;"></a>
                             </div>
                             <h4 class="text-center mb-4">Affiliate sign up</h4>
                             <p class="text-center text-muted mb-4">Register your account to manage your cars and property.</p>
                             <form action="{{ url('register') }}" method="POST">
                                 @csrf
-                                <input type="hidden" name="role" value="affiliated">
+                                <input type="hidden" name="role" value="affiliate">
                                 <div class="form-group mb-4">
                                     <label class="form-label" for="name">Full Name / Company Name</label>
                                     <input type="text" name="name" class="form-control" placeholder="Enter full name" id="name" required>

@@ -1,6 +1,6 @@
 <!-- Sidebar start -->
 <div class="dlabnav">
-    <div class="dlabnav-scroll">
+    <div class="dlabnav-scroll d-flex flex-column justify-content-between">
         <ul class="metismenu" id="menu">
             <li class="active">
                 <a href="{{ route('admin') }}" aria-expanded="false">
@@ -46,6 +46,15 @@
             </li>
         </ul>
         
+        <div class="sidebar-footer px-4 py-3 mt-auto">
+            <form method="POST" action="{{ url('logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-outline-danger btn-block d-flex align-items-center justify-content-center w-100 logout-btn">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    <span class="nav-text">Logout</span>
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 <!-- Sidebar end -->
