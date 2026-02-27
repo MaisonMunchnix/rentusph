@@ -1,3 +1,15 @@
+@php
+    $name = Auth::user()->name;
+    $words = explode(' ', $name);
+    $initials = '';
+    if (count($words) > 0) {
+        $initials .= strtoupper(substr($words[0], 0, 1));
+        if (count($words) > 1) {
+            $initials .= strtoupper(substr(end($words), 0, 1));
+        }
+    }
+@endphp
+
 <!-- Nav header start -->
 <div class="nav-header" style="background-color: #0a0a0a !important; border: none !important; box-shadow: none !important;">
     <a href="{{ url('/') }}" class="brand-logo" style="justify-content: flex-start; padding-left: 1.5rem;">
@@ -22,7 +34,9 @@
 
                     <li class="nav-item dropdown header-profile">
                         <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown">
-                            <img src="{{ asset('images/user.jpg') }}" width="56" alt="">
+                            <div class="d-flex align-items-center justify-content-center bg-white text-black rounded-circle font-w600" style="width: 45px; height: 45px; font-size: 16px; border: 1px solid rgba(0,0,0,0.1);">
+                                {{ $initials }}
+                            </div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a href="#" class="dropdown-item ai-icon">
