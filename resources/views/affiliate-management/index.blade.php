@@ -4,11 +4,8 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                    <div class="card-header border-0 pb-0">
                         <h4 class="card-title">Partners</h4>
-                        <button type="button" class="btn btn-primary shadow btn-xs" data-bs-toggle="modal" data-bs-target="#addAffiliateModal">
-                            <i class="fas fa-plus me-1"></i> Add Partner
-                        </button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -153,46 +150,4 @@
         </div>
     </div>
 
-    <!-- Add Affiliate Modal -->
-    <div class="modal fade" id="addAffiliateModal">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Partner</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form action="{{ route('affiliates.store') }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="mb-3 col-md-12">
-                                <label class="form-label">Full Name</label>
-                                <input type="text" name="name" class="form-control" placeholder="Enter name" required>
-                            </div>
-                            <div class="mb-3 col-md-12">
-                                <label class="form-label">Email Address</label>
-                                <input type="email" name="email" class="form-control" placeholder="Enter email" required>
-                            </div>
-                            <div class="mb-3 col-md-12">
-                                <label class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control" placeholder="Enter password" required>
-                            </div>
-                            <div class="mb-3 col-md-12">
-                                <label class="form-label">Phone Number</label>
-                                <input type="text" name="phone" class="form-control" placeholder="Enter phone number">
-                            </div>
-                            <div class="mb-3 col-md-12">
-                                <label class="form-label">Address</label>
-                                <textarea name="address" class="form-control" rows="3" placeholder="Enter address"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save Partner</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </x-layouts.admin>

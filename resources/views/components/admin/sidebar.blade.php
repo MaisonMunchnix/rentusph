@@ -2,26 +2,26 @@
 <div class="dlabnav">
     <div class="dlabnav-scroll d-flex flex-column justify-content-between">
         <ul class="metismenu" id="menu">
-            <li class="active">
-                <a href="{{ route('admin') }}" aria-expanded="false">
+            <li class="{{ request()->is('dashboard*') || request()->is('admin-dashboard*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('dashboard*') || request()->is('admin-dashboard*') ? 'mm-active active' : '' }}" href="{{ route('dashboard') }}" aria-expanded="false">
                     <i class="fas fa-home"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
-            <li>
-                <a href="#" aria-expanded="false">
+            <li class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}" href="{{ route('bookings.index') }}" aria-expanded="false">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Bookings</span>
                 </a>
             </li>
-            <li class="{{ request()->is('cars*') ? 'active' : '' }}">
-                <a href="{{ route('cars.index') }}" aria-expanded="false">
+            <li class="{{ request()->is('cars*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('cars*') ? 'mm-active active' : '' }}" href="{{ route('cars.index') }}" aria-expanded="false">
                     <i class="fas fa-car"></i>
                     <span class="nav-text">Cars</span>
                 </a>
             </li>
-            <li class="{{ request()->is('properties*') ? 'active' : '' }}">
-                <a href="{{ route('properties.index') }}" aria-expanded="false">
+            <li class="{{ request()->is('properties*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('properties*') ? 'mm-active active' : '' }}" href="{{ route('properties.index') }}" aria-expanded="false">
                     <i class="fas fa-building"></i>
                     <span class="nav-text">Properties</span>
                 </a>
@@ -32,8 +32,8 @@
                     <span class="nav-text">Payments</span>
                 </a>
             </li>
-            <li class="{{ request()->is('affiliate-management*') ? 'active' : '' }}">
-                <a href="{{ route('affiliates.index') }}" aria-expanded="false">
+            <li class="{{ request()->is('affiliate-management*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('affiliate-management*') ? 'mm-active active' : '' }}" href="{{ route('affiliates.index') }}" aria-expanded="false">
                     <i class="fas fa-users"></i>
                     <span class="nav-text">Partners</span>
                 </a>

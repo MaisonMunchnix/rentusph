@@ -45,7 +45,7 @@
             margin-bottom: 1rem;
         }
         p {
-            color: #6c757d;
+            color: #475569;
             line-height: 1.6;
             margin-bottom: 2.5rem;
         }

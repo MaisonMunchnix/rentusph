@@ -8,26 +8,14 @@
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
-            <li class="{{ request()->is('affiliate/cars*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('affiliate/cars*') ? 'mm-active active' : '' }}" href="#" aria-expanded="false">
-                    <i class="fas fa-car"></i>
-                    <span class="nav-text">My Cars</span>
-                </a>
-            </li>
-            <li class="{{ request()->is('affiliate/bookings*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('affiliate/bookings*') ? 'mm-active active' : '' }}" href="#" aria-expanded="false">
+            <li class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}" href="{{ route('bookings.index') }}" aria-expanded="false">
                     <i class="fas fa-calendar-check"></i>
-                    <span class="nav-text">Bookings</span>
+                    <span class="nav-text">My Bookings</span>
                 </a>
             </li>
-            <li class="{{ request()->is('affiliate/earnings*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('affiliate/earnings*') ? 'mm-active active' : '' }}" href="#" aria-expanded="false">
-                    <i class="fas fa-dollar-sign"></i>
-                    <span class="nav-text">Earnings</span>
-                </a>
-            </li>
-            <li class="{{ request()->is('affiliate/profile*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('affiliate/profile*') ? 'mm-active active' : '' }}" href="#" aria-expanded="false">
+            <li class="{{ request()->is('customer/profile*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('customer/profile*') ? 'mm-active active' : '' }}" href="#" aria-expanded="false">
                     <i class="fas fa-user"></i>
                     <span class="nav-text">Profile</span>
                 </a>

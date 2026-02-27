@@ -131,7 +131,7 @@
 
         .hero-subtitle {
             font-size: 1.125rem;
-            color: #64748b;
+            color: #475569;
             margin-bottom: 2.5rem;
             line-height: 1.6;
             max-width: 500px;
@@ -161,6 +161,7 @@
 
         .section-subtitle {
             font-size: 1.1rem;
+            color: #475569;
             max-width: 600px;
             margin: 0 auto;
         }
@@ -256,6 +257,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            color: #475569;
         }
 
         .car-specs svg {
@@ -329,6 +331,7 @@
         .step-desc {
             font-size: 0.95rem;
             line-height: 1.6;
+            color: #475569;
         }
 
         /* --- Footer --- */
@@ -366,6 +369,7 @@
             line-height: 1.6;
             margin-bottom: 1.5rem;
             max-width: 500px;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .footer-heading {
@@ -437,7 +441,7 @@
         /* --- Premium Refinements --- */
         body {
             background-color: #fdfdfd; 
-            color: #1a1a1a;
+            color: #0f172a;
             letter-spacing: -0.01em;
         }
 
@@ -501,9 +505,23 @@
 
         .btn-outline:hover {
             border-color: var(--accent) !important;
-            color: var(--accent) !important;
-            background: rgba(234, 179, 8, 0.05) !important;
+            color: #000 !important;
+            background: var(--accent) !important;
             transform: translateY(-2px);
+        }
+
+        /* Specific fix for outline buttons on light background */
+        .fleet .btn-outline,
+        .how-it-works .btn-outline {
+            border: 1.5px solid #0f172a !important;
+            color: #0f172a !important;
+        }
+
+        .fleet .btn-outline:hover,
+        .how-it-works .btn-outline:hover {
+            border-color: var(--accent) !important;
+            color: #000 !important;
+            background: var(--accent) !important;
         }
 
         /* Hover Navigation */
@@ -542,7 +560,7 @@
         }
 
         .footer-links a {
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.7);
             transition: all 0.3s ease;
             font-weight: 400;
         }
@@ -558,7 +576,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             text-align: center;
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.5);
         }
 
 

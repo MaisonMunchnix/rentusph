@@ -27,8 +27,14 @@ Route::get('/forgot-password', function () { return view('auth.forgot-password')
 Route::get('/dashboard', function () {
     if (Auth::user()->role === 'admin') {
         return view('admin.index');
+    } elseif (Auth::user()->role === 'customer') {
+        return view('customer.index');
+    } elseif (Auth::user()->role === 'affiliate') {
+        return view('affiliate.index');
     }
-    return view('affiliate.index');
+    
+    // Fallback for unrecognized roles
+    return redirect()->route('login');
 })->name('dashboard')->middleware(['auth', 'affiliate.status']);
 
 // Admin Dashboard Redirect (legacy name support)
@@ -55,6 +61,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/properties/{property}', [\App\Http\Controllers\PropertyController::class, 'update'])->name('properties.update');
     Route::delete('/properties/{property}', [\App\Http\Controllers\PropertyController::class, 'destroy'])->name('properties.destroy');
     Route::patch('/properties/{property}/toggle-status', [\App\Http\Controllers\PropertyController::class, 'toggleStatus'])->name('properties.toggle-status');
+
+    // Booking Management
+    Route::get('/bookings', function () {
+        return view('booking.index');
+    })->name('bookings.index');
 
     // Affiliate Management
     Route::get('/affiliate-management', [\App\Http\Controllers\AffiliateManagementController::class, 'index'])->name('affiliates.index');

@@ -113,9 +113,9 @@
 
 :root {
   --card: #fff;
-  --text-dark: #312a2a;
-  --text-gray: #737B8B;
-  --text: #888888;
+  --text-dark: #0f172a;
+  --text-gray: #5a6270;
+  --text: #666666;
   --body-bg: #FBFCF8;
   --border: #e6e6e6;
 }
@@ -356,13 +356,13 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   --bs-body-font-size: 0.875rem;
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.5;
-  --bs-body-color: #9da1a5;
+  --bs-body-color: #495057;
   --bs-body-color-rgb: 157, 161, 165;
   --bs-body-bg: #fff;
   --bs-body-bg-rgb: 255, 255, 255;
   --bs-emphasis-color: #000;
   --bs-emphasis-color-rgb: 0, 0, 0;
-  --bs-secondary-color: rgba(157, 161, 165, 0.75);
+  --bs-secondary-color: #71717a;
   --bs-secondary-color-rgb: 157, 161, 165;
   --bs-secondary-bg: #e9ecef;
   --bs-secondary-bg-rgb: 233, 236, 239;
@@ -40740,17 +40740,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /*# sourceMappingURL=style.css.map */
 
 /* Custom Auth Layout */
+.fix-wrapper .card {
+  background-color: #060606 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2) !important;
+  overflow: hidden;
+}
+
 .fix-wrapper .card .card-body {
-  background-color: #000;
-  color: #ffffff;
+  background-color: transparent !important;
+  color: #ffffff !important;
 }
 
 .fix-wrapper .card .card-body h4,
 .fix-wrapper .card .card-body p,
 .fix-wrapper .card .card-body label,
-.fix-wrapper .card .card-body .text-muted,
 .fix-wrapper .card .card-body .new-account p {
   color: #ffffff !important;
+}
+
+.fix-wrapper .card .card-body .text-muted {
+  color: #94a3b8 !important;
 }
 
 .fix-wrapper .card .card-body .btn-primary {
@@ -40773,4 +40784,24 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .fix-wrapper .card .card-body a.text-primary,
 .fix-wrapper .card .card-body p a.text-primary {
   color: #dfa100 !important;
+}
+
+.fix-wrapper .card .card-body .form-control {
+  background-color: #111111;
+  border: 1px solid #333333;
+  color: #ffffff;
+}
+
+.fix-wrapper .card .card-body .form-control::placeholder {
+  color: #888888;
+}
+
+.fix-wrapper .card .card-body .form-control:focus {
+  background-color: #060606;
+  border-color: #dfa100;
+  box-shadow: 0 0 0 0.15rem rgba(223, 161, 0, 0.2);
+}
+
+.fix-wrapper .card .card-body .show-pass .fa {
+  color: #888888;
 }

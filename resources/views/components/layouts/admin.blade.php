@@ -83,7 +83,7 @@
         .card,
         .card-body {
             background-color: #ffffff !important;
-            color: #312a2a !important;
+            color: #0f172a !important;
             border-radius: 1.25rem !important;
             box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
             border: 1px solid rgba(0, 0, 0, 0.05) !important;
@@ -102,7 +102,7 @@
         .card-title,
         .card-header {
             background-color: #ffffff !important;
-            color: #312a2a !important;
+            color: #0f172a !important;
             border-bottom: none !important;
             border-radius: 1.25rem 1.25rem 0 0 !important;
         }
@@ -164,6 +164,22 @@
             padding: 0.75rem 0 !important;
             width: 45px !important;
             margin: 0 auto !important;
+        }
+
+        /* Sidebar Active State Fix */
+        .dlabnav .metismenu > li.mm-active > a {
+            background-color: var(--primary) !important;
+            color: #ffffff !important;
+            border-radius: 0.75rem;
+            margin: 0 10px;
+        }
+        
+        .dlabnav .metismenu > li.mm-active > a i {
+            color: #ffffff !important;
+        }
+
+        .dlabnav .metismenu > li > a {
+            transition: all 0.2s ease;
         }
     </style>
     {{ $styles ?? '' }}

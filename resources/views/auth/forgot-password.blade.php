@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <title>Forgot Password</title>
     <meta charset="utf-8">
@@ -10,6 +10,75 @@
     <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('images/rentus.svg') }}">
     <link href="{{ asset('vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --card: #000000 !important;
+            --text-dark: #ffffff !important;
+            --text-gray: #cbd5e1 !important;
+            --text: #ffffff !important;
+            --bs-body-color: #ffffff !important;
+            --primary: #eab308 !important;
+        }
+        .fix-wrapper .card {
+            background-color: #000000 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+        }
+        .fix-wrapper .card-body {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+        .fix-wrapper .card-body .form-label,
+        .fix-wrapper .card-body label,
+        .fix-wrapper .card-body .form-group label,
+        .fix-wrapper .card-body .form-check-label,
+        .fix-wrapper .card-body * label {
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            opacity: 1 !important;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.03em;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        .fix-wrapper h4, 
+        .fix-wrapper p, 
+        .fix-wrapper span:not(.badge) {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+        .fix-wrapper .form-control {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+            color: #ffffff !important;
+            height: 45px;
+        }
+        .fix-wrapper .form-control:focus {
+            border-color: #eab308 !important;
+            background-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        .fix-wrapper .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+        .card a {
+            color: #eab308 !important;
+        }
+        .text-muted {
+            color: #cbd5e1 !important;
+        }
+        .btn-primary {
+            background-color: #eab308 !important;
+            border-color: #eab308 !important;
+            color: #000000 !important;
+            font-weight: 700 !important;
+        }
+        .btn-primary:hover {
+            background-color: #facc15 !important;
+            border-color: #facc15 !important;
+            color: #000000 !important;
+        }
+    </style>
 </head>
 <body>
     <div class="fix-wrapper">
