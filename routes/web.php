@@ -28,7 +28,9 @@ Route::get('/dashboard', function () {
     if (Auth::user()->role === 'admin') {
         return view('admin.index');
     } elseif (Auth::user()->role === 'customer') {
-        return view('customer.index');
+        $cars = \App\Models\Car::where('is_available', true)->latest()->take(6)->get();
+        $properties = \App\Models\Property::where('is_available', true)->latest()->take(6)->get();
+        return view('customer.index', compact('cars', 'properties'));
     } elseif (Auth::user()->role === 'affiliate') {
         return view('affiliate.index');
     }

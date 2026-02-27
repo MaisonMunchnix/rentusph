@@ -5,7 +5,7 @@
             <li class="{{ request()->is('dashboard*') ? 'mm-active active' : '' }}">
                 <a class="{{ request()->is('dashboard*') ? 'mm-active active' : '' }}" href="{{ route('dashboard') }}" aria-expanded="false">
                     <i class="fas fa-home"></i>
-                    <span class="nav-text">Dashboard</span>
+                    <span class="nav-text">Home</span>
                 </a>
             </li>
             <li class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}">
