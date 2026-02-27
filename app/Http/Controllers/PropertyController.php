@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PropertyController extends Controller
 {
@@ -28,9 +29,19 @@ class PropertyController extends Controller
             'address' => 'required|string',
             'city' => 'required|string|max:255',
             'monthly_rate' => 'required|numeric',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        Property::create(array_merge($request->all(), ['user_id' => Auth::id()]));
+        $data = $request->except('image');
+        $data['user_id'] = Auth::id();
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images/properties'), $imageName);
+            $data['image'] = 'images/properties/' . $imageName;
+        }
+
+        Property::create($data);
 
         return redirect()->back()->with('success', 'Property added successfully.');
     }
@@ -47,9 +58,23 @@ class PropertyController extends Controller
             'address' => 'required|string',
             'city' => 'required|string|max:255',
             'monthly_rate' => 'required|numeric',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $property->update($request->all());
+        $data = $request->except('image');
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($property->image && file_exists(public_path($property->image))) {
+                unlink(public_path($property->image));
+            }
+            
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images/properties'), $imageName);
+            $data['image'] = 'images/properties/' . $imageName;
+        }
+
+        $property->update($data);
 
         return redirect()->back()->with('success', 'Property updated successfully.');
     }

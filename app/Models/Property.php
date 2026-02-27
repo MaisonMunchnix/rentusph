@@ -23,6 +23,7 @@ class Property extends Model
         'monthly_rate',
         'description',
         'is_available',
+        'image',
     ];
 
     public function user()

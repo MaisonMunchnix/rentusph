@@ -22,6 +22,7 @@ class Car extends Model
         'daily_rate',
         'description',
         'is_available',
+        'image',
     ];
 
     public function user()

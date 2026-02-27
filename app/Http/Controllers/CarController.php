@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Car;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class CarController extends Controller
 {
@@ -34,9 +35,19 @@ class CarController extends Controller
             'fuel_type' => 'nullable|string',
             'daily_rate' => 'required|numeric',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        Car::create(array_merge($request->all(), ['user_id' => Auth::id()]));
+        $data = $request->except('image');
+        $data['user_id'] = Auth::id();
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images/cars'), $imageName);
+            $data['image'] = 'images/cars/' . $imageName;
+        }
+
+        Car::create($data);
 
         return redirect()->back()->with('success', 'Car added successfully.');
     }
@@ -58,9 +69,23 @@ class CarController extends Controller
             'fuel_type' => 'nullable|string',
             'daily_rate' => 'required|numeric',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $car->update($request->all());
+        $data = $request->except('image');
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($car->image && file_exists(public_path($car->image))) {
+                unlink(public_path($car->image));
+            }
+            
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images/cars'), $imageName);
+            $data['image'] = 'images/cars/' . $imageName;
+        }
+
+        $car->update($data);
 
         return redirect()->back()->with('success', 'Car updated successfully.');
     }

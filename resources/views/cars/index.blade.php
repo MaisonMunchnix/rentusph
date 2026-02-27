@@ -26,7 +26,7 @@
                                     @if(auth()->user() && auth()->user()->role == 'admin')
                                     <th><strong>OWNER</strong></th>
                                     @endif
-                                    <th><strong>ACTION</strong></th>
+                                    <th class="text-end"><strong>ACTION</strong></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -34,6 +34,13 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
+                                            @if($car->image)
+                                                <img src="{{ asset($car->image) }}" class="rounded-lg me-2" width="50" height="50" alt="" style="object-fit: cover;">
+                                            @else
+                                                <div class="bg-light rounded-lg me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <i class="fas fa-car text-muted"></i>
+                                                </div>
+                                            @endif
                                             <span class="w-space-no">{{ $car->brand }} {{ $car->model }}</span>
                                         </div>
                                     </td>
@@ -52,7 +59,7 @@
                                     <td>{{ $car->user->name ?? 'N/A' }}</td>
                                     @endif
                                     <td>
-                                        <div class="d-flex">
+                                        <div class="d-flex justify-content-end">
                                             <a href="#" class="btn btn-primary shadow btn-xs sharp me-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editCarModal" onclick="populateEditModal({{ json_encode($car) }})"><i class="fas fa-pencil-alt"></i></a>
                                             <a href="#" class="btn btn-warning shadow btn-xs sharp me-1" title="Toggle Status" onclick="event.preventDefault(); document.getElementById('toggle-status-{{ $car->id }}').submit();"><i class="fas fa-power-off"></i></a>
                                             <a href="#" class="btn btn-danger shadow btn-xs sharp" title="Delete" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this car?')) document.getElementById('delete-car-{{ $car->id }}').submit();"><i class="fa fa-trash"></i></a>
@@ -92,8 +99,18 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('cars.store') }}" method="POST">
+                    <form action="{{ route('cars.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <div class="form-group mb-3 text-center">
+                            <label class="text-black font-w500 d-block">Car Image</label>
+                            <div class="image-placeholder mb-2">
+                                <img id="add_image_preview" src="#" alt="Preview" style="display: none; max-width: 100%; height: 150px; object-fit: cover; border-radius: 10px;">
+                                <div id="add_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 150px;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            </div>
+                            <input type="file" name="image" class="form-control" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')">
+                        </div>
                         <div class="form-group mb-3">
                             <label class="text-black font-w500">Brand</label>
                             <input type="text" name="brand" class="form-control" required>
@@ -164,9 +181,19 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="editCarForm" method="POST">
+                    <form id="editCarForm" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+                        <div class="form-group mb-3 text-center">
+                            <label class="text-black font-w500 d-block">Car Image</label>
+                            <div class="image-placeholder mb-2">
+                                <img id="edit_image_preview" src="#" alt="Preview" style="max-width: 100%; height: 150px; object-fit: cover; border-radius: 10px;">
+                                <div id="edit_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center" style="display: none; height: 150px;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            </div>
+                            <input type="file" name="image" class="form-control" onchange="previewImage(this, 'edit_image_preview', 'edit_image_icon')">
+                        </div>
                         <div class="form-group mb-3">
                             <label class="text-black font-w500">Brand</label>
                             <input type="text" id="edit_brand" name="brand" class="form-control" required>
@@ -243,6 +270,33 @@
         // Dynamically update the form action URL
         const form = document.getElementById('editCarForm');
         form.action = `/cars/${car.id}`;
+
+        // Update image preview
+        const preview = document.getElementById('edit_image_preview');
+        const icon = document.getElementById('edit_image_icon');
+        if (car.image) {
+            preview.src = `/${car.image}`;
+            preview.style.display = 'block';
+            icon.style.display = 'none';
+        } else {
+            preview.style.display = 'none';
+            icon.style.display = 'flex';
+        }
+    }
+
+    function previewImage(input, previewId, iconId) {
+        const preview = document.getElementById(previewId);
+        const icon = document.getElementById(iconId);
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                icon.style.display = 'none';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
     }
     </script>
 </x-dynamic-component>
