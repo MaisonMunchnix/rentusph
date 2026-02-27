@@ -14,8 +14,14 @@
                     <span class="nav-text">My Cars</span>
                 </a>
             </li>
-            <li class="{{ request()->is('affiliate/bookings*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('affiliate/bookings*') ? 'mm-active active' : '' }}" href="#" aria-expanded="false">
+            <li class="{{ request()->is('properties*') ? 'active' : '' }}">
+                <a href="{{ route('properties.index') }}" aria-expanded="false">
+                    <i class="fas fa-building"></i>
+                    <span class="nav-text">My Properties</span>
+                </a>
+            </li>
+            <li class="{{ request()->is('affiliate/bookings*') ? 'active' : '' }}">
+                <a href="#" aria-expanded="false">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Bookings</span>
                 </a>
