@@ -36,6 +36,9 @@
                 <a class="{{ request()->is('affiliate-management*') ? 'mm-active active' : '' }}" href="{{ route('affiliates.index') }}" aria-expanded="false">
                     <i class="fas fa-users"></i>
                     <span class="nav-text">Partners</span>
+                    @if($pendingAffiliatesCount > 0)
+                        <span class="badge badge-warning badge-circle" style="font-size: 0.7rem; padding: 3px 7px; margin-left: 8px; border-radius: 10px; background-color: #dc3545; color: #fff;">{{ $pendingAffiliatesCount }}</span>
+                    @endif
                 </a>
             </li>
             <li>
