@@ -67,6 +67,12 @@ Route::middleware(['auth'])->group(function () {
         return view('booking.index');
     })->name('bookings.index');
 
+    // Affiliate My Cars
+    Route::get('/affiliate/cars', function () {
+        $cars = \App\Models\Car::where('user_id', Auth::id())->get();
+        return view('affiliate.mycars', compact('cars'));
+    })->name('affiliate.cars');
+
     // Affiliate Management
     Route::get('/affiliate-management', [\App\Http\Controllers\AffiliateManagementController::class, 'index'])->name('affiliates.index');
     Route::post('/affiliates', [\App\Http\Controllers\AffiliateManagementController::class, 'store'])->name('affiliates.store');
