@@ -8,8 +8,8 @@
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
-            <li class="{{ request()->is('affiliate/cars*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('affiliate/cars*') ? 'mm-active active' : '' }}" href="{{ route('affiliate.cars') }}" aria-expanded="false">
+            <li class="{{ request()->is('cars*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('cars*') ? 'mm-active active' : '' }}" href="{{ route('cars.index') }}" aria-expanded="false">
                     <i class="fas fa-car"></i>
                     <span class="nav-text">My Cars</span>
                 </a>

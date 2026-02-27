@@ -7,7 +7,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header border-0 pb-0 flex-wrap">
-                    <h4 class="card-title">Car Management</h4>
+                    <h4 class="card-title">{{ auth()->user()->role === 'admin' ? 'Car Management' : 'My Cars' }}</h4>
                     <button class="btn btn-primary btn-sm mt-3 mt-sm-0" data-bs-toggle="modal" data-bs-target="#addCarModal">
                         <i class="fas fa-plus me-2"></i>Add Car
                     </button>
@@ -104,7 +104,7 @@
                         <div class="form-group mb-3 text-center">
                             <label class="text-black font-w500 d-block">Car Image</label>
                             <div class="image-placeholder mb-2">
-                                <img id="add_image_preview" src="#" alt="Preview" style="display: none; max-width: 100%; height: 150px; object-fit: cover; border-radius: 10px;">
+                                <img id="add_image_preview" src="#" alt="Preview" class="d-none" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;">
                                 <div id="add_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 150px;">
                                     <i class="fas fa-image fa-3x text-muted"></i>
                                 </div>
@@ -187,8 +187,8 @@
                         <div class="form-group mb-3 text-center">
                             <label class="text-black font-w500 d-block">Car Image</label>
                             <div class="image-placeholder mb-2">
-                                <img id="edit_image_preview" src="#" alt="Preview" style="max-width: 100%; height: 150px; object-fit: cover; border-radius: 10px;">
-                                <div id="edit_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center" style="display: none; height: 150px;">
+                                <img id="edit_image_preview" src="#" alt="Preview" class="d-none" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;">
+                                <div id="edit_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 150px;">
                                     <i class="fas fa-image fa-3x text-muted"></i>
                                 </div>
                             </div>
@@ -276,11 +276,11 @@
         const icon = document.getElementById('edit_image_icon');
         if (car.image) {
             preview.src = `/${car.image}`;
-            preview.style.display = 'block';
-            icon.style.display = 'none';
+            preview.classList.remove('d-none');
+            icon.classList.add('d-none');
         } else {
-            preview.style.display = 'none';
-            icon.style.display = 'flex';
+            preview.classList.add('d-none');
+            icon.classList.remove('d-none');
         }
     }
 
@@ -292,8 +292,8 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
-                preview.style.display = 'block';
-                icon.style.display = 'none';
+                preview.classList.remove('d-none');
+                icon.classList.add('d-none');
             }
             reader.readAsDataURL(input.files[0]);
         }
