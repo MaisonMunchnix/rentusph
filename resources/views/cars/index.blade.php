@@ -1,4 +1,8 @@
-<x-layouts.admin>
+@php
+    $layout = auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.affiliate';
+@endphp
+
+<x-dynamic-component :component="$layout">
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -241,4 +245,4 @@
         form.action = `/cars/${car.id}`;
     }
     </script>
-</x-layouts.admin>
+</x-dynamic-component>
