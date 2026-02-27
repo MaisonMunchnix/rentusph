@@ -64,6 +64,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Booking Management
     Route::get('/bookings', function () {
+        if (auth()->user()->role === 'customer') {
+            // In a real app, we would pass $bookings here
+            $bookings = auth()->user()->bookings ?? collect([]);
+            return view('customer.bookings', compact('bookings'));
+        }
         return view('booking.index');
     })->name('bookings.index');
 
@@ -73,6 +78,11 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/affiliates/{user}/approve', [\App\Http\Controllers\AffiliateManagementController::class, 'approve'])->name('affiliates.approve');
     Route::patch('/affiliates/{user}/reject', [\App\Http\Controllers\AffiliateManagementController::class, 'reject'])->name('affiliates.reject');
     Route::delete('/affiliates/{user}', [\App\Http\Controllers\AffiliateManagementController::class, 'destroy'])->name('affiliates.destroy');
+
+    // Admin Reports
+    Route::get('/admin/reports', function () {
+        return view('admin.reports');
+    })->name('admin.reports');
 });
 
 // Authentication API / Endpoints

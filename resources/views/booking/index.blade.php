@@ -1,4 +1,8 @@
-<x-layouts.admin title="Booking Calendar">
+@php
+    $layout = auth()->user()->role === 'admin' ? 'layouts.admin' : (auth()->user()->role === 'customer' ? 'layouts.customer' : 'layouts.affiliate');
+@endphp
+
+<x-dynamic-component :component="$layout" title="Booking Calendar">
     <x-slot name="styles">
         <link href="{{ asset('vendor/fullcalendar/css/main.min.css') }}" rel="stylesheet">
     </x-slot>
@@ -100,4 +104,4 @@
         <script src="{{ asset('vendor/fullcalendar/js/main.min.js') }}"></script>
         <script src="{{ asset('js/plugins-init/fullcalendar-init.js') }}"></script>
     </x-slot>
-</x-layouts.admin>
+</x-dynamic-component>

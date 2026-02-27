@@ -20,8 +20,8 @@
                     <span class="nav-text">My Properties</span>
                 </a>
             </li>
-            <li class="{{ request()->is('affiliate/bookings*') ? 'active' : '' }}">
-                <a href="#" aria-expanded="false">
+            <li class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}" href="{{ route('bookings.index') }}" aria-expanded="false">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Bookings</span>
                 </a>

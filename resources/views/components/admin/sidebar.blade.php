@@ -41,8 +41,8 @@
                     @endif
                 </a>
             </li>
-            <li>
-                <a href="#" aria-expanded="false">
+            <li class="{{ request()->is('admin/reports*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('admin/reports*') ? 'mm-active active' : '' }}" href="{{ route('admin.reports') }}" aria-expanded="false">
                     <i class="fas fa-file-alt"></i>
                     <span class="nav-text">Reports</span>
                 </a>
