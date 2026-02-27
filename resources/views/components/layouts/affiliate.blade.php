@@ -128,14 +128,14 @@
 
         /* Sidebar Active State Fix */
         .dlabnav .metismenu > li.mm-active > a {
-            background-color: var(--primary) !important;
-            color: #ffffff !important;
-            border-radius: 0.75rem;
-            margin: 0 10px;
+            background-color: rgba(234, 179, 8, 0.15) !important;
+            color: var(--primary) !important;
+            border-radius: 0 0 1.5rem 0 !important;
+            margin: 0;
         }
         
         .dlabnav .metismenu > li.mm-active > a i {
-            color: #ffffff !important;
+            color: var(--primary) !important;
         }
 
         .dlabnav .metismenu > li > a {
