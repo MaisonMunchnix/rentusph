@@ -168,8 +168,9 @@
 
         .fleet-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 380px));
             gap: 2.5rem;
+            justify-content: flex-start;
         }
 
         .car-card {
@@ -182,6 +183,10 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
         }
 
         .car-card::before {
@@ -242,6 +247,9 @@
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .car-specs {
@@ -251,6 +259,7 @@
             margin-bottom: 1.5rem;
             padding-bottom: 1.5rem;
             border-bottom: 1px solid var(--glass-border);
+            margin-top: auto;
         }
 
         .car-specs span {
@@ -606,8 +615,8 @@
                 <div class="collapse navbar-collapse justify-content-between">
                     <div class="header-left">
                         <ul class="nav-links flex-row d-md-flex d-none" style="list-style: none; gap: 2rem; margin-bottom: 0; padding-left: 1rem;">
-                            <li><a href="#fleet" style="font-weight: 600; font-size: 1.1rem;">Our Fleet</a></li>
-                            <li><a href="#properties" style="font-weight: 600; font-size: 1.1rem;">Properties</a></li>
+                            <li><a href="{{ route('public.cars') }}" style="font-weight: 600; font-size: 1.1rem;">Our Fleet</a></li>
+                            <li><a href="{{ route('public.properties') }}" style="font-weight: 600; font-size: 1.1rem;">Properties</a></li>
                             <li><a href="#how-it-works" style="font-weight: 600; font-size: 1.1rem;">How it Works</a></li>
                             <li><a href="#footer" style="font-weight: 600; font-size: 1.1rem;">Reach Us</a></li>
                         </ul>
@@ -655,121 +664,48 @@
         </div>
 
         <div class="fleet-grid">
-            <!-- Car 1: Toyota Vios -->
+            @forelse($cars as $car)
             <div class="car-card">
                 <div class="car-image-container">
-                    <div class="car-tag">Most Popular</div>
-                    <img src="https://imgcdn.zigwheels.ph/large/gallery/exterior/30/1943/toyota-vios-front-side-view-752875.jpg" alt="Toyota Vios" class="car-image">
+                    <div class="car-tag">{{ $car->brand }}</div>
+                    @if($car->image)
+                        <img src="{{ asset($car->image) }}" alt="{{ $car->brand }} {{ $car->model }}" class="car-image">
+                    @else
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                            <i class="fas fa-car fa-4x text-muted"></i>
+                        </div>
+                    @endif
                 </div>
-                <h3 class="car-name">Toyota Vios</h3>
+                <h3 class="car-name">{{ $car->brand }} {{ $car->model }}</h3>
                 <div class="car-specs">
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        Auto
+                        {{ $car->transmission }}
                     </span>
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        5 Seats
+                        {{ $car->capacity }} Seats
                     </span>
                     <span>
                         <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                        Petrol
+                        {{ $car->type }}
                     </span>
                 </div>
                 <div class="car-footer">
                     <div class="car-price">
-                        <span>₱1,800</span><small>/day</small>
+                        <span>₱{{ number_format($car->daily_rate, 2) }}</span><small>/day</small>
                     </div>
-                    <a href="#" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
                 </div>
             </div>
-
-            <!-- Car 2: Toyota Innova -->
-            <div class="car-card">
-                <div class="car-image-container">
-                    <div class="car-tag">Family Choice</div>
-                    <img src="https://images.topgear.com.ph/topgear/images/2023/02/22/toyota-innova-facelift-2023-1677055189.jpg" alt="Toyota Innova" class="car-image">
-                </div>
-                <h3 class="car-name">Toyota Innova</h3>
-                <div class="car-specs">
-                    <span>
-                        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        Auto
-                    </span>
-                    <span>
-                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        8 Seats
-                    </span>
-                    <span>
-                        <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                        Diesel
-                    </span>
-                </div>
-                <div class="car-footer">
-                    <div class="car-price">
-                        <span>₱3,500</span><small>/day</small>
-                    </div>
-                    <a href="#" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
-                </div>
+            @empty
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">No featured cars available at the moment.</p>
             </div>
-
-            <!-- Car 3: Mitsubishi Montero Sport -->
-            <div class="car-card">
-                <div class="car-image-container">
-                    <div class="car-tag">Premium SUV</div>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Mitsubishi_Pajero_Sport_%283rd_generation%29_1X7A0409.jpg" alt="Mitsubishi Montero" class="car-image">
-                </div>
-                <h3 class="car-name">Mitsubishi Montero Sport</h3>
-                <div class="car-specs">
-                    <span>
-                        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        Auto
-                    </span>
-                    <span>
-                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        7 Seats
-                    </span>
-                    <span>
-                        <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                        Diesel
-                    </span>
-                </div>
-                <div class="car-footer">
-                    <div class="car-price">
-                        <span>₱4,500</span><small>/day</small>
-                    </div>
-                    <a href="#" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
-                </div>
-            </div>
-
-            <!-- Car 4: Toyota Hiace GL Grandia -->
-            <div class="car-card">
-                <div class="car-image-container">
-                    <div class="car-tag">Group Travel</div>
-                    <img src="https://toyotasantarosa.com.ph/wp-content/uploads/2020/08/hiace18.jpg" alt="Toyota Hiace" class="car-image">
-                </div>
-                <h3 class="car-name">Toyota Hiace GL Grandia</h3>
-                <div class="car-specs">
-                    <span>
-                        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        Manual
-                    </span>
-                    <span>
-                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        12 Seats
-                    </span>
-                    <span>
-                        <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                        Diesel
-                    </span>
-                </div>
-                <div class="car-footer">
-                    <div class="car-price">
-                        <span>₱5,500</span><small>/day</small>
-                    </div>
-                    <a href="#" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
-                </div>
-            </div>
+            @endforelse
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ route('public.cars') }}" class="btn btn-outline" style="border: 1.5px solid var(--accent) !important; color: #000 !important; background: var(--accent) !important;">View More Cars</a>
         </div>
     </section>
 
@@ -781,92 +717,48 @@
         </div>
 
         <div class="fleet-grid">
-            <!-- Property 1: Urban Condo -->
+            @forelse($properties as $property)
             <div class="car-card">
                 <div class="car-image-container">
-                    <div class="car-tag">City Living</div>
-                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Modern Penthouse" class="car-image">
+                    <div class="car-tag">{{ $property->type }}</div>
+                    @if($property->image)
+                        <img src="{{ asset($property->image) }}" alt="{{ $property->title }}" class="car-image">
+                    @else
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                            <i class="fas fa-building fa-4x text-muted"></i>
+                        </div>
+                    @endif
                 </div>
-                <h3 class="car-name">Skyline Executive Suite</h3>
+                <h3 class="car-name">{{ $property->title }}</h3>
                 <div class="car-specs">
                     <span>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                        Condo
+                        {{ $property->type }}
                     </span>
                     <span>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M2 14h20M2 8h20M2 2h20"></path></svg>
-                        2 BR
+                        {{ $property->bedrooms }} BR
                     </span>
                     <span>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
-                        Fully Furnished
+                        {{ $property->floor_area }} sqm
                     </span>
                 </div>
                 <div class="car-footer">
                     <div class="car-price">
-                        <span>₱5,500</span><small>/night</small>
+                        <span>₱{{ number_format($property->monthly_rate, 2) }}</span><small>/night</small>
                     </div>
-                    <a href="{{ route('register.customer') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book Stay</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book Stay</a>
                 </div>
             </div>
-
-            <!-- Property 2: Beachfront Villa -->
-            <div class="car-card">
-                <div class="car-image-container">
-                    <div class="car-tag">Beach Escape</div>
-                    <img src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Beachfront Villa" class="car-image">
-                </div>
-                <h3 class="car-name">Azure Beachfront Villa</h3>
-                <div class="car-specs">
-                    <span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                        Villa
-                    </span>
-                    <span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M2 14h20M2 8h20M2 2h20"></path></svg>
-                        4 BR
-                    </span>
-                    <span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 5l7 7 7-7"></path></svg>
-                        Private Pool
-                    </span>
-                </div>
-                <div class="car-footer">
-                    <div class="car-price">
-                        <span>₱12,000</span><small>/night</small>
-                    </div>
-                    <a href="{{ route('register.customer') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book Stay</a>
-                </div>
+            @empty
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">No featured properties available at the moment.</p>
             </div>
-
-            <!-- Property 3: Vacation Home -->
-            <div class="car-card">
-                <div class="car-image-container">
-                    <div class="car-tag">Staycation</div>
-                    <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Vacation Home" class="car-image">
-                </div>
-                <h3 class="car-name">Serene Hilltop Retreat</h3>
-                <div class="car-specs">
-                    <span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                        House
-                    </span>
-                    <span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M2 14h20M2 8h20M2 2h20"></path></svg>
-                        3 BR
-                    </span>
-                    <span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-                        Scenic View
-                    </span>
-                </div>
-                <div class="car-footer">
-                    <div class="car-price">
-                        <span>₱7,500</span><small>/night</small>
-                    </div>
-                    <a href="{{ route('register.customer') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book Stay</a>
-                </div>
-            </div>
+            @endforelse
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ route('public.properties') }}" class="btn btn-outline" style="border: 1.5px solid var(--accent) !important; color: #000 !important; background: var(--accent) !important;">View More Properties</a>
         </div>
     </section>
 

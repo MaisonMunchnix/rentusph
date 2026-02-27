@@ -14,8 +14,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $cars = \App\Models\Car::where('is_available', true)->latest()->take(6)->get();
+    $properties = \App\Models\Property::where('is_available', true)->latest()->take(6)->get();
+    return view('welcome', compact('cars', 'properties'));
 });
+
+Route::get('/public/cars', function() {
+    $cars = \App\Models\Car::where('is_available', true)->latest()->paginate(12);
+    return view('cars', compact('cars'));
+})->name('public.cars');
+
+Route::get('/public/properties', function() {
+    $properties = \App\Models\Property::where('is_available', true)->latest()->paginate(12);
+    return view('properties', compact('properties'));
+})->name('public.properties');
 
 // Authentication Views
 Route::get('/login', function () { return view('auth.login'); })->name('login');
