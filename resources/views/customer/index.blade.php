@@ -142,7 +142,7 @@
         <div class="col-xl-12">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h4 class="mb-0 font-w700">Available Cars</h4>
-                <a href="{{ route('cars.index') }}" class="text-primary font-w600">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                <a href="{{ route('customer.cars') }}" class="text-primary font-w600">View All <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
             <div class="row">
                 @forelse($cars as $car)
@@ -193,7 +193,7 @@
         <div class="col-xl-12 mt-4">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h4 class="mb-0 font-w700">Featured Properties</h4>
-                <a href="{{ route('properties.index') }}" class="text-primary font-w600">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                <a href="{{ route('customer.properties') }}" class="text-primary font-w600">View All <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
             <div class="row">
                 @forelse($properties as $property)
