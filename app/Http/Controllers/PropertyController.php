@@ -21,6 +21,38 @@ class PropertyController extends Controller
         return view('properties.index', compact('properties'));
     }
 
+    public function customerIndex(Request $request)
+    {
+        $query = Property::where('is_available', true);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                  ->orWhere('city', 'LIKE', "%{$search}%")
+                  ->orWhere('region', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('price')) {
+            $price = $request->price;
+            if ($price == '10000') {
+                $query->where('monthly_rate', '<', 10000);
+            } elseif ($price == '30000') {
+                $query->whereBetween('monthly_rate', [10000, 30000]);
+            } elseif ($price == '50000') {
+                $query->where('monthly_rate', '>', 30000);
+            }
+        }
+
+        $properties = $query->latest()->paginate(9);
+        return view('customer.properties', compact('properties'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([

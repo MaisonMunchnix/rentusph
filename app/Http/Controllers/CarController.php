@@ -22,6 +22,37 @@ class CarController extends Controller
         return view('cars.index', compact('cars'));
     }
 
+    public function customerIndex(Request $request)
+    {
+        $query = Car::where('is_available', true);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('brand', 'LIKE', "%{$search}%")
+                  ->orWhere('model', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('transmission')) {
+            $query->where('transmission', $request->transmission);
+        }
+
+        if ($request->filled('price')) {
+            $price = $request->price;
+            if ($price == '1000') {
+                $query->where('daily_rate', '<', 1000);
+            } elseif ($price == '3000') {
+                $query->whereBetween('daily_rate', [1000, 3000]);
+            } elseif ($price == '5000') {
+                $query->where('daily_rate', '>', 3000);
+            }
+        }
+
+        $cars = $query->latest()->paginate(9);
+        return view('customer.cars', compact('cars'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([

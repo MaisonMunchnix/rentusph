@@ -61,6 +61,12 @@ Route::get('/pending-review', function () {
     return view('pending-affiliate.index');
 })->middleware('auth')->name('pending-review');
 
+// Customer Browsing Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/browse/cars', [\App\Http\Controllers\CarController::class, 'customerIndex'])->name('customer.cars');
+    Route::get('/browse/properties', [\App\Http\Controllers\PropertyController::class, 'customerIndex'])->name('customer.properties');
+});
+
 // Car Management (Protected)
 Route::middleware(['auth'])->group(function () {
     Route::get('/cars', [\App\Http\Controllers\CarController::class, 'index'])->name('cars.index');
