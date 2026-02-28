@@ -97,6 +97,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/reports', function () {
         return view('admin.reports');
     })->name('admin.reports');
+
+    // Customer Management
+    Route::get('/admin/customers', function () {
+        $customers = \App\Models\User::where('role', 'customer')->latest()->get();
+        return view('admin.customers', compact('customers'));
+    })->name('admin.customers');
 });
 
 // Authentication API / Endpoints

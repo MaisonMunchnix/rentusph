@@ -5,7 +5,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header border-0 pb-0">
-                        <h4 class="card-title">Partners</h4>
+                        <h4 class="card-title">Affiliates</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -51,7 +51,6 @@
                                                             Approve
                                                         </button>
                                                     @endif
-
                                                     @if($affiliate->status !== 'rejected')
                                                         <button type="button" class="btn btn-outline-danger btn-xs px-3" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $affiliate->id }}">
                                                             Reject
@@ -149,5 +148,4 @@
             </div>
         </div>
     </div>
-
 </x-layouts.admin>
