@@ -28,86 +28,123 @@
                                         <td>{{ $affiliate->name }}</td>
                                         <td>{{ $affiliate->email }}</td>
                                         <td class="text-center">
-                                            @if($affiliate->status === 'approved')
+                                            @php
+                                                $detail = $affiliate->affiliateDetail;
+                                                $status = $detail ? $detail->status : 'pending';
+                                            @endphp
+                                            @if($status === 'approved')
                                                 <span class="badge light badge-success">Approved</span>
-                                            @elseif($affiliate->status === 'rejected')
+                                            @elseif($status === 'rejected')
                                                 <span class="badge light badge-danger">Rejected</span>
                                             @else
                                                 <span class="badge light badge-warning">Pending</span>
+                                                @if($detail && $detail->vehicles_submitted)
+                                                    <div class="small text-muted mt-1"><i class="fas fa-check-circle text-success"></i> Vehicles Sent</div>
+                                                @else
+                                                    <div class="small text-muted mt-1"><i class="fas fa-clock"></i> Awaiting Vehicles</div>
+                                                @endif
                                             @endif
                                         </td>
                                         <td>{{ $affiliate->phone ?? 'N/A' }}</td>
                                         <td>{{ $affiliate->address ?? 'N/A' }}</td>
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center">
-                                                @if($affiliate->status === 'approved')
-                                                    <a href="javascript:void(0)" class="btn btn-primary btn-xs px-3 me-2">View</a>
-                                                    <button type="button" class="btn btn-danger btn-xs px-3" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $affiliate->id }}">
-                                                        Delete
-                                                    </button>
-                                                @else
-                                                    @if($affiliate->status !== 'approved')
-                                                        <button type="button" class="btn btn-success btn-xs px-3 me-2" data-bs-toggle="modal" data-bs-target="#approveModal{{ $affiliate->id }}">
-                                                            Approve
-                                                        </button>
-                                                    @endif
-                                                    @if($affiliate->status !== 'rejected')
-                                                        <button type="button" class="btn btn-outline-danger btn-xs px-3" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $affiliate->id }}">
-                                                            Reject
-                                                        </button>
-                                                    @endif
-                                                @endif
+                                                @php
+                                                    $detail = $affiliate->affiliateDetail;
+                                                    $status = $detail ? $detail->status : 'pending';
+                                                @endphp
+                                                
+                                                <button type="button" class="btn btn-primary btn-xs px-3 me-2" data-bs-toggle="modal" data-bs-target="#reviewModal{{ $affiliate->id }}">
+                                                    Review
+                                                </button>
+
+                                                <button type="button" class="btn btn-danger btn-xs px-3" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $affiliate->id }}">
+                                                    Delete
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
 
-                                    <!-- Approve Confirmation Modal -->
-                                    <div class="modal fade" id="approveModal{{ $affiliate->id }}">
-                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <!-- Review and Action Modal -->
+                                    <div class="modal fade" id="reviewModal{{ $affiliate->id }}">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Confirm Approval</h5>
+                                                    <h5 class="modal-title">Review Application - {{ $affiliate->name }}</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
-                                                <div class="modal-body text-center py-4">
-                                                    <div class="mb-3 text-success">
-                                                        <i class="fas fa-check-circle fa-4x"></i>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h6 class="fw-bold mb-3">Personal Information</h6>
+                                                            <p class="mb-1 text-muted small">Full Name</p>
+                                                            <p class="mb-3 fw-bold">{{ $affiliate->name }}</p>
+                                                            
+                                                            <p class="mb-1 text-muted small">Email Address</p>
+                                                            <p class="mb-3">{{ $affiliate->email }}</p>
+                                                            
+                                                            <p class="mb-1 text-muted small">Phone Number</p>
+                                                            <p class="mb-3">{{ $affiliate->phone ?? 'N/A' }}</p>
+                                                            
+                                                            <p class="mb-1 text-muted small">Home Address</p>
+                                                            <p class="mb-0">{{ $affiliate->address ?? 'N/A' }}</p>
+                                                        </div>
+                                                        <div class="col-md-6 border-start">
+                                                            <h6 class="fw-bold mb-3">Submitted Vehicles</h6>
+                                                            @forelse($affiliate->cars as $car)
+                                                                <div class="card bg-light border-0 mb-3">
+                                                                    <div class="card-body p-3">
+                                                                        <div class="d-flex align-items-center">
+                                                                            @if($car->image)
+                                                                                <img src="{{ str_contains($car->image, '/') ? asset($car->image) : asset('images/cars/' . $car->image) }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                                                            @endif
+                                                                            <div>
+                                                                                <p class="mb-0 fw-bold">{{ $car->brand }} {{ $car->model }} ({{ $car->year }})</p>
+                                                                                <p class="mb-0 text-muted small">Plate: {{ $car->plate_number }}</p>
+                                                                                <p class="mb-0 text-primary small">Daily Rate: ₱{{ number_format($car->daily_rate, 2) }}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @empty
+                                                                <div class="text-center py-4 bg-light rounded">
+                                                                    <i class="fas fa-car-side fa-3x text-muted mb-2"></i>
+                                                                    <p class="text-muted mb-0">No vehicles submitted yet.</p>
+                                                                </div>
+                                                            @endforelse
+                                                        </div>
                                                     </div>
-                                                    <p class="mb-0 fs-5">Are you sure you want to approve <strong>{{ $affiliate->name }}</strong> as a partner?</p>
                                                 </div>
-                                                <div class="modal-footer border-0 pt-0 justify-content-center">
-                                                    <button type="button" class="btn btn-danger light btn-sm px-4" data-bs-dismiss="modal">Cancel</button>
-                                                    <form action="{{ route('affiliates.approve', $affiliate) }}" method="POST">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="btn btn-success btn-sm px-4">Yes, Approve</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                                <div class="modal-footer bg-light justify-content-between">
+                                                    <div>
+                                                        Status: 
+                                                        @if($status === 'approved')
+                                                            <span class="badge light badge-success">Approved</span>
+                                                        @elseif($status === 'rejected')
+                                                            <span class="badge light badge-danger">Rejected</span>
+                                                        @else
+                                                            <span class="badge light badge-warning">Pending</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <button type="button" class="btn btn-secondary light btn-sm me-2" data-bs-dismiss="modal">Close</button>
+                                                        
+                                                        @if($status !== 'rejected')
+                                                            <form action="{{ route('affiliates.reject', $affiliate) }}" method="POST" class="me-2">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <button type="submit" class="btn btn-danger btn-sm px-2">Reject Application</button>
+                                                            </form>
+                                                        @endif
 
-                                    <!-- Reject Confirmation Modal -->
-                                    <div class="modal fade" id="rejectModal{{ $affiliate->id }}">
-                                        <div class="modal-dialog modal-dialog-centered" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Confirm Rejection</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body text-center py-4">
-                                                    <div class="mb-3 text-danger">
-                                                        <i class="fas fa-times-circle fa-4x"></i>
+                                                        @if($status !== 'approved')
+                                                            <form action="{{ route('affiliates.approve', $affiliate) }}" method="POST">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                                            </form>
+                                                        @endif
                                                     </div>
-                                                    <p class="mb-0 fs-5">Are you sure you want to reject <strong>{{ $affiliate->name }}</strong>?</p>
-                                                </div>
-                                                <div class="modal-footer border-0 pt-0 justify-content-center">
-                                                    <button type="button" class="btn btn-light btn-sm px-4" data-bs-dismiss="modal">Cancel</button>
-                                                    <form action="{{ route('affiliates.reject', $affiliate) }}" method="POST">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="btn btn-danger btn-sm px-4">Yes, Reject</button>
-                                                    </form>
                                                 </div>
                                             </div>
                                         </div>

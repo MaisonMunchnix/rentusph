@@ -57,9 +57,8 @@ Route::get('/admin-dashboard', function() {
 })->name('admin');
 
 // Pending Affiliate View
-Route::get('/pending-review', function () {
-    return view('pending-affiliate.index');
-})->middleware('auth')->name('pending-review');
+Route::get('/pending-review', [\App\Http\Controllers\AffiliateRegistrationController::class, 'index'])->middleware('auth')->name('pending-review');
+Route::post('/pending-review/vehicles', [\App\Http\Controllers\AffiliateRegistrationController::class, 'storeVehicles'])->middleware('auth')->name('pending-review.vehicles');
 
 // Customer Browsing Routes
 Route::middleware(['auth'])->group(function () {

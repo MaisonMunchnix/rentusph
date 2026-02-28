@@ -33,9 +33,17 @@ class AuthController extends Controller
             'status' => $status,
         ]);
 
+        if ($user->role === 'affiliate') {
+            \App\Models\AffiliateDetail::create([
+                'user_id' => $user->id,
+                'status' => 'pending',
+                'vehicles_submitted' => false,
+            ]);
+        }
+
         Auth::login($user);
 
-        if ($user->status === 'pending') {
+        if ($user->role === 'affiliate') {
             return redirect('/pending-review');
         }
 

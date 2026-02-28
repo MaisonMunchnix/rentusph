@@ -22,6 +22,16 @@
                                 <a href="{{ url('/') }}"><img class="logo-auth" src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs Logo" style="max-width: 200px;"></a>
                             </div>
                             <h4 class="text-center mb-4">Customer sign up</h4>
+                            
+                            @if($errors->any())
+                                <div class="alert alert-danger py-2 mb-4">
+                                    <ul class="mb-0">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                             <form action="{{ url('register') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="role" value="customer">

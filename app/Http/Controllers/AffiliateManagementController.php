@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\AffiliateDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,8 +16,8 @@ class AffiliateManagementController extends Controller
      */
     public function index()
     {
-        $affiliates = User::where('role', 'affiliate')->get();
-        return view('affiliate-management.index', compact('affiliates'));
+        $affiliates = User::where('role', 'affiliate')->with('affiliateDetail')->get();
+        return view('admin.affiliate', compact('affiliates'));
     }
 
     /**
@@ -35,14 +36,20 @@ class AffiliateManagementController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'affiliate',
-            'status' => 'approved',
+            'status' => 'approved', // Legacy status
             'phone' => $request->phone,
             'address' => $request->address,
+        ]);
+
+        AffiliateDetail::create([
+            'user_id' => $user->id,
+            'status' => 'approved',
+            'vehicles_submitted' => true,
         ]);
 
         return redirect()->back()->with('success', 'Affiliate added successfully.');
@@ -56,7 +63,11 @@ class AffiliateManagementController extends Controller
      */
     public function approve(User $user)
     {
-        $user->update(['status' => 'approved']);
+        $user->affiliateDetail()->updateOrCreate(
+            ['user_id' => $user->id],
+            ['status' => 'approved']
+        );
+        $user->update(['status' => 'approved']); // Sync legacy status
         return redirect()->back()->with('success', 'Affiliate approved successfully.');
     }
 
@@ -68,7 +79,11 @@ class AffiliateManagementController extends Controller
      */
     public function reject(User $user)
     {
-        $user->update(['status' => 'rejected']);
+        $user->affiliateDetail()->updateOrCreate(
+            ['user_id' => $user->id],
+            ['status' => 'rejected']
+        );
+        $user->update(['status' => 'rejected']); // Sync legacy status
         return redirect()->back()->with('success', 'Affiliate rejected successfully.');
     }
 
