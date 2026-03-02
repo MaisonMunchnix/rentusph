@@ -47,4 +47,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Car::class);
     }
+
+    public function properties()
+    {
+        return $this->hasMany(Property::class);
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
 }

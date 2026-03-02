@@ -81,14 +81,10 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/properties/{property}/toggle-status', [\App\Http\Controllers\PropertyController::class, 'toggleStatus'])->name('properties.toggle-status');
 
     // Booking Management
-    Route::get('/bookings', function () {
-        if (auth()->user()->role === 'customer') {
-            // In a real app, we would pass $bookings here
-            $bookings = auth()->user()->bookings ?? collect([]);
-            return view('customer.bookings', compact('bookings'));
-        }
-        return view('booking.index');
-    })->name('bookings.index');
+    Route::get('/bookings', [\App\Http\Controllers\BookingController::class, 'index'])->name('bookings.index');
+    Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])->name('bookings.store');
+    Route::put('/bookings/{booking}', [\App\Http\Controllers\BookingController::class, 'update'])->name('bookings.update');
+    Route::delete('/bookings/{booking}/cancel', [\App\Http\Controllers\BookingController::class, 'cancel'])->name('bookings.cancel');
 
     // Affiliate Management
     Route::get('/affiliate-management', [\App\Http\Controllers\AffiliateManagementController::class, 'index'])->name('affiliates.index');
