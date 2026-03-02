@@ -64,6 +64,7 @@ Route::post('/pending-review/vehicles', [\App\Http\Controllers\AffiliateRegistra
 Route::middleware(['auth'])->group(function () {
     Route::get('/browse/cars', [\App\Http\Controllers\CarController::class, 'customerIndex'])->name('customer.cars');
     Route::get('/browse/properties', [\App\Http\Controllers\PropertyController::class, 'customerIndex'])->name('customer.properties');
+    Route::get('/explore-listings', [\App\Http\Controllers\ListingController::class, 'index'])->name('customer.explore');
 });
 
 // Car Management (Protected)

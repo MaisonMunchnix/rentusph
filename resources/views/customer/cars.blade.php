@@ -109,7 +109,7 @@
         <div class="col-12">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div>
-                    <h2 class="font-w700 mb-0">Browse Cars</h2>
+                    <h2 class="font-w700 mb-0">Explore Available Cars</h2>
                     <p class="text-muted mb-0">Find the perfect ride for your next journey</p>
                 </div>
             </div>

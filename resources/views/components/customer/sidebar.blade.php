@@ -8,16 +8,10 @@
                     <span class="nav-text">Home</span>
                 </a>
             </li>
-            <li class="{{ request()->is('browse/cars*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('browse/cars*') ? 'mm-active active' : '' }}" href="{{ route('customer.cars') }}" aria-expanded="false">
-                    <i class="fas fa-car"></i>
-                    <span class="nav-text">Browse Cars</span>
-                </a>
-            </li>
-            <li class="{{ request()->is('browse/properties*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('browse/properties*') ? 'mm-active active' : '' }}" href="{{ route('customer.properties') }}" aria-expanded="false">
-                    <i class="fas fa-building"></i>
-                    <span class="nav-text">Browse Properties</span>
+            <li class="{{ request()->is('explore-listings*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('explore-listings*') ? 'mm-active active' : '' }}" href="{{ route('customer.explore') }}" aria-expanded="false">
+                    <i class="fas fa-th-large"></i>
+                    <span class="nav-text">Explore Listings</span>
                 </a>
             </li>
             <li class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}">
