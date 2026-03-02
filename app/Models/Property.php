@@ -30,4 +30,9 @@ class Property extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function bookings()
+    {
+        return $this->morphMany(Booking::class, 'bookable');
+    }
 }

@@ -209,7 +209,11 @@
                             <div class="listing-price">
                                 <span>₱{{ number_format($item->daily_rate) }}</span><small>/day</small>
                             </div>
-                            <a href="#" class="btn btn-primary btn-book shadow-none">Book Now</a>
+                            <a href="javascript:void(0);" class="btn btn-primary btn-book shadow-none" 
+                                data-id="{{ $item->id }}" 
+                                data-type="App\Models\Car" 
+                                data-name="{{ $item->brand }} {{ $item->model }}" 
+                                data-rate="₱{{ number_format($item->daily_rate) }}/day">Book Now</a>
                         </div>
                     @else
                         <h3 class="listing-title text-truncate">{{ $item->title }}</h3>
@@ -235,7 +239,11 @@
                             <div class="listing-price">
                                 <span>₱{{ number_format($item->monthly_rate) }}</span><small>/mo</small>
                             </div>
-                            <a href="#" class="btn btn-success btn-book shadow-none">Book Stay</a>
+                            <a href="javascript:void(0);" class="btn btn-success btn-book shadow-none" 
+                                data-id="{{ $item->id }}" 
+                                data-type="App\Models\Property" 
+                                data-name="{{ $item->title }}" 
+                                data-rate="₱{{ number_format($item->monthly_rate) }}/mo">Book Stay</a>
                         </div>
                     @endif
                 </div>
@@ -253,4 +261,91 @@
             {{ $listings->links() }}
         </div>
     </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Book Your Stay</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('bookings.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" name="bookable_id" id="modal_bookable_id">
+                        <input type="hidden" name="bookable_type" id="modal_bookable_type">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Selected Item</label>
+                                <input type="text" id="modal_item_name" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Rate</label>
+                                <input type="text" id="modal_item_rate" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h6 class="mb-3 text-primary">Your Information</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Full Name</label>
+                                <input type="text" name="customer_name" class="form-control" value="{{ Auth::user()->name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Email Address</label>
+                                <input type="email" name="customer_email" class="form-control" value="{{ Auth::user()->email }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Phone Number</label>
+                                <input type="text" name="customer_phone" class="form-control" value="{{ Auth::user()->phone }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Pickup/Check-in Date</label>
+                                <input type="date" name="start_date" class="form-control" required min="{{ date('Y-m-d') }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Return/Check-out Date</label>
+                                <input type="date" name="end_date" class="form-control" required min="{{ date('Y-m-d') }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label font-w600">Special Requests (Optional)</label>
+                            <textarea name="special_requests" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <x-slot name="scripts">
+    <script>
+        $(document).on('click', '.btn-book', function(e) {
+            e.preventDefault();
+            
+            const id = $(this).attr('data-id');
+            const type = $(this).attr('data-type');
+            const name = $(this).attr('data-name');
+            const rate = $(this).attr('data-rate');
+            const label = type === 'App\\Models\\Car' ? 'Book Car' : 'Book Stay';
+
+            $('#modal_bookable_id').val(id);
+            $('#modal_bookable_type').val(type);
+            $('#modal_item_name').val(name);
+            $('#modal_item_rate').val(rate);
+            $('#bookingModalLabel').text(label);
+
+            $('#bookingModal').modal('show');
+        });
+    </script>
+    </x-slot>
 </x-layouts.customer>
