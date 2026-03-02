@@ -1,32 +1,82 @@
 <x-layouts.admin>
     <x-slot name="styles">
+        {{-- FullCalendar --}}
+        <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
         <style>
-            .badge-pending   { background: rgba(234,179,8,0.15);  color: #ca8a04; }
-            .badge-confirmed { background: rgba(34,197,94,0.15);  color: #15803d; }
-            .badge-cancelled { background: rgba(239,68,68,0.15);  color: #b91c1c; }
-            .badge-completed { background: rgba(59,130,246,0.15); color: #1d4ed8; }
-            .status-badge {
-                padding: 0.3rem 0.75rem;
-                border-radius: 50px;
-                font-size: 0.78rem;
+            .fc { font-family: inherit; }
+
+            .fc .fc-toolbar-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+
+            .fc .fc-button-primary {
+                background: #eab308 !important;
+                border-color: #eab308 !important;
+                color: #0f172a !important;
                 font-weight: 600;
+                border-radius: 8px !important;
+                box-shadow: none !important;
             }
-            .search-bar {
-                background: #fff;
-                border-radius: 15px;
-                padding: 16px 20px;
-                margin-bottom: 24px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+
+            .fc .fc-button-primary:hover, .fc .fc-button-primary:focus {
+                background: #ca8a04 !important;
+                border-color: #ca8a04 !important;
             }
-            .type-pill {
-                font-size: 0.7rem;
-                font-weight: 700;
-                padding: 0.2rem 0.6rem;
-                border-radius: 50px;
-                text-transform: uppercase;
+
+            .fc .fc-button-primary:disabled {
+                opacity: 0.5 !important;
             }
-            .type-car      { background: rgba(234,179,8,0.15); color: #92400e; }
-            .type-property { background: rgba(99,102,241,0.15); color: #4338ca; }
+
+            .fc .fc-today-button {
+                border-radius: 50px !important;
+                padding: 0.35rem 1rem !important;
+            }
+
+            .fc-daygrid-day.fc-day-today {
+                background: rgba(234,179,8,0.08) !important;
+            }
+
+            .fc-event {
+                border-radius: 6px !important;
+                border: none !important;
+                padding: 2px 6px !important;
+                font-size: 0.8rem !important;
+                cursor: pointer;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 0.82rem;
+                font-weight: 600;
+                color: #475569;
+            }
+
+            .legend-dot {
+                width: 10px; height: 10px;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+
+            #bookingDetailModal .modal-header {
+                border-bottom: none;
+            }
+
+            .detail-row { 
+                display: flex; 
+                gap: 12px; 
+                margin-bottom: 12px; 
+                align-items: flex-start;
+            }
+
+            .detail-icon { 
+                width: 32px; height: 32px; border-radius: 8px; 
+                display: flex; align-items: center; justify-content: center; 
+                font-size: 0.85rem; flex-shrink: 0;
+                background: rgba(234,179,8,0.12); color: #ca8a04;
+            }
+
+            .detail-label { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
+            .detail-value { font-size: 0.9rem; color: #0f172a; font-weight: 500; }
         </style>
     </x-slot>
 
@@ -34,192 +84,177 @@
         <div class="col-12">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div>
-                    <h2 class="font-w700 mb-0">All Bookings</h2>
-                    <p class="text-muted mb-0">Manage and review customer bookings</p>
+                    <h2 class="font-w700 mb-0">Bookings Calendar</h2>
+                    <p class="text-muted mb-0">Visual overview of all customer booking schedules</p>
                 </div>
-                <span class="badge bg-dark text-white px-3 py-2" style="border-radius:50px;">
-                    {{ $bookings->total() }} total
-                </span>
+                <div class="d-flex gap-3 align-items-center flex-wrap">
+                    <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div> Pending</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Confirmed</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> Completed</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> Cancelled</div>
+                </div>
             </div>
         </div>
 
-        {{-- Filters --}}
         <div class="col-12">
-            <div class="search-bar">
-                <form action="{{ route('bookings.index') }}" method="GET" class="row align-items-end g-2">
-                    <div class="col-md-4">
-                        <label class="form-label font-w600 mb-1">Search Customer</label>
-                        <input type="text" name="search" class="form-control" placeholder="Name or email..." value="{{ request('search') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label font-w600 mb-1">Type</label>
-                        <select name="type" class="form-control">
-                            <option value="">All Types</option>
-                            <option value="car"      {{ request('type') == 'car'      ? 'selected' : '' }}>Cars</option>
-                            <option value="property" {{ request('type') == 'property' ? 'selected' : '' }}>Properties</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label font-w600 mb-1">Status</label>
-                        <select name="status" class="form-control">
-                            <option value="">All Statuses</option>
-                            <option value="pending"   {{ request('status') == 'pending'   ? 'selected' : '' }}>Pending</option>
-                            <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                            <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        {{-- Table --}}
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead style="background:#f8f9fa;">
-                                <tr>
-                                    <th class="ps-4">ID</th>
-                                    <th>Customer</th>
-                                    <th>Item</th>
-                                    <th>Dates</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                    <th class="pe-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($bookings as $booking)
-                                    <tr>
-                                        <td class="ps-4">
-                                            <strong class="text-muted">#BK-{{ $booking->id }}</strong>
-                                        </td>
-                                        <td>
-                                            <div class="font-w600">{{ $booking->customer_name }}</div>
-                                            <small class="text-muted">{{ $booking->customer_email }}</small>
-                                        </td>
-                                        <td>
-                                            @php $isCar = $booking->bookable_type === 'App\Models\Car'; @endphp
-                                            <span class="type-pill {{ $isCar ? 'type-car' : 'type-property' }}">
-                                                {{ $isCar ? 'Car' : 'Property' }}
-                                            </span>
-                                            <div class="mt-1 font-w600 small">
-                                                @if($isCar)
-                                                    {{ $booking->bookable->brand ?? 'N/A' }} {{ $booking->bookable->model ?? '' }}
-                                                @else
-                                                    {{ $booking->bookable->title ?? 'N/A' }}
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="small">{{ \Carbon\Carbon::parse($booking->start_date)->format('M d, Y') }}</div>
-                                            @if($booking->end_date)
-                                                <div class="small text-muted">to {{ \Carbon\Carbon::parse($booking->end_date)->format('M d, Y') }}</div>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <strong>₱{{ number_format($booking->total_price, 2) }}</strong>
-                                        </td>
-                                        <td>
-                                            @php
-                                                $cls = match($booking->status) {
-                                                    'pending'   => 'badge-pending',
-                                                    'confirmed' => 'badge-confirmed',
-                                                    'cancelled' => 'badge-cancelled',
-                                                    'completed' => 'badge-completed',
-                                                    default     => ''
-                                                };
-                                            @endphp
-                                            <span class="status-badge {{ $cls }}">{{ ucfirst($booking->status) }}</span>
-                                        </td>
-                                        <td class="pe-4">
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li>
-                                                        <button class="dropdown-item"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#statusModal"
-                                                            data-id="{{ $booking->id }}"
-                                                            data-name="{{ $isCar ? ($booking->bookable->brand ?? '') . ' ' . ($booking->bookable->model ?? '') : ($booking->bookable->title ?? 'N/A') }}"
-                                                            data-customer="{{ $booking->customer_name }}"
-                                                            data-status="{{ $booking->status }}">
-                                                            <i class="fas fa-edit me-2 text-primary"></i> Update Status
-                                                        </button>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center py-5">
-                                            <i class="fas fa-calendar-times fa-3x text-muted opacity-25 mb-3 d-block"></i>
-                                            <h5 class="text-muted">No bookings found.</h5>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-4">
-                {{ $bookings->withQueryString()->links() }}
+            <div class="card p-4">
+                <div id="calendar"></div>
             </div>
         </div>
     </div>
 
-    {{-- Update Status Modal --}}
-    <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+    {{-- Booking Detail Modal --}}
+    <div class="modal fade" id="bookingDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Update Booking Status</h5>
+                <div class="modal-header pb-0">
+                    <div>
+                        <h5 class="modal-title font-w700" id="modal_booking_title"></h5>
+                        <span class="badge mt-1" id="modal_status_badge" style="border-radius: 50px; font-size: 0.75rem;"></span>
+                    </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="statusForm" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <div class="modal-body">
-                        <p class="text-muted mb-3">
-                            Booking for <strong id="status_item"></strong> by <strong id="status_customer"></strong>.
-                        </p>
-                        <div class="mb-3">
-                            <label class="form-label font-w600">New Status</label>
-                            <select name="status" id="status_select" class="form-control">
+                <div class="modal-body pt-3">
+                    <div class="detail-row">
+                        <div class="detail-icon"><i class="fas fa-user"></i></div>
+                        <div>
+                            <div class="detail-label">Customer</div>
+                            <div class="detail-value" id="modal_customer"></div>
+                            <div class="text-muted small" id="modal_email"></div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon"><i class="fas fa-phone"></i></div>
+                        <div>
+                            <div class="detail-label">Phone</div>
+                            <div class="detail-value" id="modal_phone"></div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div>
+                            <div class="detail-label">Dates</div>
+                            <div class="detail-value" id="modal_dates"></div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon"><i id="modal_type_icon" class="fas fa-car"></i></div>
+                        <div>
+                            <div class="detail-label" id="modal_type_label">Item</div>
+                            <div class="detail-value" id="modal_item"></div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon"><i class="fas fa-peso-sign"></i></div>
+                        <div>
+                            <div class="detail-label">Total Amount</div>
+                            <div class="detail-value fw-bold" id="modal_total"></div>
+                        </div>
+                    </div>
+                    <div class="detail-row" id="modal_special_row" style="display:none;">
+                        <div class="detail-icon"><i class="fas fa-comment-alt"></i></div>
+                        <div>
+                            <div class="detail-label">Special Requests</div>
+                            <div class="detail-value" id="modal_special"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <form id="statusUpdateForm" method="POST">
+                        @csrf @method('PATCH')
+                        <div class="d-flex align-items-center gap-2">
+                            <select name="status" id="modal_status_select" class="form-control form-control-sm" style="width:auto;">
                                 <option value="pending">Pending</option>
                                 <option value="confirmed">Confirmed</option>
                                 <option value="completed">Completed</option>
                                 <option value="cancelled">Cancelled</option>
                             </select>
+                            <button type="submit" class="btn btn-primary btn-sm px-3">Update Status</button>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Status</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
     <x-slot name="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script>
-        document.getElementById('statusModal').addEventListener('show.bs.modal', function (event) {
-            const btn = event.relatedTarget;
-            document.getElementById('status_item').textContent     = btn.dataset.name;
-            document.getElementById('status_customer').textContent = btn.dataset.customer;
-            document.getElementById('status_select').value         = btn.dataset.status;
-            document.getElementById('statusForm').action           = '/bookings/' + btn.dataset.id + '/status';
+        const statusColors = {
+            pending:   '#eab308',
+            confirmed: '#22c55e',
+            cancelled: '#ef4444',
+            completed: '#3b82f6',
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left:   'prev,next today',
+                    center: 'title',
+                    right:  'dayGridMonth,timeGridWeek,listMonth'
+                },
+                height: 'auto',
+                events: '{{ route("bookings.events") }}',
+                eventClick: function (info) {
+                    const p = info.event.extendedProps;
+                    const start = info.event.start ? info.event.start.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+                    const endRaw = info.event.end ? new Date(info.event.end.getTime() - 86400000) : null;
+                    const end = endRaw ? endRaw.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : start;
+
+                    document.getElementById('modal_booking_title').textContent = p.item;
+
+                    const badge = document.getElementById('modal_status_badge');
+                    const colorMap = { pending:'#eab308', confirmed:'#22c55e', cancelled:'#ef4444', completed:'#3b82f6' };
+                    badge.textContent = p.status.charAt(0).toUpperCase() + p.status.slice(1);
+                    badge.style.background = (colorMap[p.status] || '#6b7280') + '22';
+                    badge.style.color = colorMap[p.status] || '#6b7280';
+
+                    document.getElementById('modal_customer').textContent = p.customer;
+                    document.getElementById('modal_email').textContent    = p.email;
+                    document.getElementById('modal_phone').textContent    = p.phone || '—';
+                    document.getElementById('modal_dates').textContent    = start + (end !== start ? ' → ' + end : '');
+                    document.getElementById('modal_item').textContent     = p.item;
+                    document.getElementById('modal_total').textContent    = p.total;
+                    document.getElementById('modal_type_label').textContent = p.type;
+                    document.getElementById('modal_type_icon').className  = p.type === 'Car' ? 'fas fa-car' : 'fas fa-building';
+
+                    const specialRow = document.getElementById('modal_special_row');
+                    if (p.special) {
+                        document.getElementById('modal_special').textContent = p.special;
+                        specialRow.style.display = 'flex';
+                    } else {
+                        specialRow.style.display = 'none';
+                    }
+
+                    document.getElementById('modal_status_select').value = p.status;
+                    document.getElementById('statusUpdateForm').action = '/bookings/' + info.event.id + '/status';
+
+                    var modal = new bootstrap.Modal(document.getElementById('bookingDetailModal'));
+                    modal.show();
+                }
+            });
+
+            calendar.render();
+
+            // Refresh calendar after status update
+            document.getElementById('statusUpdateForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const form = this;
+                fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).then(r => {
+                    if (r.ok || r.redirected) {
+                        bootstrap.Modal.getInstance(document.getElementById('bookingDetailModal')).hide();
+                        calendar.refetchEvents();
+                    }
+                });
+            });
         });
     </script>
     </x-slot>

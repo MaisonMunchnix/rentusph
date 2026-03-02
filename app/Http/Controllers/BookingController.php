@@ -40,6 +40,51 @@ class BookingController extends Controller
         return view('customer.bookings', compact('bookings'));
     }
 
+    public function events()
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $bookings = Booking::with('bookable')->get();
+
+        $colorMap = [
+            'pending'   => '#eab308',
+            'confirmed' => '#22c55e',
+            'cancelled' => '#ef4444',
+            'completed' => '#3b82f6',
+        ];
+
+        $events = $bookings->map(function ($booking) use ($colorMap) {
+            $isCar = $booking->bookable_type === 'App\Models\Car';
+            $name = $isCar
+                ? ($booking->bookable->brand ?? '') . ' ' . ($booking->bookable->model ?? '')
+                : ($booking->bookable->title ?? 'N/A');
+
+            return [
+                'id'    => $booking->id,
+                'title' => $booking->customer_name . ' — ' . trim($name),
+                'start' => $booking->start_date,
+                'end'   => $booking->end_date
+                    ? \Carbon\Carbon::parse($booking->end_date)->addDay()->format('Y-m-d')
+                    : null,
+                'color'           => $colorMap[$booking->status] ?? '#6b7280',
+                'extendedProps'   => [
+                    'status'        => $booking->status,
+                    'customer'      => $booking->customer_name,
+                    'email'         => $booking->customer_email,
+                    'phone'         => $booking->customer_phone,
+                    'item'          => trim($name),
+                    'type'          => $isCar ? 'Car' : 'Property',
+                    'total'         => '₱' . number_format($booking->total_price, 2),
+                    'special'       => $booking->special_requests,
+                ],
+            ];
+        });
+
+        return response()->json($events);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
