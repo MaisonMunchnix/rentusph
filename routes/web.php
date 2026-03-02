@@ -87,6 +87,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/bookings/{booking}', [\App\Http\Controllers\BookingController::class, 'update'])->name('bookings.update');
     Route::delete('/bookings/{booking}/cancel', [\App\Http\Controllers\BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::patch('/bookings/{booking}/status', [\App\Http\Controllers\BookingController::class, 'updateStatus'])->name('bookings.status');
+    Route::post('/bookings/{booking}/proof', [\App\Http\Controllers\BookingController::class, 'uploadProof'])->name('bookings.proof');
 
     // Affiliate Management
     Route::get('/affiliate-management', [\App\Http\Controllers\AffiliateManagementController::class, 'index'])->name('affiliates.index');

@@ -8,6 +8,7 @@ use App\Models\Property;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BookingController extends Controller
 {
@@ -197,5 +198,28 @@ class BookingController extends Controller
         $booking->update(['status' => $request->status]);
 
         return redirect()->back()->with('success', 'Booking status updated to ' . ucfirst($request->status) . '.');
+    }
+
+    public function uploadProof(Request $request, Booking $booking)
+    {
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'proof_of_payment' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
+
+        if ($request->hasFile('proof_of_payment')) {
+            // Delete old proof if it exists
+            if ($booking->proof_of_payment) {
+                Storage::disk('public')->delete($booking->proof_of_payment);
+            }
+
+            $path = $request->file('proof_of_payment')->store('proofs', 'public');
+            $booking->update(['proof_of_payment' => $path]);
+        }
+
+        return redirect()->back()->with('success', 'Proof of payment uploaded successfully!');
     }
 }
