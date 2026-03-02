@@ -16394,7 +16394,6 @@ label {
 .dlabnav .metismenu {
   display: flex;
   flex-direction: var(--dz-side-menu-direction);
-  padding-top: 0.9375rem;
 }
 
 .dlabnav .metismenu.fixed {
