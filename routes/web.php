@@ -40,9 +40,7 @@ Route::get('/dashboard', function () {
     if (Auth::user()->role === 'admin') {
         return view('admin.index');
     } elseif (Auth::user()->role === 'customer') {
-        $cars = \App\Models\Car::where('is_available', true)->latest()->take(6)->get();
-        $properties = \App\Models\Property::where('is_available', true)->latest()->take(6)->get();
-        return view('customer.index', compact('cars', 'properties'));
+        return redirect()->route('customer.explore');
     } elseif (Auth::user()->role === 'affiliate') {
         return view('affiliate.index');
     }
@@ -62,9 +60,9 @@ Route::post('/pending-review/vehicles', [\App\Http\Controllers\AffiliateRegistra
 
 // Customer Browsing Routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/browse/cars', [\App\Http\Controllers\CarController::class, 'customerIndex'])->name('customer.cars');
-    Route::get('/browse/properties', [\App\Http\Controllers\PropertyController::class, 'customerIndex'])->name('customer.properties');
     Route::get('/explore-listings', [\App\Http\Controllers\ListingController::class, 'index'])->name('customer.explore');
+    Route::get('/customer/profile', [\App\Http\Controllers\CustomerProfileController::class, 'index'])->name('customer.profile');
+    Route::put('/customer/profile', [\App\Http\Controllers\CustomerProfileController::class, 'update'])->name('customer.profile.update');
 });
 
 // Car Management (Protected)

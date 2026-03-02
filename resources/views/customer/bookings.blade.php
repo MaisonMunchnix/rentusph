@@ -72,7 +72,7 @@
                             </div>
                             <h5>No Bookings Found</h5>
                             <p class="text-muted">You haven't made any bookings yet.</p>
-                            <a href="{{ url('/') }}" class="btn btn-primary mt-3">Disover Cars & Properties</a>
+                            <a href="{{ url('/explore-listings') }}" class="btn btn-primary mt-3">Discover Cars & Properties</a>
                         </div>
                     @endif
                 </div>

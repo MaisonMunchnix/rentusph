@@ -141,6 +141,16 @@
         .dlabnav .metismenu > li > a {
             transition: all 0.2s ease;
         }
+
+        /* Remove lavender/themed footer strip */
+        .footer {
+            background-color: #f8f9fa !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .footer .copyright p {
+            color: #94a3b8 !important;
+        }
     </style>
     {{ $styles ?? '' }}
 </head>

@@ -2,16 +2,10 @@
 <div class="dlabnav">
     <div class="dlabnav-scroll d-flex flex-column justify-content-between">
         <ul class="metismenu" id="menu">
-            <li class="{{ request()->is('dashboard*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('dashboard*') ? 'mm-active active' : '' }}" href="{{ route('dashboard') }}" aria-expanded="false">
-                    <i class="fas fa-home"></i>
-                    <span class="nav-text">Home</span>
-                </a>
-            </li>
             <li class="{{ request()->is('explore-listings*') ? 'mm-active active' : '' }}">
                 <a class="{{ request()->is('explore-listings*') ? 'mm-active active' : '' }}" href="{{ route('customer.explore') }}" aria-expanded="false">
-                    <i class="fas fa-th-large"></i>
-                    <span class="nav-text">Explore Listings</span>
+                    <i class="fas fa-search"></i>
+                    <span class="nav-text">Search Rentals</span>
                 </a>
             </li>
             <li class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}">
@@ -21,7 +15,7 @@
                 </a>
             </li>
             <li class="{{ request()->is('customer/profile*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('customer/profile*') ? 'mm-active active' : '' }}" href="#" aria-expanded="false">
+                <a class="{{ request()->is('customer/profile*') ? 'mm-active active' : '' }}" href="{{ route('customer.profile') }}" aria-expanded="false">
                     <i class="fas fa-user"></i>
                     <span class="nav-text">Profile</span>
                 </a>

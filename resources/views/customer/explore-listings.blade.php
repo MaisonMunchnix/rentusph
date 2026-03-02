@@ -123,11 +123,14 @@
     </x-slot>
 
     <div class="row">
-        <div class="col-12">
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <div>
-                    <h2 class="font-w700 mb-0">Explore Listings</h2>
-                    <p class="text-muted mb-0">Discover cars and properties all in one place</p>
+        <div class="col-xl-12">
+            <div class="card mb-4 overflow-hidden">
+                <div class="card-body py-5 position-relative">
+                    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(234, 179, 8, 0.05); border-radius: 50%;"></div>
+                    <div style="position: absolute; bottom: -30px; left: 10%; width: 100px; height: 100px; background: rgba(234, 179, 8, 0.03); border-radius: 50%;"></div>
+                    
+                    <h2 class="mb-2 text-dark font-w700">Welcome home, {{ Auth::user()->name }}!</h2>
+                    <p class="text-muted mb-0">Explore our available fleet and premium stays ready for your next trip.</p>
                 </div>
             </div>
         </div>
