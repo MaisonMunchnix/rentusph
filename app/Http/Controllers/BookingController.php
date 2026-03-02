@@ -11,8 +11,31 @@ use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if (Auth::user()->role === 'admin') {
+            $query = Booking::with(['bookable', 'user'])->latest();
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('type')) {
+                $query->where('bookable_type', $request->type === 'car' ? 'App\Models\Car' : 'App\Models\Property');
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('customer_name', 'LIKE', "%{$search}%")
+                      ->orWhere('customer_email', 'LIKE', "%{$search}%");
+                });
+            }
+
+            $bookings = $query->paginate(15);
+            return view('admin.bookings', compact('bookings'));
+        }
+
         $bookings = Auth::user()->bookings()->with('bookable')->latest()->get();
         return view('customer.bookings', compact('bookings'));
     }
@@ -114,5 +137,20 @@ class BookingController extends Controller
         }
 
         return redirect()->back()->with('error', 'Cannot cancel this booking.');
+    }
+
+    public function updateStatus(Request $request, Booking $booking)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,completed,cancelled',
+        ]);
+
+        $booking->update(['status' => $request->status]);
+
+        return redirect()->back()->with('success', 'Booking status updated to ' . ucfirst($request->status) . '.');
     }
 }
