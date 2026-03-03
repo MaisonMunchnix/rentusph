@@ -222,4 +222,14 @@ class BookingController extends Controller
 
         return redirect()->back()->with('success', 'Proof of payment uploaded successfully!');
     }
+
+    public function payments()
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $bookings = Booking::with(['bookable', 'user'])->latest()->paginate(15);
+        return view('admin.payments', compact('bookings'));
+    }
 }

@@ -101,6 +101,9 @@ Route::middleware(['auth'])->group(function () {
         return view('admin.reports');
     })->name('admin.reports');
 
+    // Admin Payments
+    Route::get('/admin/payments', [\App\Http\Controllers\BookingController::class, 'payments'])->name('admin.payments');
+
     // Customer Management
     Route::get('/admin/customers', function () {
         $customers = \App\Models\User::where('role', 'customer')->latest()->get();
