@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Inspection;
 
 class BookingController extends Controller
 {
@@ -42,69 +43,79 @@ class BookingController extends Controller
 
     public function events()
     {
-        $user = Auth::user();
-        $query = Booking::with('bookable');
+        try {
+            $user = Auth::user();
+            $query = Booking::with('bookable');
 
-        if ($user->role === 'affiliate') {
-            $carIds = Car::where('user_id', $user->id)->pluck('id')->toArray();
-            $propertyIds = Property::where('user_id', $user->id)->pluck('id')->toArray();
+            if ($user->role === 'affiliate') {
+                $carIds = Car::where('user_id', $user->id)->pluck('id')->toArray();
+                $propertyIds = Property::where('user_id', $user->id)->pluck('id')->toArray();
 
-            $query->where(function($q) use ($carIds) {
-                $q->where('bookable_type', 'App\Models\Car')->whereIn('bookable_id', $carIds);
-            })->orWhere(function($q) use ($propertyIds) {
-                $q->where('bookable_type', 'App\Models\Property')->whereIn('bookable_id', $propertyIds);
-            });
-        } elseif ($user->role !== 'admin') {
-            abort(403);
-        }
+                $query->where(function($q) use ($carIds) {
+                    $q->where('bookable_type', 'App\Models\Car')->whereIn('bookable_id', $carIds);
+                })->orWhere(function($q) use ($propertyIds) {
+                    $q->where('bookable_type', 'App\Models\Property')->whereIn('bookable_id', $propertyIds);
+                });
+            } elseif ($user->role !== 'admin') {
+                abort(403);
+            }
 
-        if (request()->filled('car_id')) {
-            $query->where('bookable_type', 'App\Models\Car')->where('bookable_id', request()->car_id);
-        }
+            if (request()->filled('car_id')) {
+                $query->where('bookable_type', 'App\Models\Car')->where('bookable_id', request()->car_id);
+            }
 
-        $bookings = $query->get();
+            $bookings = $query->get();
 
-        $colorMap = [
-            'pending'   => '#eab308',
-            'confirmed' => '#22c55e',
-            'cancelled' => '#ef4444',
-            'completed' => '#3b82f6',
-        ];
-
-        $events = $bookings->map(function ($booking) use ($colorMap) {
-            $isCar = $booking->bookable_type === 'App\Models\Car';
-            $name = $isCar
-                ? ($booking->bookable->brand ?? '') . ' ' . ($booking->bookable->model ?? '')
-                : ($booking->bookable->title ?? 'N/A');
-
-            $image = $booking->bookable->image 
-                ? asset($booking->bookable->image) 
-                : 'https://placehold.co/600x400?text=' . urlencode($name);
-
-            return [
-                'id'    => $booking->id,
-                'title' => $booking->customer_name . ' — ' . trim($name),
-                'start' => $booking->start_date,
-                'end'   => $booking->end_date
-                    ? \Carbon\Carbon::parse($booking->end_date)->addDay()->format('Y-m-d')
-                    : null,
-                'color'           => $colorMap[$booking->status] ?? '#6b7280',
-                'extendedProps'   => [
-                    'status'        => $booking->status,
-                    'customer'      => $booking->customer_name,
-                    'email'         => $booking->customer_email,
-                    'phone'         => $booking->customer_phone,
-                    'item'          => trim($name),
-                    'type'          => $isCar ? 'Car' : 'Property',
-                    'total'         => '₱' . number_format($booking->total_price, 2),
-                    'special'       => $booking->special_requests,
-                    'image_url'     => $image,
-                    'proof_url'     => $booking->proof_of_payment ? asset('storage/' . $booking->proof_of_payment) : null,
-                ],
+            $colorMap = [
+                'pending'   => '#eab308',
+                'confirmed' => '#22c55e',
+                'cancelled' => '#ef4444',
+                'completed' => '#3b82f6',
             ];
-        });
 
-        return response()->json($events);
+            $events = $bookings->map(function ($booking) use ($colorMap) {
+                $isCar = $booking->bookable_type === 'App\Models\Car';
+                
+                if (!$booking->bookable) {
+                    $name = 'Unknown Item (Deleted)';
+                    $image = 'https://placehold.co/600x400?text=Deleted';
+                } else {
+                    $name = $isCar
+                        ? ($booking->bookable->brand ?? '') . ' ' . ($booking->bookable->model ?? '')
+                        : ($booking->bookable->title ?? 'N/A');
+
+                    $image = $booking->bookable->image 
+                        ? asset($booking->bookable->image) 
+                        : 'https://placehold.co/600x400?text=' . urlencode($name);
+                }
+
+                return [
+                    'id'    => $booking->id,
+                    'title' => $booking->customer_name . ' — ' . trim($name),
+                    'start' => $booking->start_date,
+                    'end'   => $booking->end_date
+                        ? \Carbon\Carbon::parse($booking->end_date)->addDay()->format('Y-m-d')
+                        : null,
+                    'color'           => $colorMap[$booking->status] ?? '#6b7280',
+                    'extendedProps'   => [
+                        'status'        => $booking->status,
+                        'customer'      => $booking->customer_name,
+                        'email'         => $booking->customer_email,
+                        'phone'         => $booking->customer_phone,
+                        'item'          => trim($name),
+                        'type'          => $isCar ? 'Car' : 'Property',
+                        'total'         => '₱' . number_format($booking->total_price, 2),
+                        'special'       => $booking->special_requests,
+                        'image_url'     => $image,
+                        'proof_url'     => $booking->proof_of_payment ? asset('storage/' . $booking->proof_of_payment) : null,
+                    ],
+                ];
+            });
+
+            return response()->json($events);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function store(Request $request)
@@ -224,9 +235,25 @@ class BookingController extends Controller
 
         $request->validate([
             'status' => 'required|in:pending,confirmed,completed,cancelled',
+            'inspection_condition' => 'nullable|in:good,damaged',
+            'inspection_notes' => 'nullable|string',
         ]);
 
         $booking->update(['status' => $request->status]);
+
+        // If completing, save inspection
+        if ($request->status === 'completed' && $request->has('inspection_condition')) {
+            Inspection::updateOrCreate(
+                ['booking_id' => $booking->id],
+                [
+                    'condition' => $request->inspection_condition,
+                    'notes' => $request->inspection_notes,
+                ]
+            );
+            
+            // If carriage is damaged, we might want to flag the car later. 
+            // For now, we just save the record.
+        }
 
         return redirect()->back()->with('success', 'Booking status updated to ' . ucfirst($request->status) . '.');
     }

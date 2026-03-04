@@ -111,6 +111,49 @@
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
+            
+            /* Inspection Section Styles */
+            .inspection-container {
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 15px;
+                margin-top: 15px;
+            }
+            .condition-toggle {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+            .condition-btn {
+                flex: 1;
+                text-align: center;
+                padding: 8px;
+                border-radius: 8px;
+                border: 1px solid #e2e8f0;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.85rem;
+                transition: all 0.2s;
+                background: #fff;
+                color: #64748b;
+            }
+            .condition-btn i { margin-right: 5px; }
+            .condition-btn.active.good {
+                background: #dcfce7;
+                color: #15803d;
+                border-color: #15803d;
+            }
+            .condition-btn.active.damaged {
+                background: #fee2e2;
+                color: #b91c1c;
+                border-color: #b91c1c;
+            }
+            .inspection-notes {
+                border-radius: 8px;
+                font-size: 0.85rem;
+                border: 1px solid #e2e8f0;
+            }
         </style>
     </x-slot>
 
@@ -251,6 +294,20 @@
                                 <span>Update</span>
                             </button>
                         </div>
+
+                        <div id="inspectionSection" class="inspection-container" style="display: none;">
+                            <h6 class="detail-label mb-3">Return Inspection Report</h6>
+                            <div class="condition-toggle">
+                                <div class="condition-btn good active" onclick="setCondition('good')">
+                                    <i class="fas fa-check-circle"></i> Clean / Good
+                                </div>
+                                <div class="condition-btn damaged" onclick="setCondition('damaged')">
+                                    <i class="fas fa-exclamation-triangle"></i> Damaged / Issues
+                                </div>
+                            </div>
+                            <input type="hidden" name="inspection_condition" id="inspection_condition" value="good">
+                            <textarea name="inspection_notes" class="form-control inspection-notes" rows="2" placeholder="Describe any new scratches, fuel level, or issues..."></textarea>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -279,8 +336,9 @@
                     events: {
                         url: '{{ route("bookings.events") }}',
                         extraParams: function() {
+                            const filter = document.getElementById('carFilter');
                             return {
-                                car_id: document.getElementById('carFilter').value
+                                car_id: filter ? filter.value : ''
                             };
                         }
                     },
@@ -327,6 +385,26 @@
                             proofStatus.innerHTML = `<span class="text-danger small fw-bold">Not Uploaded</span>`;
                         }
 
+                        // Handle Inspection Data Display
+                        const inspectionSection = document.getElementById('inspectionSection');
+                        if (p.inspection) {
+                            inspectionSection.style.display = 'block';
+                            document.querySelector('.detail-label.mb-3').textContent = 'Inspection Report (Stored)';
+                            setCondition(p.inspection.condition);
+                            document.querySelector('.inspection-notes').value = p.inspection.notes || '';
+                            // If it's already completed, maybe disable editing? 
+                            // For OJT, let's keep it editable so they can fix mistakes.
+                        } else {
+                            if (p.status === 'completed') {
+                                inspectionSection.style.display = 'block';
+                                document.querySelector('.detail-label.mb-3').textContent = 'Return Inspection Report';
+                                setCondition('good');
+                                document.querySelector('.inspection-notes').value = '';
+                            } else {
+                                inspectionSection.style.display = 'none';
+                            }
+                        }
+
                         const specialRow = document.getElementById('modal_special_row');
                         if (p.special) {
                             document.getElementById('modal_special').textContent = p.special;
@@ -359,25 +437,59 @@
                 calendar.render();
 
                 // Handle car filter change
-                document.getElementById('carFilter').addEventListener('change', function() {
-                    calendar.refetchEvents();
-                });
+                const filterEl = document.getElementById('carFilter');
+                if (filterEl) {
+                    filterEl.addEventListener('change', function() {
+                        calendar.refetchEvents();
+                    });
+                }
+
+                // Toggle inspection section based on status
+                const statusSelect = document.getElementById('modal_status_select');
+                const inspectionSection = document.getElementById('inspectionSection');
+                
+                function toggleInspection() {
+                    if (statusSelect && inspectionSection) {
+                        if (statusSelect.value === 'completed') {
+                            $(inspectionSection).slideDown();
+                        } else {
+                            $(inspectionSection).slideUp();
+                        }
+                    }
+                }
+
+                if (statusSelect) {
+                    statusSelect.addEventListener('change', toggleInspection);
+                    // For bootstrap-select
+                    $(statusSelect).on('changed.bs.select', toggleInspection);
+                }
+
+                window.setCondition = function(val) {
+                    const conditionInput = document.getElementById('inspection_condition');
+                    if (conditionInput) conditionInput.value = val;
+                    document.querySelectorAll('.condition-btn').forEach(btn => btn.classList.remove('active'));
+                    const activeBtn = document.querySelector(`.condition-btn.${val}`);
+                    if (activeBtn) activeBtn.classList.add('active');
+                };
 
                 // Handle ajax form submission to avoid reload
-                document.getElementById('statusUpdateForm').addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    const form = this;
-                    fetch(form.action, {
-                        method: 'POST',
-                        body: new FormData(form),
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    }).then(r => {
-                        if (r.ok || r.redirected) {
-                            bootstrap.Modal.getInstance(document.getElementById('bookingDetailModal')).hide();
-                            calendar.refetchEvents();
-                        }
+                const updateForm = document.getElementById('statusUpdateForm');
+                if (updateForm) {
+                    updateForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const form = this;
+                        fetch(form.action, {
+                            method: 'POST',
+                            body: new FormData(form),
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        }).then(r => {
+                            if (r.ok || r.redirected) {
+                                bootstrap.Modal.getInstance(document.getElementById('bookingDetailModal')).hide();
+                                calendar.refetchEvents();
+                            }
+                        });
                     });
-                });
+                }
             });
         </script>
     </x-slot>
