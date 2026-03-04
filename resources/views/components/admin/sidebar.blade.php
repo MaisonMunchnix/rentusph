@@ -26,8 +26,8 @@
                     <span class="nav-text">Properties</span>
                 </a>
             </li>
-            <li>
-                <a href="#" aria-expanded="false">
+            <li class="{{ request()->is('admin/payments*') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->is('admin/payments*') ? 'mm-active active' : '' }}" href="{{ route('admin.payments') }}" aria-expanded="false">
                     <i class="fas fa-credit-card"></i>
                     <span class="nav-text">Payments</span>
                 </a>

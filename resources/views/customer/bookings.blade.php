@@ -4,6 +4,12 @@
             .table-responsive {
                 overflow: visible !important;
             }
+            .btn-xs {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+                line-height: 1.5;
+                border-radius: 0.2rem;
+            }
         </style>
     </x-slot>
     <div class="row">
@@ -15,21 +21,22 @@
                 <div class="card-body">
                     @if(isset($bookings) && $bookings->count() > 0)
                         <div class="table-responsive">
-                            <table class="table table-responsive-md">
+                            <table class="table table-responsive-md text-nowrap">
                                 <thead>
                                     <tr>
-                                        <th><strong>BOOKING ID</strong></th>
+                                        <th><strong>ID</strong></th>
                                         <th><strong>CAR/PROPERTY</strong></th>
                                         <th><strong>DATES</strong></th>
                                         <th><strong>TOTAL PRICE</strong></th>
                                         <th><strong>STATUS</strong></th>
-                                        <th></th>
+                                        <th><strong>PROOF OF PAYMENT</strong></th>
+                                        <th class="text-center"><strong>ACTIONS</strong></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($bookings as $booking)
                                         <tr>
-                                            <td><strong>#BK-{{ $booking->id }}</strong></td>
+                                            <td><strong>#{{ $booking->id }}</strong></td>
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     @if($booking->bookable_type === 'App\Models\Car')
@@ -56,24 +63,34 @@
                                                 <span class="badge light {{ $badgeClass }}">{{ ucfirst($booking->status) }}</span>
                                             </td>
                                             <td>
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn btn-success light sharp" data-bs-toggle="dropdown">
-                                                        <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><circle fill="#000000" cx="5" cy="12" r="2"/><circle fill="#000000" cx="12" cy="12" r="2"/><circle fill="#000000" cx="19" cy="12" r="2"/></g></svg>
+                                                @if($booking->proof_of_payment)
+                                                    <button type="button" class="btn btn-info btn-xs light shadow-none" data-bs-toggle="modal" data-bs-target="#viewProofModal{{ $booking->id }}">
+                                                        <i class="fas fa-eye me-1"></i> View Proof
                                                     </button>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#viewBookingModal{{ $booking->id }}">Edit Details</a>
-                                                        @if($booking->status === 'pending')
-                                                            <a class="dropdown-item text-danger" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#cancelBookingModal{{ $booking->id }}">Cancel Booking</a>
-                                                        @endif
-                                                    </div>
+                                                @else
+                                                    <button type="button" class="btn btn-outline-primary btn-xs shadow-none" data-bs-toggle="modal" data-bs-target="#uploadProofModal{{ $booking->id }}">
+                                                        <i class="fas fa-upload me-1"></i> Upload Proof
+                                                    </button>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <button type="button" class="btn btn-primary btn-xs sharp shadow-none" data-bs-toggle="modal" data-bs-target="#viewBookingModal{{ $booking->id }}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    @if($booking->status === 'pending')
+                                                        <button type="button" class="btn btn-danger btn-xs sharp shadow-none" data-bs-toggle="modal" data-bs-target="#cancelBookingModal{{ $booking->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    @endif
                                                 </div>
 
-                                                <!-- View/Edit Modal -->
+                                                <!-- Edit Modal -->
                                                 <div class="modal fade" id="viewBookingModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
-                                                    <div class="modal-dialog modal-lg">
+                                                    <div class="modal-dialog modal-lg text-start">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title">Edit Booking Details - #BK-{{ $booking->id }}</h5>
+                                                                <h5 class="modal-title">Edit Booking Details - #{{ $booking->id }}</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <form action="{{ route('bookings.update', $booking->id) }}" method="POST">
@@ -134,7 +151,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
                                                                     @if($booking->status === 'pending')
                                                                         <button type="submit" class="btn btn-primary">Save Changes</button>
                                                                     @endif
@@ -144,20 +161,73 @@
                                                     </div>
                                                 </div>
 
+                                                <!-- Upload Proof Modal -->
+                                                <div class="modal fade" id="uploadProofModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog text-start">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Upload Proof of Payment</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('bookings.proof', $booking->id) }}" method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <p class="small text-muted mb-3">Please upload an image or PDF of your bank transfer, G-Cash screenshot, or deposit slip.</p>
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label font-w600 text-dark">Select File</label>
+                                                                        <input type="file" name="proof_of_payment" class="form-control" required accept="image/*,.pdf">
+                                                                        <div class="form-text mt-2">Max file size: 5MB. Accepted formats: JPG, PNG, PDF.</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                                                    <button type="submit" class="btn btn-primary">Upload Now</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- View Proof Modal -->
+                                                @if($booking->proof_of_payment)
+                                                <div class="modal fade" id="viewProofModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg text-start">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Proof of Payment - #{{ $booking->id }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body text-center bg-light">
+                                                                @if(Str::endsWith($booking->proof_of_payment, '.pdf'))
+                                                                    <iframe src="{{ asset('storage/' . $booking->proof_of_payment) }}" width="100%" height="500px"></iframe>
+                                                                @else
+                                                                    <img src="{{ asset('storage/' . $booking->proof_of_payment) }}" class="img-fluid rounded shadow-sm" alt="Proof of Payment">
+                                                                @endif
+                                                                <div class="mt-4">
+                                                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadProofModal{{ $booking->id }}">
+                                                                        <i class="fas fa-sync-alt me-1"></i> Update Proof
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @endif
+
                                                 <!-- Cancel Modal -->
                                                 @if($booking->status === 'pending')
                                                 <div class="modal fade" id="cancelBookingModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
-                                                    <div class="modal-dialog">
+                                                    <div class="modal-dialog text-start">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title">Cancel Booking</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
-                                                            <div class="modal-body">
+                                                            <div class="modal-body text-dark">
                                                                 Are you sure you want to cancel your booking for <strong>{{ $booking->bookable->brand ?? $booking->bookable->title ?? 'this item' }}</strong>?
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep it</button>
+                                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">No, Keep it</button>
                                                                 <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST">
                                                                     @csrf
                                                                     @method('DELETE')
@@ -168,8 +238,6 @@
                                                     </div>
                                                 </div>
                                                 @endif
-
-
                                             </td>
                                         </tr>
                                     @endforeach
