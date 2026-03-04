@@ -91,11 +91,6 @@
             transform: none !important;
         }
 
-        /* Ensure content area is light */
-        [data-theme-version="dark"] .content-body,
-        .content-body {
-            background-color: #f8f9fa !important;
-        }
 
         [data-theme-version="dark"] .card-title,
         [data-theme-version="dark"] .card-header,
@@ -112,9 +107,12 @@
             box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
         }
 
-        /* Footer & Layout Clean-up */
-        #main-wrapper {
-            background-color: #f8f9fa !important;
+        /* Ensure entire page and content area is white */
+        body,
+        #main-wrapper,
+        [data-theme-version="dark"] .content-body,
+        .content-body {
+            background-color: #ffffff !important;
         }
 
         .footer {

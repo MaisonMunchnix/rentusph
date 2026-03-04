@@ -67,10 +67,12 @@
             transform: none !important;
         }
 
-        /* Ensure content area is light */
+        /* Ensure entire page and content area is white */
+        body,
+        #main-wrapper,
         [data-theme-version="dark"] .content-body,
         .content-body {
-            background-color: #f8f9fa !important;
+            background-color: #ffffff !important;
         }
 
         [data-theme-version="dark"] .card-title,
@@ -86,6 +88,18 @@
         .card:hover {
             transform: none !important;
             box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
+        }
+
+
+        .footer {
+            background-color: #ffffff !important;
+            border-top: none !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        .footer .copyright {
+            background-color: #ffffff !important;
         }
 
         /* Sidebar Logout Positioning */

@@ -13,40 +13,72 @@ class BookingController extends Controller
 {
     public function index(Request $request)
     {
-        if (Auth::user()->role === 'admin') {
-            $query = Booking::with(['bookable', 'user'])->latest();
+        $user = Auth::user();
+        if ($user->role === 'admin') {
+            if ($request->get('view') === 'list') {
+                $query = Booking::with(['bookable', 'user'])->latest();
 
-            if ($request->filled('status')) {
-                $query->where('status', $request->status);
+                if ($request->filled('status')) {
+                    $query->where('status', $request->status);
+                }
+
+                if ($request->filled('type')) {
+                    $query->where('bookable_type', $request->type === 'car' ? 'App\Models\Car' : 'App\Models\Property');
+                }
+
+                if ($request->filled('search')) {
+                    $search = $request->search;
+                    $query->where(function($q) use ($search) {
+                        $q->where('customer_name', 'LIKE', "%{$search}%")
+                          ->orWhere('customer_email', 'LIKE', "%{$search}%");
+                    });
+                }
+
+                $bookings = $query->paginate(15);
+                return view('admin.bookings-list', compact('bookings'));
             }
-
-            if ($request->filled('type')) {
-                $query->where('bookable_type', $request->type === 'car' ? 'App\Models\Car' : 'App\Models\Property');
-            }
-
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function($q) use ($search) {
-                    $q->where('customer_name', 'LIKE', "%{$search}%")
-                      ->orWhere('customer_email', 'LIKE', "%{$search}%");
-                });
-            }
-
-            $bookings = $query->paginate(15);
-            return view('admin.bookings', compact('bookings'));
+            return view('admin.bookings');
         }
 
-        $bookings = Auth::user()->bookings()->with('bookable')->latest()->get();
+        if ($user->role === 'affiliate') {
+            if ($request->get('view') === 'list') {
+                $carIds = Car::where('user_id', $user->id)->pluck('id')->toArray();
+                $propertyIds = Property::where('user_id', $user->id)->pluck('id')->toArray();
+
+                $bookings = Booking::where(function($q) use ($carIds) {
+                        $q->where('bookable_type', 'App\Models\Car')->whereIn('bookable_id', $carIds);
+                    })->orWhere(function($q) use ($propertyIds) {
+                        $q->where('bookable_type', 'App\Models\Property')->whereIn('bookable_id', $propertyIds);
+                    })->with('bookable')->latest()->paginate(15);
+
+                return view('affiliate.bookings-list', compact('bookings'));
+            }
+            return view('affiliate.bookings');
+        }
+
+        $bookings = $user->bookings()->with('bookable')->latest()->get();
         return view('customer.bookings', compact('bookings'));
     }
 
     public function events()
     {
-        if (Auth::user()->role !== 'admin') {
+        $user = Auth::user();
+        $query = Booking::with('bookable');
+
+        if ($user->role === 'affiliate') {
+            $carIds = Car::where('user_id', $user->id)->pluck('id')->toArray();
+            $propertyIds = Property::where('user_id', $user->id)->pluck('id')->toArray();
+
+            $query->where(function($q) use ($carIds) {
+                $q->where('bookable_type', 'App\Models\Car')->whereIn('bookable_id', $carIds);
+            })->orWhere(function($q) use ($propertyIds) {
+                $q->where('bookable_type', 'App\Models\Property')->whereIn('bookable_id', $propertyIds);
+            });
+        } elseif ($user->role !== 'admin') {
             abort(403);
         }
 
-        $bookings = Booking::with('bookable')->get();
+        $bookings = $query->get();
 
         $colorMap = [
             'pending'   => '#eab308',
@@ -186,7 +218,17 @@ class BookingController extends Controller
 
     public function updateStatus(Request $request, Booking $booking)
     {
-        if (Auth::user()->role !== 'admin') {
+        $user = Auth::user();
+        
+        // Authorization check
+        if ($user->role === 'admin') {
+            // Admin can update any booking
+        } elseif ($user->role === 'affiliate') {
+            // Affiliate can only update bookings for their own items
+            if ($booking->bookable->user_id !== $user->id) {
+                abort(403);
+            }
+        } else {
             abort(403);
         }
 

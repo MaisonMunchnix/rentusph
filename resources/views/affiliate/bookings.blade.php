@@ -1,4 +1,4 @@
-<x-layouts.admin>
+<x-layouts.affiliate>
     <x-slot name="styles">
         <link href="{{ asset('vendor/fullcalendar/css/main.min.css') }}" rel="stylesheet">
         <link href="{{ asset('vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
@@ -53,7 +53,7 @@
 
                     <div class="">
                         <div id="external-events" class="my-3">
-                            <p class="text-muted">Legend for booking events on the calendar.</p>
+                            <p class="text-muted">Legend for your booking events on the calendar.</p>
                             
                             <div class="legend-item shadow-sm">
                                 <span class="legend-dot bg-warning"></span> Pending
@@ -71,7 +71,7 @@
 
                         <div class="mt-4 pt-3 border-top">
                             <a href="{{ route('bookings.index', ['view' => 'list']) }}" class="btn btn-primary d-block w-100">
-                                <i class="fas fa-add me-2"></i> Create Booking
+                                <i class="fas fa-list me-2"></i> View List
                             </a>
                         </div>
                     </div>
@@ -258,4 +258,4 @@
             });
         </script>
     </x-slot>
-</x-layouts.admin>
+</x-layouts.affiliate>

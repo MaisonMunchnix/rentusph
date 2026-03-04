@@ -61,8 +61,8 @@
                                     <td>
                                         <div class="d-flex justify-content-end">
                                             <a href="#" class="btn btn-primary shadow btn-xs sharp me-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editCarModal" onclick="populateEditModal({{ json_encode($car) }})"><i class="fas fa-pencil-alt"></i></a>
-                                            <a href="#" class="btn btn-warning shadow btn-xs sharp me-1" title="Toggle Status" onclick="event.preventDefault(); document.getElementById('toggle-status-{{ $car->id }}').submit();"><i class="fas fa-power-off"></i></a>
-                                            <a href="#" class="btn btn-danger shadow btn-xs sharp" title="Delete" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this car?')) document.getElementById('delete-car-{{ $car->id }}').submit();"><i class="fa fa-trash"></i></a>
+                                            <a href="#" class="btn btn-warning shadow btn-xs sharp me-1" title="Toggle Status" onclick="event.preventDefault(); confirmToggleStatus({{ $car->id }}, {{ $car->is_available ? 'true' : 'false' }});"><i class="fas fa-power-off"></i></a>
+                                            <a href="#" class="btn btn-danger shadow btn-xs sharp" title="Delete" onclick="event.preventDefault(); confirmDelete({{ $car->id }});"><i class="fa fa-trash"></i></a>
                                         </div>
                                         
                                         <!-- Actions Hidden Forms -->
@@ -254,49 +254,100 @@
         </div>
     </div>
     
-    <script>
-    function populateEditModal(car) {
-        document.getElementById('edit_brand').value = car.brand;
-        document.getElementById('edit_model').value = car.model;
-        document.getElementById('edit_year').value = car.year;
-        document.getElementById('edit_color').value = car.color;
-        document.getElementById('edit_plate_number').value = car.plate_number;
-        document.getElementById('edit_capacity').value = car.capacity;
-        document.getElementById('edit_transmission').value = car.transmission;
-        document.getElementById('edit_fuel_type').value = car.fuel_type;
-        document.getElementById('edit_daily_rate').value = car.daily_rate;
-        document.getElementById('edit_description').value = car.description;
-        
-        // Dynamically update the form action URL
-        const form = document.getElementById('editCarForm');
-        form.action = `/cars/${car.id}`;
+    <x-slot name="styles">
+        <link href="{{ asset('vendor/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
+    </x-slot>
 
-        // Update image preview
-        const preview = document.getElementById('edit_image_preview');
-        const icon = document.getElementById('edit_image_icon');
-        if (car.image) {
-            preview.src = `/${car.image}`;
-            preview.classList.remove('d-none');
-            icon.classList.add('d-none');
-        } else {
-            preview.classList.add('d-none');
-            icon.classList.remove('d-none');
+    <x-slot name="scripts">
+        <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}"></script>
+        <script>
+        function confirmToggleStatus(carId, isAvailable) {
+            const action = isAvailable ? 'deactivate' : 'activate';
+            const color = isAvailable ? '#eab308' : '#22c55e';
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to ${action} this car?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: color,
+                cancelButtonColor: '#d33',
+                confirmButtonText: `Yes, ${action} it!`,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('toggle-status-' + carId).submit();
+                }
+            });
         }
-    }
 
-    function previewImage(input, previewId, iconId) {
-        const preview = document.getElementById(previewId);
-        const icon = document.getElementById(iconId);
-        
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
+        function confirmDelete(carId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ff5e5e',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-car-' + carId).submit();
+                }
+            });
+        }
+
+        @if(session('success'))
+            Swal.fire({
+                title: 'Success!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                confirmButtonColor: '#eab308'
+            });
+        @endif
+
+        function populateEditModal(car) {
+            document.getElementById('edit_brand').value = car.brand;
+            document.getElementById('edit_model').value = car.model;
+            document.getElementById('edit_year').value = car.year;
+            document.getElementById('edit_color').value = car.color;
+            document.getElementById('edit_plate_number').value = car.plate_number;
+            document.getElementById('edit_capacity').value = car.capacity;
+            document.getElementById('edit_transmission').value = car.transmission;
+            document.getElementById('edit_fuel_type').value = car.fuel_type;
+            document.getElementById('edit_daily_rate').value = car.daily_rate;
+            document.getElementById('edit_description').value = car.description;
+            
+            const form = document.getElementById('editCarForm');
+            form.action = `/cars/${car.id}`;
+
+            const preview = document.getElementById('edit_image_preview');
+            const icon = document.getElementById('edit_image_icon');
+            if (car.image) {
+                preview.src = `/${car.image}`;
                 preview.classList.remove('d-none');
                 icon.classList.add('d-none');
+            } else {
+                preview.classList.add('d-none');
+                icon.classList.remove('d-none');
             }
-            reader.readAsDataURL(input.files[0]);
         }
-    }
-    </script>
+
+        function previewImage(input, previewId, iconId) {
+            const preview = document.getElementById(previewId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    icon.classList.add('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        </script>
+    </x-slot>
 </x-dynamic-component>
