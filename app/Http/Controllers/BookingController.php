@@ -16,29 +16,8 @@ class BookingController extends Controller
     {
         $user = Auth::user();
         if ($user->role === 'admin') {
-            if ($request->get('view') === 'list') {
-                $query = Booking::with(['bookable', 'user'])->latest();
-
-                if ($request->filled('status')) {
-                    $query->where('status', $request->status);
-                }
-
-                if ($request->filled('type')) {
-                    $query->where('bookable_type', $request->type === 'car' ? 'App\Models\Car' : 'App\Models\Property');
-                }
-
-                if ($request->filled('search')) {
-                    $search = $request->search;
-                    $query->where(function($q) use ($search) {
-                        $q->where('customer_name', 'LIKE', "%{$search}%")
-                          ->orWhere('customer_email', 'LIKE', "%{$search}%");
-                    });
-                }
-
-                $bookings = $query->paginate(15);
-                return view('admin.bookings-list', compact('bookings'));
-            }
-            return view('admin.bookings');
+            $cars = Car::orderBy('brand')->orderBy('model')->get();
+            return view('admin.bookings', compact('cars'));
         }
 
         if ($user->role === 'affiliate') {
@@ -77,6 +56,10 @@ class BookingController extends Controller
             });
         } elseif ($user->role !== 'admin') {
             abort(403);
+        }
+
+        if (request()->filled('car_id')) {
+            $query->where('bookable_type', 'App\Models\Car')->where('bookable_id', request()->car_id);
         }
 
         $bookings = $query->get();

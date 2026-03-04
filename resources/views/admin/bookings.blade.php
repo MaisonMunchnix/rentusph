@@ -52,6 +52,18 @@
                     <h4 class="card-intro-title">Booking Status</h4>
 
                     <div class="">
+                        <div class="mb-4">
+                            <label class="form-label font-w600">Filter by Car</label>
+                            <select id="carFilter" class="form-control default-select">
+                                <option value="">All Cars</option>
+                                @foreach($cars as $car)
+                                    <option value="{{ $car->id }}">
+                                        {{ $car->brand }} {{ $car->model }} ({{ $car->plate_number }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div id="external-events" class="my-3">
                             <p class="text-muted">Legend for booking events on the calendar.</p>
                             
@@ -173,7 +185,14 @@
                     editable: false,
                     selectable: false,
                     nowIndicator: true,
-                    events: '{{ route("bookings.events") }}',
+                    events: {
+                        url: '{{ route("bookings.events") }}',
+                        extraParams: function() {
+                            return {
+                                car_id: document.getElementById('carFilter').value
+                            };
+                        }
+                    },
                     eventClick: function (info) {
                         const p = info.event.extendedProps;
                         const start = info.event.start ? new Date(info.event.start).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
@@ -239,6 +258,11 @@
                 });
 
                 calendar.render();
+
+                // Handle car filter change
+                document.getElementById('carFilter').addEventListener('change', function() {
+                    calendar.refetchEvents();
+                });
 
                 // Handle ajax form submission to avoid reload
                 document.getElementById('statusUpdateForm').addEventListener('submit', function (e) {

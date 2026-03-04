@@ -17,6 +17,14 @@
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                                 <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                             </select>
+                            <select name="car_id" class="form-control default-select form-control-sm me-2" onchange="this.form.submit()">
+                                <option value="">All Cars</option>
+                                @foreach($cars as $car)
+                                    <option value="{{ $car->id }}" {{ request('car_id') == $car->id ? 'selected' : '' }}>
+                                        {{ $car->brand }} {{ $car->model }} ({{ $car->plate_number }})
+                                    </option>
+                                @endforeach
+                            </select>
                         </form>
                     </div>
                 </div>
