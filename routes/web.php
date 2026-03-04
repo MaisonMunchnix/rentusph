@@ -97,9 +97,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/affiliates/{user}', [\App\Http\Controllers\AffiliateManagementController::class, 'destroy'])->name('affiliates.destroy');
 
     // Admin Reports
-    Route::get('/admin/reports', function () {
-        return view('admin.reports');
-    })->name('admin.reports');
+    Route::get('/admin/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('admin.reports');
 
     // Admin Payments
     Route::get('/admin/payments', [\App\Http\Controllers\BookingController::class, 'payments'])->name('admin.payments');

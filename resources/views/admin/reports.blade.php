@@ -7,7 +7,7 @@
                     <div class="d-flex align-items-center">
                         <div class="me-auto">
                             <p class="mb-1 text-primary">Total Bookings (This Month)</p>
-                            <h2 class="text-dark">124</h2>
+                            <h2 class="text-dark">{{ number_format($totalBookingsThisMonth) }}</h2>
                         </div>
                         <div class="icon-box-lg bg-light-warning circle">
                             <i class="fas fa-calendar-check text-primary"></i>
@@ -22,7 +22,7 @@
                     <div class="d-flex align-items-center">
                         <div class="me-auto">
                             <p class="mb-1 text-success">Total Revenue (This Month)</p>
-                            <h2 class="text-dark">₱45,200</h2>
+                            <h2 class="text-dark">₱{{ number_format($totalRevenueThisMonth, 2) }}</h2>
                         </div>
                         <div class="icon-box-lg bg-light-success circle">
                             <i class="fas fa-wallet text-success"></i>
@@ -37,7 +37,7 @@
                     <div class="d-flex align-items-center">
                         <div class="me-auto">
                             <p class="mb-1 text-info">Active Deliveries</p>
-                            <h2 class="text-dark">12</h2>
+                            <h2 class="text-dark">{{ number_format($activeDeliveries) }}</h2>
                         </div>
                         <div class="icon-box-lg bg-light-info circle">
                             <i class="fas fa-car text-info"></i>
@@ -89,30 +89,30 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ asset('images/car-placeholder.png') }}" class="rounded-lg me-2" width="24" alt=""/>
-                                            <span class="w-space-no">Toyota Vios 2023</span>
-                                        </div>
-                                    </td>
-                                    <td>John Doe</td>
-                                    <td>45</td>
-                                    <td>₱15,000</td>
-                                    <td><span class="badge light badge-success">Available</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ asset('images/car-placeholder.png') }}" class="rounded-lg me-2" width="24" alt=""/>
-                                            <span class="w-space-no">Mitsubishi Mirage</span>
-                                        </div>
-                                    </td>
-                                    <td>Jane Smith</td>
-                                    <td>38</td>
-                                    <td>₱12,400</td>
-                                    <td><span class="badge light badge-success">Available</span></td>
-                                </tr>
+                                @forelse($topPerformingCars as $car)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ $car->image ? asset('storage/' . $car->image) : asset('images/car-placeholder.png') }}" class="rounded-lg me-2" width="24" alt=""/>
+                                                <span class="w-space-no">{{ $car->brand }} {{ $car->model }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ $car->user->name ?? 'N/A' }}</td>
+                                        <td>{{ $car->bookings_count }}</td>
+                                        <td>₱{{ number_format($car->bookings_sum_total_price ?? 0, 2) }}</td>
+                                        <td>
+                                            @if($car->is_available)
+                                                <span class="badge light badge-success">Available</span>
+                                            @else
+                                                <span class="badge light badge-danger">Unavailable</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">No car data available</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -129,11 +129,11 @@
                 series: [{
                     name: 'Bookings',
                     type: 'column',
-                    data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45]
+                    data: @json($chartBookings)
                 }, {
                     name: 'Revenue (₱)',
                     type: 'line',
-                    data: [3000, 2500, 3600, 3000, 4500, 3500, 6400, 5200, 5900, 3600, 3900, 5100]
+                    data: @json($chartRevenue)
                 }],
                 chart: {
                     height: 350,
@@ -142,7 +142,7 @@
                 },
                 stroke: { width: [0, 4] },
                 colors: ['#eab308', '#22c55e'],
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                labels: @json($chartLabels),
                 xaxis: { type: 'category' },
                 yaxis: [{
                     title: { text: 'Bookings' },
@@ -156,13 +156,13 @@
 
             // Popular Cars Chart
             var options2 = {
-                series: [44, 55, 13, 33],
+                series: @json($popularCarsSeries),
                 chart: {
                     width: '100%',
                     type: 'donut',
                 },
-                labels: ['Toyota Vios', 'Mitsubishi Mirage', 'Hyundai Accent', 'Honda City'],
-                colors: ['#eab308', '#3b82f6', '#22c55e', '#ef4444'],
+                labels: @json($popularCarsLabels),
+                colors: ['#eab308', '#3b82f6', '#22c55e', '#ef4444', '#a855f7'],
                 plotOptions: {
                     pie: {
                         donut: {
