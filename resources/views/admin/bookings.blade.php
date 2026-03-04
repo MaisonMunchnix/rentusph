@@ -6,9 +6,10 @@
             #bookingDetailModal .modal-header { border-bottom: none; }
             .detail-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
             .detail-icon { 
-                width: 32px; height: 32px; border-radius: 8px; 
+                width: 20px; 
                 display: flex; align-items: center; justify-content: center; 
-                font-size: 0.85rem; flex-shrink: 0;
+                font-size: 1rem; flex-shrink: 0;
+                margin-top: 2px;
             }
             .detail-label { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
             .detail-value { font-size: 0.9rem; color: #0f172a; font-weight: 500; }
@@ -34,6 +35,81 @@
                 height: 12px;
                 border-radius: 50%;
                 display: inline-block;
+            }
+            .item-image-container {
+                width: 100%;
+                height: 154px;
+                border-radius: 12px;
+                overflow: hidden;
+                margin-bottom: 20px;
+                background: #f1f5f9;
+                border: 1px solid #e2e8f0;
+            }
+            .item-image-container img {
+                width: 100%; height: 100%; object-fit: cover;
+            }
+            .status-cta-container {
+                display: flex;
+                align-items: stretch;
+                gap: 0;
+                background: #f8fafc;
+                border-radius: 12px;
+                padding: 4px;
+                border: 1px solid #e2e8f0;
+                width: 100%;
+            }
+            .status-select-wrapper {
+                flex-grow: 1;
+                position: relative;
+            }
+            .status-select-wrapper select {
+                border: none !important;
+                background: transparent !important;
+                height: 48px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                padding-left: 15px;
+                cursor: pointer;
+                box-shadow: none !important;
+                color: #0f172a !important;
+            }
+            /* Target bootstrap-select if it's being used */
+            .status-select-wrapper .bootstrap-select .dropdown-toggle {
+                border: none !important;
+                background: transparent !important;
+                height: 48px;
+                color: #0f172a !important;
+                font-weight: 600;
+                padding-left: 15px;
+            }
+            .status-select-wrapper .bootstrap-select .dropdown-toggle .filter-option-inner-inner {
+                color: #0f172a !important;
+            }
+            .status-select-wrapper .bootstrap-select .dropdown-menu .dropdown-item {
+                color: #0f172a !important;
+            }
+            .status-select-wrapper .bootstrap-select .dropdown-menu .dropdown-item.active,
+            .status-select-wrapper .bootstrap-select .dropdown-menu .dropdown-item:hover {
+                background-color: var(--primary-light);
+                color: #000 !important;
+            }
+            .btn-update-status {
+                line-height: 1;
+                padding: 0 20px;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                height: 48px;
+                border-radius: 10px !important;
+                white-space: nowrap;
+                min-width: 100px;
+            }
+            .btn-update-status span {
+                font-size: 0.9rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
         </style>
     </x-slot>
@@ -104,8 +180,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-3">
+                    <div class="item-image-container">
+                        <img src="" id="modal_item_image" alt="Item Image">
+                    </div>
+
                     <div class="detail-row">
-                        <div class="detail-icon bg-primary-light text-primary"><i class="fas fa-user"></i></div>
+                        <div class="detail-icon text-primary"><i class="fas fa-user"></i></div>
                         <div>
                             <div class="detail-label">Customer</div>
                             <div class="detail-value" id="modal_customer"></div>
@@ -113,35 +193,42 @@
                         </div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-icon bg-info-light text-info"><i class="fas fa-phone"></i></div>
+                        <div class="detail-icon text-primary"><i class="fas fa-phone"></i></div>
                         <div>
                             <div class="detail-label">Phone</div>
                             <div class="detail-value" id="modal_phone"></div>
                         </div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-icon bg-success-light text-success"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="detail-icon text-primary"><i class="fas fa-calendar-alt"></i></div>
                         <div>
                             <div class="detail-label">Dates</div>
                             <div class="detail-value" id="modal_dates"></div>
                         </div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-icon bg-warning-light text-warning"><i id="modal_type_icon" class="fas fa-car"></i></div>
+                        <div class="detail-icon text-primary"><i id="modal_type_icon" class="fas fa-car"></i></div>
                         <div>
                             <div class="detail-label" id="modal_type_label">Item</div>
                             <div class="detail-value" id="modal_item"></div>
                         </div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-icon bg-danger-light text-danger"><i class="fas fa-peso-sign"></i></div>
+                        <div class="detail-icon text-primary"><i class="fas fa-peso-sign"></i></div>
                         <div>
                             <div class="detail-label">Total Amount</div>
                             <div class="detail-value fw-bold" id="modal_total"></div>
                         </div>
                     </div>
+                    <div class="detail-row" id="modal_proof_row">
+                        <div class="detail-icon text-primary"><i class="fas fa-receipt"></i></div>
+                        <div>
+                            <div class="detail-label">Proof of Payment</div>
+                            <div class="detail-value" id="modal_proof_status"></div>
+                        </div>
+                    </div>
                     <div class="detail-row" id="modal_special_row" style="display:none;">
-                        <div class="detail-icon bg-dark-light text-dark"><i class="fas fa-comment-alt"></i></div>
+                        <div class="detail-icon text-primary"><i class="fas fa-comment-alt"></i></div>
                         <div>
                             <div class="detail-label">Special Requests</div>
                             <div class="detail-value" id="modal_special"></div>
@@ -149,16 +236,20 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <form id="statusUpdateForm" method="POST">
+                    <form id="statusUpdateForm" method="POST" class="w-100">
                         @csrf @method('PATCH')
-                        <div class="d-flex align-items-center gap-2">
-                            <select name="status" id="modal_status_select" class="form-control default-select form-control-sm" style="width:140px;">
-                                <option value="pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary btn-sm px-3">Update Status</button>
+                        <div class="status-cta-container">
+                            <div class="status-select-wrapper">
+                                <select name="status" id="modal_status_select" class="form-control default-select">
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-update-status">
+                                <span>Update</span>
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -227,6 +318,14 @@
                         document.getElementById('modal_total').textContent    = p.total;
                         document.getElementById('modal_type_label').textContent = p.type;
                         document.getElementById('modal_type_icon').className  = p.type === 'Car' ? 'fas fa-car' : 'fas fa-building';
+                        document.getElementById('modal_item_image').src = p.image_url;
+
+                        const proofStatus = document.getElementById('modal_proof_status');
+                        if (p.proof_url) {
+                            proofStatus.innerHTML = `<a href="${p.proof_url}" target="_blank" class="text-primary fw-bold" style="text-decoration: underline;">View Attachment</a>`;
+                        } else {
+                            proofStatus.innerHTML = `<span class="text-danger small fw-bold">Not Uploaded</span>`;
+                        }
 
                         const specialRow = document.getElementById('modal_special_row');
                         if (p.special) {

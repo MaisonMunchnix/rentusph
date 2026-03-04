@@ -77,6 +77,10 @@ class BookingController extends Controller
                 ? ($booking->bookable->brand ?? '') . ' ' . ($booking->bookable->model ?? '')
                 : ($booking->bookable->title ?? 'N/A');
 
+            $image = $booking->bookable->image 
+                ? asset($booking->bookable->image) 
+                : 'https://placehold.co/600x400?text=' . urlencode($name);
+
             return [
                 'id'    => $booking->id,
                 'title' => $booking->customer_name . ' — ' . trim($name),
@@ -94,6 +98,8 @@ class BookingController extends Controller
                     'type'          => $isCar ? 'Car' : 'Property',
                     'total'         => '₱' . number_format($booking->total_price, 2),
                     'special'       => $booking->special_requests,
+                    'image_url'     => $image,
+                    'proof_url'     => $booking->proof_of_payment ? asset('storage/' . $booking->proof_of_payment) : null,
                 ],
             ];
         });
