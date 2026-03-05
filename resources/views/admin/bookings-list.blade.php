@@ -1,4 +1,13 @@
 <x-layouts.admin>
+    <x-slot name="styles">
+        <style>
+            .badge-blue {
+                background-color: #3065D0 !important;
+                color: #fff !important;
+            }
+        </style>
+    </x-slot>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -70,7 +79,7 @@
                                             $statusClasses = [
                                                 'pending' => 'badge-warning',
                                                 'confirmed' => 'badge-success',
-                                                'completed' => 'badge-primary',
+                                                'completed' => 'badge-blue',
                                                 'cancelled' => 'badge-danger'
                                             ];
                                         @endphp
@@ -87,15 +96,23 @@
                                                 <div class="dropdown-menu dropdown-menu-end">
                                                     <form action="{{ route('bookings.status', $booking->id) }}" method="POST">
                                                         @csrf @method('PATCH')
-                                                        <button type="submit" name="status" value="confirmed" class="dropdown-item">Confirm</button>
+                                                        @if($booking->proof_of_payment)
+                                                            <button type="submit" name="status" value="confirmed" class="dropdown-item">Confirm</button>
+                                                        @else
+                                                            <button type="button" class="dropdown-item disabled text-muted" disabled
+                                                                title="Cannot confirm: proof of payment not uploaded"
+                                                                data-bs-toggle="tooltip" data-bs-placement="left">
+                                                                Confirm <i class="fas fa-lock ms-1 small"></i>
+                                                            </button>
+                                                        @endif
                                                         <button type="submit" name="status" value="completed" class="dropdown-item">Complete</button>
                                                         <button type="submit" name="status" value="cancelled" class="dropdown-item">Cancel</button>
                                                     </form>
                                                     <div class="dropdown-divider"></div>
-                                                    <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this booking permanently? This action cannot be undone.')">
-                                                        @csrf @method('DELETE')
-                                                        <button type="submit" class="dropdown-item text-danger">Delete Booking</button>
-                                                    </form>
+                                                    <button type="button" class="dropdown-item text-danger"
+                                                        onclick="confirmDeleteBooking('{{ route('bookings.destroy', $booking->id) }}')">
+                                                        <i class="fas fa-trash-alt me-1"></i> Delete Booking
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -116,4 +133,52 @@
             </div>
         </div>
     </div>
+
+    {{-- Delete Confirmation Modal --}}
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+            <div class="modal-content">
+                <div class="modal-body text-center pt-4 pb-3 px-4">
+                    <div class="mb-3" style="font-size: 2.5rem; color: #ef4444;"><i class="fas fa-trash-alt"></i></div>
+                    <h5 class="fw-700 mb-2">Delete Booking?</h5>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">This will permanently delete the booking and all associated records. <strong>This action cannot be undone.</strong></p>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger flex-fill" id="confirmDeleteListBtn">
+                            <i class="fas fa-trash-alt me-1"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Hidden delete form --}}
+    <form id="deleteBookingListForm" method="POST" style="display:none;">
+        @csrf @method('DELETE')
+    </form>
+
+    <x-slot name="scripts">
+        <script>
+            var _deleteAction = '';
+
+            window.confirmDeleteBooking = function(action) {
+                _deleteAction = action;
+                new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+            };
+
+            document.getElementById('confirmDeleteListBtn').addEventListener('click', function () {
+                bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+                const form = document.getElementById('deleteBookingListForm');
+                form.action = _deleteAction;
+                form.submit();
+            });
+
+            // Initialize Bootstrap tooltips
+            document.addEventListener('DOMContentLoaded', function () {
+                var tooltipEls = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipEls.forEach(function (el) { new bootstrap.Tooltip(el); });
+            });
+        </script>
+    </x-slot>
 </x-layouts.admin>

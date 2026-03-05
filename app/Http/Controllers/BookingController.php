@@ -88,7 +88,7 @@ class BookingController extends Controller
                 'pending'   => '#eab308',
                 'confirmed' => '#22c55e',
                 'cancelled' => '#ef4444',
-                'completed' => '#3b82f6',
+                'completed' => '#3065D0',
             ];
 
             $events = $bookings->map(function ($booking) use ($colorMap) {

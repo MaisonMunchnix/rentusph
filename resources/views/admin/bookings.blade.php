@@ -170,6 +170,14 @@
                 border-radius: 8px;
                 border: 1px solid #e2e8f0;
             }
+            .bg-blue {
+                background-color: #3065D0 !important;
+                color: #fff !important;
+            }
+            .badge-blue {
+                background-color: #3065D0 !important;
+                color: #fff !important;
+            }
         </style>
     </x-slot>
 
@@ -209,7 +217,7 @@
                                 <span class="legend-dot bg-success"></span> Confirmed
                             </div>
                             <div class="legend-item shadow-sm">
-                                <span class="legend-dot bg-primary"></span> Completed
+                                <span class="legend-dot bg-blue"></span> Completed
                             </div>
                             <div class="legend-item shadow-sm">
                                 <span class="legend-dot bg-danger"></span> Cancelled
@@ -371,6 +379,25 @@
         </div>
     </div>
 
+    {{-- Delete Confirmation Modal --}}
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+            <div class="modal-content">
+                <div class="modal-body text-center pt-4 pb-3 px-4">
+                    <div class="mb-3" style="font-size: 2.5rem; color: #ef4444;"><i class="fas fa-trash-alt"></i></div>
+                    <h5 class="fw-700 mb-2">Delete Booking?</h5>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">This will permanently delete the booking and all associated records. <strong>This action cannot be undone.</strong></p>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger flex-fill" id="confirmDeleteBtn">
+                            <i class="fas fa-trash-alt me-1"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <x-slot name="scripts">
         <script src="{{ asset('vendor/moment/moment.min.js') }}"></script>
         <script src="{{ asset('vendor/fullcalendar/js/main.min.js') }}"></script>
@@ -421,7 +448,7 @@
                             pending: 'bg-warning', 
                             confirmed: 'bg-success', 
                             cancelled: 'bg-danger', 
-                            completed: 'bg-primary' 
+                            completed: 'bg-blue' 
                         };
                         badge.className = 'badge mt-1 ' + (classMap[p.status] || 'bg-secondary');
 
@@ -445,11 +472,27 @@
                         document.getElementById('modal_item_image').src = p.image_url;
 
                         const proofStatus = document.getElementById('modal_proof_status');
-                        if (p.proof_url) {
+                        const hasProof = !!p.proof_url;
+                        if (hasProof) {
                             proofStatus.innerHTML = `<a href="${p.proof_url}" target="_blank" class="text-primary fw-bold" style="text-decoration: underline;">View Attachment</a>`;
                         } else {
                             proofStatus.innerHTML = `<span class="text-danger small fw-bold">Not Uploaded</span>`;
                         }
+
+                        // Disable "Confirmed" option if no proof of payment
+                        const confirmedOption = document.querySelector('#modal_status_select option[value="confirmed"]');
+                        if (confirmedOption) {
+                            if (!hasProof) {
+                                confirmedOption.disabled = true;
+                                confirmedOption.textContent = 'Confirmed (requires proof of payment)';
+                            } else {
+                                confirmedOption.disabled = false;
+                                confirmedOption.textContent = 'Confirmed';
+                            }
+                        }
+
+                        // Store hasProof flag on the select for use by change listener
+                        statusSelect.dataset.hasProof = hasProof ? '1' : '0';
                         
                         // Handle Payment Data Display
                         const paymentSection = document.getElementById('paymentSection');
@@ -505,7 +548,7 @@
                         if(info.event.backgroundColor === '#eab308') info.el.classList.add('bg-warning', 'border-warning');
                         if(info.event.backgroundColor === '#22c55e') info.el.classList.add('bg-success', 'border-success');
                         if(info.event.backgroundColor === '#ef4444') info.el.classList.add('bg-danger', 'border-danger');
-                        if(info.event.backgroundColor === '#3b82f6') info.el.classList.add('bg-primary', 'border-primary');
+                        if(info.event.backgroundColor === '#3065D0') info.el.classList.add('bg-blue', 'border-blue');
                         info.el.classList.add('text-white');
                     }
                 });
@@ -525,28 +568,42 @@
                 const inspectionSection = document.getElementById('inspectionSection');
                 const paymentSection = document.getElementById('paymentSection');
                 
+                // Warning element for missing proof
+                let proofWarning = document.getElementById('modal_proof_warning');
+                if (!proofWarning) {
+                    proofWarning = document.createElement('div');
+                    proofWarning.id = 'modal_proof_warning';
+                    proofWarning.className = 'alert alert-warning py-2 px-3 mt-2 small fw-bold';
+                    proofWarning.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> Cannot confirm: customer has not uploaded proof of payment.';
+                    proofWarning.style.display = 'none';
+                    document.querySelector('.status-cta-container').after(proofWarning);
+                }
+
                 function toggleSections() {
                     if (!statusSelect) return;
                     
                     const status = statusSelect.value;
-                    
+                    const hasProof = statusSelect.dataset.hasProof === '1';
+
+                    // Show warning if trying to select confirmed without proof
+                    if (status === 'confirmed' && !hasProof) {
+                        proofWarning.style.display = 'block';
+                        // Revert selection to pending
+                        statusSelect.value = 'pending';
+                        if ($.fn.selectpicker) $('#modal_status_select').selectpicker('refresh');
+                        return;
+                    } else {
+                        proofWarning.style.display = 'none';
+                    }
+
                     if (status === 'completed') {
                         $(inspectionSection).slideDown();
                     } else {
                         $(inspectionSection).slideUp();
                     }
                     
-                    if (status === 'confirmed') {
+                    if (status === 'confirmed' || status === 'completed') {
                         $(paymentSection).slideDown();
-                    } else if (status === 'completed' || status === 'pending') {
-                        // Keep visible if data already exists, but for switching:
-                        // If switching TO completed, maybe keep payment visible to see what was paid?
-                        // Actually, let's show payment section for confirmed AND completed.
-                        if (status === 'completed') {
-                             $(paymentSection).slideDown();
-                        } else {
-                             $(paymentSection).slideUp();
-                        }
                     } else {
                         $(paymentSection).slideUp();
                     }
@@ -586,20 +643,26 @@
                 }
 
                 window.confirmDelete = function() {
-                    if (confirm('Are you sure you want to delete this booking permanently? This action cannot be undone.')) {
-                        const form = document.getElementById('deleteBookingForm');
-                        fetch(form.action, {
-                            method: 'POST',
-                            body: new FormData(form),
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        }).then(r => {
-                            if (r.ok || r.redirected) {
-                                bootstrap.Modal.getInstance(document.getElementById('bookingDetailModal')).hide();
-                                calendar.refetchEvents();
-                            }
-                        });
-                    }
+                    const detailModal = bootstrap.Modal.getInstance(document.getElementById('bookingDetailModal'));
+                    if (detailModal) detailModal.hide();
+
+                    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                    deleteModal.show();
                 };
+
+                document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+                    bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+                    const form = document.getElementById('deleteBookingForm');
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    }).then(r => {
+                        if (r.ok || r.redirected) {
+                            calendar.refetchEvents();
+                        }
+                    });
+                });
             });
         </script>
     </x-slot>
