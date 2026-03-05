@@ -38,10 +38,10 @@
             }
             .item-image-container {
                 width: 100%;
-                height: 154px;
+                height: 120px;
                 border-radius: 12px;
                 overflow: hidden;
-                margin-bottom: 20px;
+                margin-bottom: 15px;
                 background: #f1f5f9;
                 border: 1px solid #e2e8f0;
             }
@@ -154,6 +154,22 @@
                 font-size: 0.85rem;
                 border: 1px solid #e2e8f0;
             }
+            .payment-input-group {
+                margin-top: 10px;
+            }
+            .payment-input-label {
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #64748b;
+                margin-bottom: 4px;
+                display: block;
+            }
+            .payment-input {
+                font-weight: 600;
+                color: #0f172a;
+                border-radius: 8px;
+                border: 1px solid #e2e8f0;
+            }
         </style>
     </x-slot>
 
@@ -213,7 +229,7 @@
 
     {{-- Booking Detail Modal --}}
     <div class="modal fade" id="bookingDetailModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header pb-0">
                     <div>
@@ -223,58 +239,69 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-3">
-                    <div class="item-image-container">
-                        <img src="" id="modal_item_image" alt="Item Image">
-                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="item-image-container mb-3" style="aspect-ratio: 16/9; height: auto; min-height: 180px;">
+                                <img src="" id="modal_item_image" alt="Item Image" style="object-fit: cover; width: 100%; height: 100%; border-radius: 8px;">
+                            </div>
+                            
+                            {{-- Specific Details stack here --}}
+                            <div class="detail-row">
+                                <div class="detail-icon text-primary"><i class="fas fa-calendar-alt"></i></div>
+                                <div>
+                                    <div class="detail-label">Dates</div>
+                                    <div class="detail-value" id="modal_dates"></div>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-icon text-primary"><i class="fas fa-peso-sign"></i></div>
+                                <div>
+                                    <div class="detail-label">Total Amount</div>
+                                    <div class="detail-value fw-bold text-success fs-5" id="modal_total"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-7 border-start">
+                            <div class="detail-row">
+                                <div class="detail-icon text-primary"><i class="fas fa-user"></i></div>
+                                <div>
+                                    <div class="detail-label">Customer</div>
+                                    <div class="detail-value" id="modal_customer"></div>
+                                    <div class="text-muted small" id="modal_email"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <div class="detail-icon text-primary"><i class="fas fa-phone"></i></div>
+                                <div>
+                                    <div class="detail-label">Phone</div>
+                                    <div class="detail-value" id="modal_phone"></div>
+                                </div>
+                            </div>
 
-                    <div class="detail-row">
-                        <div class="detail-icon text-primary"><i class="fas fa-user"></i></div>
-                        <div>
-                            <div class="detail-label">Customer</div>
-                            <div class="detail-value" id="modal_customer"></div>
-                            <div class="text-muted small" id="modal_email"></div>
-                        </div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-icon text-primary"><i class="fas fa-phone"></i></div>
-                        <div>
-                            <div class="detail-label">Phone</div>
-                            <div class="detail-value" id="modal_phone"></div>
-                        </div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-icon text-primary"><i class="fas fa-calendar-alt"></i></div>
-                        <div>
-                            <div class="detail-label">Dates</div>
-                            <div class="detail-value" id="modal_dates"></div>
-                        </div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-icon text-primary"><i id="modal_type_icon" class="fas fa-car"></i></div>
-                        <div>
-                            <div class="detail-label" id="modal_type_label">Item</div>
-                            <div class="detail-value" id="modal_item"></div>
-                        </div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-icon text-primary"><i class="fas fa-peso-sign"></i></div>
-                        <div>
-                            <div class="detail-label">Total Amount</div>
-                            <div class="detail-value fw-bold" id="modal_total"></div>
-                        </div>
-                    </div>
-                    <div class="detail-row" id="modal_proof_row">
-                        <div class="detail-icon text-primary"><i class="fas fa-receipt"></i></div>
-                        <div>
-                            <div class="detail-label">Proof of Payment</div>
-                            <div class="detail-value" id="modal_proof_status"></div>
-                        </div>
-                    </div>
-                    <div class="detail-row" id="modal_special_row" style="display:none;">
-                        <div class="detail-icon text-primary"><i class="fas fa-comment-alt"></i></div>
-                        <div>
-                            <div class="detail-label">Special Requests</div>
-                            <div class="detail-value" id="modal_special"></div>
+                            <div class="detail-row">
+                                <div class="detail-icon text-primary"><i id="modal_type_icon" class="fas fa-car"></i></div>
+                                <div>
+                                    <div class="detail-label" id="modal_type_label">Item</div>
+                                    <div class="detail-value" id="modal_item"></div>
+                                </div>
+                            </div>
+
+                            <div class="detail-row" id="modal_proof_row">
+                                <div class="detail-icon text-primary"><i class="fas fa-receipt"></i></div>
+                                <div>
+                                    <div class="detail-label">Proof of Payment</div>
+                                    <div class="detail-value" id="modal_proof_status"></div>
+                                </div>
+                            </div>
+
+                            <div class="detail-row" id="modal_special_row" style="display:none;">
+                                <div class="detail-icon text-primary"><i class="fas fa-comment-alt"></i></div>
+                                <div>
+                                    <div class="detail-label">Special Requests</div>
+                                    <div class="detail-value" id="modal_special"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -293,6 +320,20 @@
                             <button type="submit" class="btn btn-primary btn-update-status">
                                 <span>Update</span>
                             </button>
+                        </div>
+
+                        <div id="paymentSection" class="inspection-container" style="display: none;">
+                            <h6 class="detail-label mb-3">Payment Confirmation Details</h6>
+                            <div class="row">
+                                <div class="col-6 payment-input-group">
+                                    <label class="payment-input-label">Actual Rental Amount (₱)</label>
+                                    <input type="number" name="rental_amount" id="modal_rental_amount" class="form-control payment-input" step="0.01" placeholder="0.00">
+                                </div>
+                                <div class="col-6 payment-input-group">
+                                    <label class="payment-input-label">Security Deposit (₱)</label>
+                                    <input type="number" name="security_deposit" id="modal_security_deposit" class="form-control payment-input" step="0.01" placeholder="0.00">
+                                </div>
+                            </div>
                         </div>
 
                         <div id="inspectionSection" class="inspection-container" style="display: none;">
@@ -384,25 +425,34 @@
                         } else {
                             proofStatus.innerHTML = `<span class="text-danger small fw-bold">Not Uploaded</span>`;
                         }
+                        
+                        // Handle Payment Data Display
+                        const paymentSection = document.getElementById('paymentSection');
+                        const rentalInput = document.getElementById('modal_rental_amount');
+                        const depositInput = document.getElementById('modal_security_deposit');
+                        
+                        if (p.rental_amount || p.security_deposit || p.status === 'confirmed' || p.status === 'completed') {
+                            paymentSection.style.display = 'block';
+                            rentalInput.value = p.rental_amount || '';
+                            depositInput.value = p.security_deposit || '';
+                        } else {
+                            paymentSection.style.display = 'none';
+                        }
 
                         // Handle Inspection Data Display
                         const inspectionSection = document.getElementById('inspectionSection');
                         if (p.inspection) {
                             inspectionSection.style.display = 'block';
-                            document.querySelector('.detail-label.mb-3').textContent = 'Inspection Report (Stored)';
+                            document.querySelector('#inspectionSection .detail-label').textContent = 'Inspection Report (Stored)';
                             setCondition(p.inspection.condition);
                             document.querySelector('.inspection-notes').value = p.inspection.notes || '';
-                            // If it's already completed, maybe disable editing? 
-                            // For OJT, let's keep it editable so they can fix mistakes.
+                        } else if (p.status === 'completed') {
+                            inspectionSection.style.display = 'block';
+                            document.querySelector('#inspectionSection .detail-label').textContent = 'Return Inspection Report';
+                            setCondition('good');
+                            document.querySelector('.inspection-notes').value = '';
                         } else {
-                            if (p.status === 'completed') {
-                                inspectionSection.style.display = 'block';
-                                document.querySelector('.detail-label.mb-3').textContent = 'Return Inspection Report';
-                                setCondition('good');
-                                document.querySelector('.inspection-notes').value = '';
-                            } else {
-                                inspectionSection.style.display = 'none';
-                            }
+                            inspectionSection.style.display = 'none';
                         }
 
                         const specialRow = document.getElementById('modal_special_row');
@@ -444,24 +494,42 @@
                     });
                 }
 
-                // Toggle inspection section based on status
+                // Toggle sections based on status
                 const statusSelect = document.getElementById('modal_status_select');
                 const inspectionSection = document.getElementById('inspectionSection');
+                const paymentSection = document.getElementById('paymentSection');
                 
-                function toggleInspection() {
-                    if (statusSelect && inspectionSection) {
-                        if (statusSelect.value === 'completed') {
-                            $(inspectionSection).slideDown();
+                function toggleSections() {
+                    if (!statusSelect) return;
+                    
+                    const status = statusSelect.value;
+                    
+                    if (status === 'completed') {
+                        $(inspectionSection).slideDown();
+                    } else {
+                        $(inspectionSection).slideUp();
+                    }
+                    
+                    if (status === 'confirmed') {
+                        $(paymentSection).slideDown();
+                    } else if (status === 'completed' || status === 'pending') {
+                        // Keep visible if data already exists, but for switching:
+                        // If switching TO completed, maybe keep payment visible to see what was paid?
+                        // Actually, let's show payment section for confirmed AND completed.
+                        if (status === 'completed') {
+                             $(paymentSection).slideDown();
                         } else {
-                            $(inspectionSection).slideUp();
+                             $(paymentSection).slideUp();
                         }
+                    } else {
+                        $(paymentSection).slideUp();
                     }
                 }
 
                 if (statusSelect) {
-                    statusSelect.addEventListener('change', toggleInspection);
+                    statusSelect.addEventListener('change', toggleSections);
                     // For bootstrap-select
-                    $(statusSelect).on('changed.bs.select', toggleInspection);
+                    $(statusSelect).on('changed.bs.select', toggleSections);
                 }
 
                 window.setCondition = function(val) {

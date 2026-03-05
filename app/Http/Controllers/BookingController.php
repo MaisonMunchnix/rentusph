@@ -108,6 +108,8 @@ class BookingController extends Controller
                         'special'       => $booking->special_requests,
                         'image_url'     => $image,
                         'proof_url'     => $booking->proof_of_payment ? asset('storage/' . $booking->proof_of_payment) : null,
+                        'rental_amount' => $booking->rental_amount,
+                        'security_deposit' => $booking->security_deposit,
                     ],
                 ];
             });
@@ -237,9 +239,18 @@ class BookingController extends Controller
             'status' => 'required|in:pending,confirmed,completed,cancelled',
             'inspection_condition' => 'nullable|in:good,damaged',
             'inspection_notes' => 'nullable|string',
+            'rental_amount' => 'required_if:status,confirmed|nullable|numeric',
+            'security_deposit' => 'required_if:status,confirmed|nullable|numeric',
         ]);
 
-        $booking->update(['status' => $request->status]);
+        $updateData = ['status' => $request->status];
+
+        if ($request->status === 'confirmed') {
+            $updateData['rental_amount'] = $request->rental_amount;
+            $updateData['security_deposit'] = $request->security_deposit;
+        }
+
+        $booking->update($updateData);
 
         // If completing, save inspection
         if ($request->status === 'completed' && $request->has('inspection_condition')) {
