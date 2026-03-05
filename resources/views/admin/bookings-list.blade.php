@@ -91,6 +91,11 @@
                                                         <button type="submit" name="status" value="completed" class="dropdown-item">Complete</button>
                                                         <button type="submit" name="status" value="cancelled" class="dropdown-item">Cancel</button>
                                                     </form>
+                                                    <div class="dropdown-divider"></div>
+                                                    <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this booking permanently? This action cannot be undone.')">
+                                                        @csrf @method('DELETE')
+                                                        <button type="submit" class="dropdown-item text-danger">Delete Booking</button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>

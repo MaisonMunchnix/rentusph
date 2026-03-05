@@ -392,4 +392,25 @@ class BookingController extends Controller
 
         return response()->json(array_unique($takenDates));
     }
+
+    public function destroy(Booking $booking)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        // Delete associated inspection if exists
+        if ($booking->inspection) {
+            $booking->inspection->delete();
+        }
+
+        // Delete proof of payment if exists
+        if ($booking->proof_of_payment) {
+            Storage::disk('public')->delete($booking->proof_of_payment);
+        }
+
+        $booking->delete();
+
+        return redirect()->back()->with('success', 'Booking deleted successfully!');
+    }
 }

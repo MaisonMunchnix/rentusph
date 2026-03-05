@@ -358,6 +358,14 @@
                             <textarea name="inspection_notes" class="form-control inspection-notes" rows="2" placeholder="Describe any new scratches, fuel level, or issues..."></textarea>
                         </div>
                     </form>
+                    <div class="w-100 text-center mt-3">
+                        <form id="deleteBookingForm" method="POST" class="d-inline">
+                            @csrf @method('DELETE')
+                            <button type="button" class="btn btn-link text-danger p-0" onclick="confirmDelete()">
+                                <i class="fas fa-trash-alt me-1"></i> Delete Booking Permanently
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -487,6 +495,7 @@
                         }
 
                         document.getElementById('statusUpdateForm').action = '/bookings/' + info.event.id + '/status';
+                        document.getElementById('deleteBookingForm').action = '/bookings/' + info.event.id;
 
                         var myModal = new bootstrap.Modal(document.getElementById('bookingDetailModal'));
                         myModal.show();
@@ -575,6 +584,22 @@
                         });
                     });
                 }
+
+                window.confirmDelete = function() {
+                    if (confirm('Are you sure you want to delete this booking permanently? This action cannot be undone.')) {
+                        const form = document.getElementById('deleteBookingForm');
+                        fetch(form.action, {
+                            method: 'POST',
+                            body: new FormData(form),
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        }).then(r => {
+                            if (r.ok || r.redirected) {
+                                bootstrap.Modal.getInstance(document.getElementById('bookingDetailModal')).hide();
+                                calendar.refetchEvents();
+                            }
+                        });
+                    }
+                };
             });
         </script>
     </x-slot>

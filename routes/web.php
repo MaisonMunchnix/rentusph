@@ -85,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings/events', [\App\Http\Controllers\BookingController::class, 'events'])->name('bookings.events');
     Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])->name('bookings.store');
     Route::put('/bookings/{booking}', [\App\Http\Controllers\BookingController::class, 'update'])->name('bookings.update');
+    Route::delete('/bookings/{booking}', [\App\Http\Controllers\BookingController::class, 'destroy'])->name('bookings.destroy');
     Route::delete('/bookings/{booking}/cancel', [\App\Http\Controllers\BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::patch('/bookings/{booking}/status', [\App\Http\Controllers\BookingController::class, 'updateStatus'])->name('bookings.status');
     Route::get('/bookings/taken-dates', [\App\Http\Controllers\BookingController::class, 'getTakenDates'])->name('bookings.taken-dates');
