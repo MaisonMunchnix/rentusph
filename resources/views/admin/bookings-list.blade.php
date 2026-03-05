@@ -37,6 +37,7 @@
                                     <th><strong>CUSTOMER</strong></th>
                                     <th><strong>ITEM</strong></th>
                                     <th><strong>DATES</strong></th>
+                                    <th><strong>ADDRESS</strong></th>
                                     <th><strong>TOTAL</strong></th>
                                     <th><strong>STATUS</strong></th>
                                     <th class="text-end"><strong>ACTION</strong></th>
@@ -62,6 +63,7 @@
                                         @endif
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($booking->start_date)->format('M d') }} - {{ $booking->end_date ? \Carbon\Carbon::parse($booking->end_date)->format('M d, Y') : 'N/A' }}</td>
+                                    <td><small>{{ $booking->customer_address ?? '—' }}</small></td>
                                     <td>₱{{ number_format($booking->total_price, 2) }}</td>
                                     <td>
                                         @php

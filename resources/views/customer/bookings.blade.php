@@ -1,5 +1,6 @@
 <x-layouts.customer title="My Bookings">
     <x-slot name="styles">
+        <link href="{{ asset('vendor/bootstrap-datepicker-master/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
         <style>
             .table-responsive {
                 overflow: visible !important;
@@ -75,7 +76,7 @@
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center gap-2">
-                                                    <button type="button" class="btn btn-primary btn-xs sharp shadow-none" data-bs-toggle="modal" data-bs-target="#viewBookingModal{{ $booking->id }}">
+                                                    <button type="button" class="btn btn-primary btn-xs sharp shadow-none btn-edit-booking" data-id="{{ $booking->id }}" data-bookable="{{ $booking->bookable_id }}" data-type="{{ $booking->bookable_type }}">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     @if($booking->status === 'pending')
@@ -128,13 +129,17 @@
                                                                             <label class="form-label font-w600">Phone Number</label>
                                                                             <input type="text" name="customer_phone" class="form-control" value="{{ $booking->customer_phone }}" {{ $booking->status !== 'pending' ? 'readonly' : 'required' }}>
                                                                         </div>
+                                                                        <div class="col-md-12 mb-3">
+                                                                            <label class="form-label font-w600">Address</label>
+                                                                            <input type="text" name="customer_address" class="form-control" value="{{ $booking->customer_address }}" {{ $booking->status !== 'pending' ? 'readonly' : 'required' }}>
+                                                                        </div>
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label font-w600">Start Date</label>
-                                                                            <input type="date" name="start_date" class="form-control" value="{{ $booking->start_date->format('Y-m-d') }}" {{ $booking->status !== 'pending' ? 'readonly' : 'required' }}>
+                                                                            <input type="text" name="start_date" id="start_date_{{ $booking->id }}" class="form-control" value="{{ $booking->start_date->format('Y-m-d') }}" {{ $booking->status !== 'pending' ? 'readonly' : 'required' }} autocomplete="off">
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label font-w600">End Date</label>
-                                                                            <input type="date" name="end_date" class="form-control" value="{{ $booking->end_date ? $booking->end_date->format('Y-m-d') : '' }}" {{ $booking->status !== 'pending' ? 'readonly' : 'required' }}>
+                                                                            <input type="text" name="end_date" id="end_date_{{ $booking->id }}" class="form-control" value="{{ $booking->end_date ? $booking->end_date->format('Y-m-d') : '' }}" {{ $booking->status !== 'pending' ? 'readonly' : 'required' }} autocomplete="off">
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label font-w600">Total Price</label>
@@ -258,4 +263,57 @@
             </div>
         </div>
     </div>
+    <x-slot name="scripts">
+    <script src="{{ asset('vendor/bootstrap-datepicker-master/js/bootstrap-datepicker.min.js') }}"></script>
+    <script>
+        $(document).on('click', '.btn-edit-booking', function(e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const bookableId = $(this).data('bookable');
+            const type = $(this).data('type');
+
+            $.ajax({
+                url: '{{ route("bookings.taken-dates") }}',
+                method: 'GET',
+                data: { bookable_id: bookableId, bookable_type: type },
+                success: function(takenDates) {
+                    initDatepickers(id, takenDates);
+                    $('#viewBookingModal' + id).modal('show');
+                },
+                error: function() {
+                    initDatepickers(id, []);
+                    $('#viewBookingModal' + id).modal('show');
+                }
+            });
+        });
+
+        function initDatepickers(bookingId, takenDates) {
+            const $start = $('#start_date_' + bookingId);
+            const $end = $('#end_date_' + bookingId);
+
+            if ($start.attr('readonly')) return;
+
+            $start.datepicker('destroy').datepicker({
+                format: 'yyyy-mm-dd',
+                startDate: new Date(),
+                autoclose: true,
+                todayHighlight: true,
+                datesDisabled: takenDates
+            }).on('changeDate', function(e) {
+                $end.datepicker('setStartDate', e.date);
+                if ($end.datepicker('getDate') < e.date) {
+                    $end.datepicker('setDate', e.date);
+                }
+            });
+
+            $end.datepicker('destroy').datepicker({
+                format: 'yyyy-mm-dd',
+                startDate: new Date(),
+                autoclose: true,
+                todayHighlight: true,
+                datesDisabled: takenDates
+            });
+        }
+    </script>
+    </x-slot>
 </x-layouts.customer>

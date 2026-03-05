@@ -12,6 +12,9 @@
                 <a class="{{ request()->is('bookings*') ? 'mm-active active' : '' }}" href="{{ route('bookings.index') }}" aria-expanded="false">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Bookings</span>
+                    @if($pendingBookingsCount > 0)
+                        <span class="badge badge-danger badge-circle" style="font-size: 0.7rem; padding: 3px 7px; margin-left: 8px; border-radius: 10px; background-color: #dc3545; color: #fff;">{{ $pendingBookingsCount }}</span>
+                    @endif
                 </a>
             </li>
             <li class="{{ request()->is('cars*') ? 'mm-active active' : '' }}">

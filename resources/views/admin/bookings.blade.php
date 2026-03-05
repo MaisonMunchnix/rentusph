@@ -218,7 +218,7 @@
 
                         <div class="mt-4 pt-3 border-top">
                             <a href="{{ route('bookings.index', ['view' => 'list']) }}" class="btn btn-primary d-block w-100">
-                                <i class="fas fa-add me-2"></i> Create Booking
+                                <i class="fas fa-list me-2"></i> Table View
                             </a>
                         </div>
                     </div>
@@ -276,6 +276,14 @@
                                 <div>
                                     <div class="detail-label">Phone</div>
                                     <div class="detail-value" id="modal_phone"></div>
+                                </div>
+                            </div>
+
+                            <div class="detail-row" id="modal_address_row">
+                                <div class="detail-icon text-primary"><i class="fas fa-map-marker-alt"></i></div>
+                                <div>
+                                    <div class="detail-label">Address</div>
+                                    <div class="detail-value" id="modal_address"></div>
                                 </div>
                             </div>
 
@@ -412,6 +420,15 @@
                         document.getElementById('modal_customer').textContent = p.customer;
                         document.getElementById('modal_email').textContent    = p.email;
                         document.getElementById('modal_phone').textContent    = p.phone || '—';
+                        
+                        const addressRow = document.getElementById('modal_address_row');
+                        if (p.address) {
+                            document.getElementById('modal_address').textContent = p.address;
+                            addressRow.style.display = '';
+                        } else {
+                            addressRow.style.display = 'none';
+                        }
+                        
                         document.getElementById('modal_dates').textContent    = start + (end !== start ? ' → ' + end : '');
                         document.getElementById('modal_item').textContent     = p.item;
                         document.getElementById('modal_total').textContent    = p.total;

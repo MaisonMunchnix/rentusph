@@ -109,5 +109,18 @@
     <script src="{{ asset('vendor/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
     <script src="{{ asset('js/custom.min.js') }}"></script>
     <script src="{{ asset('js/dlabnav-init.js') }}"></script>
+    <script>
+        jQuery(document).ready(function() {
+            jQuery('.show-pass').off('click').on('click', function(){
+                jQuery(this).toggleClass('active');
+                var input = jQuery(this).parent().find('input');
+                if (input.attr('type') == 'password') {
+                    input.attr('type', 'text');
+                } else {
+                    input.attr('type', 'password');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

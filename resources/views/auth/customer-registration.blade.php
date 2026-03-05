@@ -15,8 +15,8 @@
     <div class="fix-wrapper">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-5 col-md-6">
-                    <div class="card mb-0 h-auto">
+                <div class="col-lg-7 col-md-8">
+                    <div class="card mb-0 h-auto text-white">
                         <div class="card-body">
                             <div class="text-center mb-3">
                                 <a href="{{ url('/') }}"><img class="logo-auth" src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs Logo" style="max-width: 200px;"></a>
@@ -35,39 +35,61 @@
                             <form action="{{ url('register') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="role" value="customer">
-                                <div class="form-group mb-4">
-                                    <label class="form-label" for="name">Name</label>
-                                    <input type="text" name="name" class="form-control" placeholder="Enter your name" id="name" required>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label class="form-label" for="name">Name</label>
+                                            <input type="text" name="name" class="form-control" placeholder="Enter your name" id="name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label class="form-label" for="email">Email</label>
+                                            <input type="email" name="email" class="form-control" placeholder="hello@example.com" id="email" required>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-group mb-4">
-                                    <label class="form-label" for="email">Email</label>
-                                    <input type="email" name="email" class="form-control" placeholder="hello@example.com" id="email" required>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-sm-4 mb-3 position-relative">
+                                            <label class="form-label" for="dlab-password">Password</label>
+                                            <input type="password" name="password" id="dlab-password" class="form-control" required>
+                                            <span class="show-pass eye">
+                                                <i class="fa fa-eye-slash"></i>
+                                                <i class="fa fa-eye"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-sm-4 mb-3 position-relative">
+                                            <label class="form-label" for="dlab-confirm-password">Confirm password</label>
+                                            <input type="password" name="password_confirmation" id="dlab-confirm-password" class="form-control" required>
+                                            <span class="show-pass eye">
+                                                <i class="fa fa-eye-slash"></i>
+                                                <i class="fa fa-eye"></i>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mb-sm-4 mb-3 position-relative">
-                                    <label class="form-label" for="dlab-password">Password</label>
-                                    <input type="password" name="password" id="dlab-password" class="form-control" required>
-                                    <span class="show-pass eye">
-                                        <i class="fa fa-eye-slash"></i>
-                                        <i class="fa fa-eye"></i>
-                                    </span>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label class="form-label" for="phone">Phone number (optional)</label>
+                                            <input type="tel" name="phone" class="form-control" placeholder="Enter phone number" id="phone">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label class="form-label" for="address">Address (optional)</label>
+                                            <input type="text" name="address" class="form-control" placeholder="Enter your full address" id="address">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mb-sm-4 mb-3 position-relative">
-                                    <label class="form-label" for="dlab-confirm-password">Confirm password</label>
-                                    <input type="password" name="password_confirmation" id="dlab-confirm-password" class="form-control" required>
-                                    <span class="show-pass eye">
-                                        <i class="fa fa-eye-slash"></i>
-                                        <i class="fa fa-eye"></i>
-                                    </span>
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label class="form-label" for="phone">Phone number (optional)</label>
-                                    <input type="tel" name="phone" class="form-control" placeholder="Enter phone number" id="phone">
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label class="form-label" for="address">Address (optional)</label>
-                                    <input type="text" name="address" class="form-control" placeholder="Enter your full address" id="address">
-                                </div>
-                                <div class="text-center">
+
+                                <div class="text-center mt-2">
                                     <button type="submit" class="btn btn-primary btn-block">Sign up</button>
                                 </div>
                             </form>
@@ -86,5 +108,18 @@
     <script src="{{ asset('vendor/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
     <script src="{{ asset('js/custom.min.js') }}"></script>
     <script src="{{ asset('js/dlabnav-init.js') }}"></script>
+    <script>
+        jQuery(document).ready(function() {
+            jQuery('.show-pass').off('click').on('click', function(){
+                jQuery(this).toggleClass('active');
+                var input = jQuery(this).parent().find('input');
+                if (input.attr('type') == 'password') {
+                    input.attr('type', 'text');
+                } else {
+                    input.attr('type', 'password');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

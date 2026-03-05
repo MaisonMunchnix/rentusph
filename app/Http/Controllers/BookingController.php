@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Car;
 use App\Models\Property;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +18,23 @@ class BookingController extends Controller
     {
         $user = Auth::user();
         if ($user->role === 'admin') {
+            if ($request->get('view') === 'list') {
+                $query = Booking::with(['bookable', 'user']);
+                
+                if ($request->filled('status')) {
+                    $query->where('status', $request->status);
+                }
+                
+                if ($request->filled('car_id')) {
+                    $query->where('bookable_type', 'App\Models\Car')->where('bookable_id', $request->car_id);
+                }
+
+                $bookings = $query->latest()->paginate(15);
+                $cars = Car::orderBy('brand')->orderBy('model')->get();
+                
+                return view('admin.bookings-list', compact('bookings', 'cars'));
+            }
+
             $cars = Car::orderBy('brand')->orderBy('model')->get();
             return view('admin.bookings', compact('cars'));
         }
@@ -45,7 +63,7 @@ class BookingController extends Controller
     {
         try {
             $user = Auth::user();
-            $query = Booking::with('bookable');
+            $query = Booking::with('bookable', 'user');
 
             if ($user->role === 'affiliate') {
                 $carIds = Car::where('user_id', $user->id)->pluck('id')->toArray();
@@ -102,6 +120,7 @@ class BookingController extends Controller
                         'customer'      => $booking->customer_name,
                         'email'         => $booking->customer_email,
                         'phone'         => $booking->customer_phone,
+                        'address'       => $booking->customer_address ?? ($booking->user->address ?? null),
                         'item'          => trim($name),
                         'type'          => $isCar ? 'Car' : 'Property',
                         'total'         => '₱' . number_format($booking->total_price, 2),
@@ -132,11 +151,29 @@ class BookingController extends Controller
             'customer_phone' => 'nullable|string|max:255',
         ]);
 
-        $bookableClass = $request->bookable_type;
-        $bookable = $bookableClass::findOrFail($request->bookable_id);
-
         $startDate = Carbon::parse($request->start_date);
         $endDate = $request->end_date ? Carbon::parse($request->end_date) : $startDate;
+
+        // Check for overlapping bookings
+        $overlap = Booking::where('bookable_id', $request->bookable_id)
+            ->where('bookable_type', $request->bookable_type)
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate])
+                    ->orWhere(function ($q) use ($startDate, $endDate) {
+                        $q->where('start_date', '<=', $startDate)
+                          ->where('end_date', '>=', $endDate);
+                    });
+            })
+            ->exists();
+
+        if ($overlap) {
+            return redirect()->back()->withInput()->with('error', 'Sorry, this item is already booked for the selected dates.');
+        }
+
+        $bookableClass = $request->bookable_type;
+        $bookable = $bookableClass::findOrFail($request->bookable_id);
         
         $days = $startDate->diffInDays($endDate) ?: 1;
         
@@ -158,10 +195,16 @@ class BookingController extends Controller
             'customer_name' => $request->customer_name,
             'customer_email' => $request->customer_email,
             'customer_phone' => $request->customer_phone,
+            'customer_address' => $request->customer_address,
             'special_requests' => $request->special_requests,
             'status' => 'pending',
             'payment_status' => 'pending',
         ]);
+
+        // Also update the user's address profile if provided
+        if ($request->filled('customer_address')) {
+            Auth::user()->update(['address' => $request->customer_address]);
+        }
 
         return redirect()->back()->with('success', 'Booking submitted successfully!');
     }
@@ -178,10 +221,31 @@ class BookingController extends Controller
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
             'customer_phone' => 'nullable|string|max:255',
+            'customer_address' => 'nullable|string|max:255',
         ]);
 
         $startDate = Carbon::parse($request->start_date);
         $endDate = $request->end_date ? Carbon::parse($request->end_date) : $startDate;
+
+        // Check for overlapping bookings (excluding current)
+        $overlap = Booking::where('bookable_id', $booking->bookable_id)
+            ->where('bookable_type', $booking->bookable_type)
+            ->where('id', '!=', $booking->id)
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate])
+                    ->orWhere(function ($q) use ($startDate, $endDate) {
+                        $q->where('start_date', '<=', $startDate)
+                          ->where('end_date', '>=', $endDate);
+                    });
+            })
+            ->exists();
+
+        if ($overlap) {
+            return redirect()->back()->withInput()->with('error', 'Sorry, this item is already booked for the selected dates.');
+        }
+
         $days = $startDate->diffInDays($endDate) ?: 1;
 
         $totalPrice = 0;
@@ -199,6 +263,7 @@ class BookingController extends Controller
             'customer_name' => $request->customer_name,
             'customer_email' => $request->customer_email,
             'customer_phone' => $request->customer_phone,
+            'customer_address' => $request->customer_address,
             'special_requests' => $request->special_requests,
         ]);
 
@@ -300,5 +365,31 @@ class BookingController extends Controller
 
         $bookings = Booking::with(['bookable', 'user'])->latest()->paginate(15);
         return view('admin.payments', compact('bookings'));
+    }
+
+    public function getTakenDates(Request $request)
+    {
+        $request->validate([
+            'bookable_id' => 'required|integer',
+            'bookable_type' => 'required|string',
+        ]);
+
+        $bookings = Booking::where('bookable_id', $request->bookable_id)
+            ->where('bookable_type', $request->bookable_type)
+            ->where('status', '!=', 'cancelled')
+            ->get(['start_date', 'end_date']);
+
+        $takenDates = [];
+        foreach ($bookings as $booking) {
+            $startDate = Carbon::parse($booking->start_date);
+            $endDate = Carbon::parse($booking->end_date);
+            
+            $period = CarbonPeriod::create($startDate, $endDate);
+            foreach ($period as $date) {
+                $takenDates[] = $date->format('Y-m-d');
+            }
+        }
+
+        return response()->json(array_unique($takenDates));
     }
 }

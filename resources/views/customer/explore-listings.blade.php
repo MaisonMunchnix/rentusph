@@ -1,5 +1,6 @@
 <x-layouts.customer>
     <x-slot name="styles">
+        <link href="{{ asset('vendor/bootstrap-datepicker-master/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
         <style>
             .listing-card {
                 background: #ffffff !important;
@@ -431,15 +432,19 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label font-w600">Phone Number</label>
-                                <input type="text" name="customer_phone" class="form-control" value="{{ Auth::user()->phone }}" required>
+                                <input type="text" name="customer_phone" class="form-control" placeholder="0912-345-6789" value="{{ Auth::user()->phone }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Address</label>
+                                <input type="text" name="customer_address" class="form-control" placeholder="Your permanent address" value="{{ Auth::user()->address }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label font-w600">Pickup/Check-in Date</label>
-                                <input type="date" name="start_date" class="form-control" required min="{{ date('Y-m-d') }}">
+                                <input type="text" name="start_date" id="start_date" class="form-control datepicker-input" required placeholder="YYYY-MM-DD" autocomplete="off">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label font-w600">Return/Check-out Date</label>
-                                <input type="date" name="end_date" class="form-control" required min="{{ date('Y-m-d') }}">
+                                <input type="text" name="end_date" id="end_date" class="form-control datepicker-input" required placeholder="YYYY-MM-DD" autocomplete="off">
                             </div>
                         </div>
 
@@ -458,7 +463,33 @@
     </div>
 
     <x-slot name="scripts">
+    <script src="{{ asset('vendor/bootstrap-datepicker-master/js/bootstrap-datepicker.min.js') }}"></script>
     <script>
+        function initDatepickers(takenDates) {
+            $('.datepicker-input').datepicker('destroy');
+            
+            $('#start_date').datepicker({
+                format: 'yyyy-mm-dd',
+                startDate: new Date(),
+                autoclose: true,
+                todayHighlight: true,
+                datesDisabled: takenDates
+            }).on('changeDate', function(e) {
+                $('#end_date').datepicker('setStartDate', e.date);
+                if ($('#end_date').datepicker('getDate') < e.date) {
+                    $('#end_date').datepicker('setDate', e.date);
+                }
+            });
+
+            $('#end_date').datepicker({
+                format: 'yyyy-mm-dd',
+                startDate: new Date(),
+                autoclose: true,
+                todayHighlight: true,
+                datesDisabled: takenDates
+            });
+        }
+
         $(document).on('click', '.btn-book', function(e) {
             e.preventDefault();
             e.stopPropagation(); // Prevent detail modal from opening
@@ -475,7 +506,19 @@
             $('#modal_item_rate').val(rate);
             $('#bookingModalLabel').text(label);
 
-            $('#bookingModal').modal('show');
+            $.ajax({
+                url: '{{ route("bookings.taken-dates") }}',
+                method: 'GET',
+                data: { bookable_id: id, bookable_type: type },
+                success: function(takenDates) {
+                    initDatepickers(takenDates);
+                    $('#bookingModal').modal('show');
+                },
+                error: function() {
+                    initDatepickers([]);
+                    $('#bookingModal').modal('show');
+                }
+            });
         });
 
         $(document).on('click', '.listing-card', function() {
@@ -552,9 +595,23 @@
             $('#modal_item_rate').val(rate);
             $('#bookingModalLabel').text(label);
 
-            setTimeout(() => {
-                $('#bookingModal').modal('show');
-            }, 400); // Wait for detail modal to close
+            $.ajax({
+                url: '{{ route("bookings.taken-dates") }}',
+                method: 'GET',
+                data: { bookable_id: id, bookable_type: type },
+                success: function(takenDates) {
+                    initDatepickers(takenDates);
+                    setTimeout(() => {
+                        $('#bookingModal').modal('show');
+                    }, 400); // Wait for detail modal to close
+                },
+                error: function() {
+                    initDatepickers([]);
+                    setTimeout(() => {
+                        $('#bookingModal').modal('show');
+                    }, 400);
+                }
+            });
         });
     </script>
     </x-slot>
