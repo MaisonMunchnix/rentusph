@@ -6,10 +6,12 @@
             #bookingDetailModal .modal-header { border-bottom: none; }
             .detail-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
             .detail-icon { 
-                width: 20px; 
+                width: 24px; 
                 display: flex; align-items: center; justify-content: center; 
-                font-size: 1rem; flex-shrink: 0;
+                font-size: 1.1rem; flex-shrink: 0;
                 margin-top: 2px;
+                color: #f1bc19 !important;
+                background: transparent !important;
             }
             .detail-label { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
             .detail-value { font-size: 0.9rem; color: #0f172a; font-weight: 500; }
@@ -255,23 +257,24 @@
                             
                             {{-- Specific Details stack here --}}
                             <div class="detail-row">
-                                <div class="detail-icon text-primary"><i class="fas fa-calendar-alt"></i></div>
+                                <div class="detail-icon"><i class="fas fa-calendar-alt"></i></div>
                                 <div>
                                     <div class="detail-label">Dates</div>
                                     <div class="detail-value" id="modal_dates"></div>
                                 </div>
                             </div>
                             <div class="detail-row">
-                                <div class="detail-icon text-primary"><i class="fas fa-peso-sign"></i></div>
+                                <div class="detail-icon"><i class="fas fa-peso-sign"></i></div>
                                 <div>
                                     <div class="detail-label">Total Amount</div>
-                                    <div class="detail-value fw-bold text-success fs-5" id="modal_total"></div>
+                                    <div class="detail-value fw-bold text-success fs-4" id="modal_total"></div>
+                                    <div class="text-muted fw-semi-bold" style="font-size: 0.75rem;" id="modal_total_breakdown"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-7 border-start">
                             <div class="detail-row">
-                                <div class="detail-icon text-primary"><i class="fas fa-user"></i></div>
+                                <div class="detail-icon"><i class="fas fa-user"></i></div>
                                 <div>
                                     <div class="detail-label">Customer</div>
                                     <div class="detail-value" id="modal_customer"></div>
@@ -280,7 +283,7 @@
                             </div>
                             
                             <div class="detail-row">
-                                <div class="detail-icon text-primary"><i class="fas fa-phone"></i></div>
+                                <div class="detail-icon"><i class="fas fa-phone"></i></div>
                                 <div>
                                     <div class="detail-label">Phone</div>
                                     <div class="detail-value" id="modal_phone"></div>
@@ -288,7 +291,7 @@
                             </div>
 
                             <div class="detail-row" id="modal_address_row">
-                                <div class="detail-icon text-primary"><i class="fas fa-map-marker-alt"></i></div>
+                                <div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div>
                                 <div>
                                     <div class="detail-label">Address</div>
                                     <div class="detail-value" id="modal_address"></div>
@@ -296,7 +299,7 @@
                             </div>
 
                             <div class="detail-row">
-                                <div class="detail-icon text-primary"><i id="modal_type_icon" class="fas fa-car"></i></div>
+                                <div class="detail-icon"><i id="modal_type_icon" class="fas fa-car"></i></div>
                                 <div>
                                     <div class="detail-label" id="modal_type_label">Item</div>
                                     <div class="detail-value" id="modal_item"></div>
@@ -304,7 +307,7 @@
                             </div>
 
                             <div class="detail-row" id="modal_proof_row">
-                                <div class="detail-icon text-primary"><i class="fas fa-receipt"></i></div>
+                                <div class="detail-icon"><i class="fas fa-receipt"></i></div>
                                 <div>
                                     <div class="detail-label">Proof of Payment</div>
                                     <div class="detail-value" id="modal_proof_status"></div>
@@ -312,10 +315,47 @@
                             </div>
 
                             <div class="detail-row" id="modal_special_row" style="display:none;">
-                                <div class="detail-icon text-primary"><i class="fas fa-comment-alt"></i></div>
+                                <div class="detail-icon"><i class="fas fa-comment-alt"></i></div>
                                 <div>
                                     <div class="detail-label">Special Requests</div>
                                     <div class="detail-value" id="modal_special"></div>
+                                </div>
+                            </div>
+
+                            <div id="commissionBreakdown" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e2e8f0;">
+                                <div class="detail-row">
+                                    <div class="detail-icon"><i class="fas fa-money-bill-wave"></i></div>
+                                    <div class="flex-fill">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="detail-label">Rental Amount</span>
+                                            <span class="detail-value" id="modal_rental_amount_display">₱0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <span class="detail-label">System Commission (<span id="modal_commission_rate">0</span>%)</span>
+                                            <span class="detail-value text-danger" id="modal_commission_display">-₱0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-1 pt-1 border-top">
+                                            <span class="detail-label">Affiliate Earnings</span>
+                                            <span class="detail-value text-success" id="modal_earnings_display">₱0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-row mt-2" id="modal_deposit_row">
+                                    <div class="detail-icon"><i class="fas fa-shield-alt"></i></div>
+                                    <div class="flex-fill d-flex justify-content-between align-items-center">
+                                        <span class="detail-label">Security Deposit (Held)</span>
+                                        <span class="detail-value" id="modal_deposit_display">₱0.00</span>
+                                    </div>
+                                </div>
+                                <div id="settlementSummary" style="display:none; margin-top: 10px; padding: 10px; background: #f8fafc; border-radius: 8px;">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small font-w600 text-muted">Damage Deduction</span>
+                                        <span class="small font-w700 text-danger" id="modal_deducted_display">₱0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center border-top pt-1">
+                                        <span class="small font-w600 text-muted">Customer Refund</span>
+                                        <span class="small font-w700 text-primary" id="modal_refunded_display">₱0.00</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -352,19 +392,24 @@
                             </div>
                         </div>
 
-                        <div id="inspectionSection" class="inspection-container" style="display: none;">
-                            <h6 class="detail-label mb-3">Return Inspection Report</h6>
-                            <div class="condition-toggle">
-                                <div class="condition-btn good active" onclick="setCondition('good')">
-                                    <i class="fas fa-check-circle"></i> Clean / Good
+                            <div id="inspectionSection" class="inspection-container" style="display: none;">
+                                <h6 class="detail-label mb-3">Return Inspection Report</h6>
+                                <div class="condition-toggle">
+                                    <div class="condition-btn good active" onclick="setCondition('good')">
+                                        <i class="fas fa-check-circle"></i> Clean / Good
+                                    </div>
+                                    <div class="condition-btn damaged" onclick="setCondition('damaged')">
+                                        <i class="fas fa-exclamation-triangle"></i> Damaged / Issues
+                                    </div>
                                 </div>
-                                <div class="condition-btn damaged" onclick="setCondition('damaged')">
-                                    <i class="fas fa-exclamation-triangle"></i> Damaged / Issues
+                                <input type="hidden" name="inspection_condition" id="inspection_condition" value="good">
+                                
+                                <div id="damageDeductionNotice" class="mt-3 mb-3 alert alert-danger py-2 px-3 small shadow-sm" style="display:none; border-left: 4px solid #b91c1c;">
+                                    <i class="fas fa-exclamation-circle me-1"></i> <strong>Note:</strong> When marked as damaged, the security deposit (₱<span id="modal_deposit_val">3,000</span>) will <strong>not</strong> be refunded.
                                 </div>
+
+                                <textarea name="inspection_notes" class="form-control inspection-notes" rows="2" placeholder="Describe any new scratches, fuel level, or issues..."></textarea>
                             </div>
-                            <input type="hidden" name="inspection_condition" id="inspection_condition" value="good">
-                            <textarea name="inspection_notes" class="form-control inspection-notes" rows="2" placeholder="Describe any new scratches, fuel level, or issues..."></textarea>
-                        </div>
                     </form>
                     <div class="w-100 text-center mt-3">
                         <form id="deleteBookingForm" method="POST" class="d-inline">
@@ -427,6 +472,7 @@
                         }
                     },
                     eventClick: function (info) {
+                        const statusSelect = document.getElementById('modal_status_select');
                         const p = info.event.extendedProps;
                         const start = info.event.start ? new Date(info.event.start).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
                         
@@ -467,12 +513,16 @@
                         document.getElementById('modal_dates').textContent    = start + (end !== start ? ' → ' + end : '');
                         document.getElementById('modal_item').textContent     = p.item;
                         document.getElementById('modal_total').textContent    = p.total;
+                        
+                        const rental = parseFloat(p.rental_amount || 0);
+                        const deposit = parseFloat(p.security_deposit || 0);
+                        document.getElementById('modal_total_breakdown').textContent = `Rental: ₱${rental.toLocaleString(undefined, {minimumFractionDigits:2})} + Deposit: ₱${deposit.toLocaleString(undefined, {minimumFractionDigits:2})}`;
                         document.getElementById('modal_type_label').textContent = p.type;
                         document.getElementById('modal_type_icon').className  = p.type === 'Car' ? 'fas fa-car' : 'fas fa-building';
                         document.getElementById('modal_item_image').src = p.image_url;
 
                         const proofStatus = document.getElementById('modal_proof_status');
-                        const hasProof = !!p.proof_url;
+                        const hasProof = p.proof_url && p.proof_url.length > 0;
                         if (hasProof) {
                             proofStatus.innerHTML = `<a href="${p.proof_url}" target="_blank" class="text-primary fw-bold" style="text-decoration: underline;">View Attachment</a>`;
                         } else {
@@ -532,6 +582,39 @@
                         }
 
                         document.getElementById('modal_status_select').value = p.status;
+                        
+                        // Handle Commission Breakdown Display
+                        const commissionSection = document.getElementById('commissionBreakdown');
+                        // Store raw values for toggleSections pre-filling
+                        statusSelect.dataset.totalRaw = p.total.replace(/[^\d.-]/g, '');
+                        
+                        if (p.rental_amount || p.status === 'pending') {
+                            const r = p.rental_amount || (p.total_raw - 3000); // fallback for legacy
+                            const d = p.security_deposit || 3000;
+                            commissionSection.style.display = 'block';
+                            document.getElementById('modal_rental_amount_display').textContent = '₱' + Number(r).toLocaleString();
+                            document.getElementById('modal_commission_rate').textContent = p.commission_rate || 20;
+                            
+                            // Estimate commission if not yet confirmed
+                            const platformComm = p.platform_commission || (r * (p.commission_rate || 20) / 100);
+                            const affiliateEarn = p.affiliate_earnings || (r - platformComm);
+
+                            document.getElementById('modal_commission_display').textContent = '-₱' + Number(platformComm).toLocaleString();
+                            document.getElementById('modal_earnings_display').textContent = '₱' + Number(affiliateEarn).toLocaleString();
+                            document.getElementById('modal_deposit_display').textContent = '₱' + Number(d).toLocaleString();
+
+                            const settlementSection = document.getElementById('settlementSummary');
+                            if (p.status === 'completed') {
+                                settlementSection.style.display = 'block';
+                                document.getElementById('modal_deducted_display').textContent = '₱' + Number(p.deposit_deducted || 0).toLocaleString();
+                                document.getElementById('modal_refunded_display').textContent = '₱' + Number(p.deposit_refunded || p.security_deposit).toLocaleString();
+                            } else {
+                                settlementSection.style.display = 'none';
+                            }
+                        } else {
+                            commissionSection.style.display = 'none';
+                        }
+
                         // if nice-select is used, we have to update it
                         if($.fn.selectpicker) {
                              $('#modal_status_select').selectpicker('refresh');
@@ -542,6 +625,9 @@
 
                         var myModal = new bootstrap.Modal(document.getElementById('bookingDetailModal'));
                         myModal.show();
+                        
+                        // Sync sections
+                        setTimeout(toggleSections, 100);
                     },
                     eventDidMount: function(info) {
                         // Apply bootstrap classes to events based on color/status passed from backend
@@ -588,9 +674,9 @@
                     // Show warning if trying to select confirmed without proof
                     if (status === 'confirmed' && !hasProof) {
                         proofWarning.style.display = 'block';
-                        // Revert selection to pending
+                        // Revert selection without triggering infinite loop
                         statusSelect.value = 'pending';
-                        if ($.fn.selectpicker) $('#modal_status_select').selectpicker('refresh');
+                        if ($.fn.selectpicker) $(statusSelect).selectpicker('refresh');
                         return;
                     } else {
                         proofWarning.style.display = 'none';
@@ -604,6 +690,14 @@
                     
                     if (status === 'confirmed' || status === 'completed') {
                         $(paymentSection).slideDown();
+                        
+                        // Pre-fill if empty and confirmed
+                        if (status === 'confirmed') {
+                            const rentalInput = document.getElementById('modal_rental_amount');
+                            const depositInput = document.getElementById('modal_security_deposit');
+                            if (!rentalInput.value) rentalInput.value = statusSelect.dataset.totalRaw || '';
+                            if (!depositInput.value) depositInput.value = '3000';
+                        }
                     } else {
                         $(paymentSection).slideUp();
                     }
@@ -621,6 +715,19 @@
                     document.querySelectorAll('.condition-btn').forEach(btn => btn.classList.remove('active'));
                     const activeBtn = document.querySelector(`.condition-btn.${val}`);
                     if (activeBtn) activeBtn.classList.add('active');
+
+                    // Show notice for damaged items
+                    const damageNotice = document.getElementById('damageDeductionNotice');
+                    if (damageNotice) {
+                        if (val === 'damaged') {
+                            const depositVal = document.getElementById('modal_security_deposit').value || '3,000';
+                            const displayVal = document.getElementById('modal_deposit_val');
+                            if (displayVal) displayVal.textContent = Number(depositVal).toLocaleString();
+                            $(damageNotice).slideDown();
+                        } else {
+                            $(damageNotice).slideUp();
+                        }
+                    }
                 };
 
                 // Handle ajax form submission to avoid reload
@@ -637,7 +744,14 @@
                             if (r.ok || r.redirected) {
                                 bootstrap.Modal.getInstance(document.getElementById('bookingDetailModal')).hide();
                                 calendar.refetchEvents();
+                            } else {
+                                return r.json().then(data => {
+                                    alert('Error: ' + (data.message || 'Validation failed. Please check your inputs.'));
+                                });
                             }
+                        }).catch(err => {
+                            console.error(err);
+                            alert('An unexpected error occurred. Please try again.');
                         });
                     });
                 }

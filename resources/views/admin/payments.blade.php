@@ -72,7 +72,14 @@
                                                 <div class="fs-13">{{ $booking->bookable->title ?? 'N/A' }}</div>
                                             @endif
                                         </td>
-                                        <td><strong>₱{{ number_format($booking->total_price, 2) }}</strong></td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <strong>₱{{ number_format($booking->total_price, 2) }}</strong>
+                                                <small class="text-muted" style="font-size: 0.65rem;">
+                                                    R: ₱{{ number_format($booking->rental_amount, 2) }} | D: ₱{{ number_format($booking->security_deposit, 2) }}
+                                                </small>
+                                            </div>
+                                        </td>
                                         <td>
                                             @php
                                                 $statusColor = match($booking->status) {
@@ -87,6 +94,14 @@
                                                 <span class="status-dot" style="background-color: {{ $statusColor }};"></span>
                                                 {{ ucfirst($booking->status) }}
                                             </span>
+                                            @if($booking->status === 'completed')
+                                                <div class="mt-1" style="line-height: 1.2;">
+                                                    <small class="text-success fw-bold" style="font-size: 0.6rem;">Ref: ₱{{ number_format($booking->deposit_refunded, 2) }}</small>
+                                                    @if($booking->deposit_deducted > 0)
+                                                        <br><small class="text-danger" style="font-size: 0.6rem;">Ded: ₱{{ number_format($booking->deposit_deducted, 2) }}</small>
+                                                    @endif
+                                                </div>
+                                            @endif
                                         </td>
                                         <td>
                                             @if($booking->proof_of_payment)
@@ -175,18 +190,43 @@
                                                                 <p class="mb-0">{{ $booking->special_requests ?? 'No special requests' }}</p>
                                                             </div>
                                                             <hr>
-                                                            <div class="d-flex justify-content-between align-items-center">
+                                                            <div class="d-flex justify-content-between align-items-center mb-3">
                                                                 <div>
                                                                     <small class="text-muted d-block">Total Amount</small>
                                                                     <h4 class="mb-0 text-primary">₱{{ number_format($booking->total_price, 2) }}</h4>
+                                                                    <small class="text-muted" style="font-size: 0.75rem;">
+                                                                        Rental: ₱{{ number_format($booking->rental_amount, 2) }} + Deposit: ₱{{ number_format($booking->security_deposit, 2) }}
+                                                                    </small>
                                                                 </div>
-                                                                <div>
+                                                                <div class="text-end">
                                                                     <small class="text-muted d-block">Current Status</small>
                                                                     <span class="badge light" style="background-color: {{ $statusColor }}22; color: {{ $statusColor }};">
                                                                         {{ ucfirst($booking->status) }}
                                                                     </span>
                                                                 </div>
                                                             </div>
+
+                                                            @if($booking->status === 'completed')
+                                                                <div class="bg-light p-3 rounded">
+                                                                    <h6 class="font-w600 text-primary mb-3" style="font-size: 0.85rem;">Deposit Settlement</h6>
+                                                                    <div class="row">
+                                                                        <div class="col-6 mb-2">
+                                                                            <small class="text-muted d-block">Deducted</small>
+                                                                            <span class="fw-bold text-danger">₱{{ number_format($booking->deposit_deducted, 2) }}</span>
+                                                                        </div>
+                                                                        <div class="col-6 mb-2">
+                                                                            <small class="text-muted d-block">Refunded</small>
+                                                                            <span class="fw-bold text-success">₱{{ number_format($booking->deposit_refunded, 2) }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    @if($booking->inspection && $booking->inspection->notes)
+                                                                        <div class="mt-2 pt-2 border-top">
+                                                                            <small class="text-muted d-block mb-1">Inspection Notes</small>
+                                                                            <p class="mb-0 fs-12 italic text-dark">"{{ $booking->inspection->notes }}"</p>
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                            @endif
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>

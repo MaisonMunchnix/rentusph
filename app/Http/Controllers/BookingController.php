@@ -10,6 +10,7 @@ use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\AffiliateDetail;
 use App\Models\Inspection;
 
 class BookingController extends Controller
@@ -124,11 +125,21 @@ class BookingController extends Controller
                         'item'          => trim($name),
                         'type'          => $isCar ? 'Car' : 'Property',
                         'total'         => '₱' . number_format($booking->total_price, 2),
+                        'total_raw'     => $booking->total_price,
                         'special'       => $booking->special_requests,
                         'image_url'     => $image,
                         'proof_url'     => $booking->proof_of_payment ? asset('storage/' . $booking->proof_of_payment) : null,
                         'rental_amount' => $booking->rental_amount,
                         'security_deposit' => $booking->security_deposit,
+                        'commission_rate' => $booking->commission_rate ?: 20,
+                        'platform_commission' => $booking->platform_commission,
+                        'affiliate_earnings' => $booking->affiliate_earnings,
+                        'deposit_deducted' => $booking->deposit_deducted,
+                        'deposit_refunded' => $booking->deposit_refunded,
+                        'inspection' => $booking->inspection ? [
+                            'condition' => $booking->inspection->condition,
+                            'notes' => $booking->inspection->notes,
+                        ] : null,
                     ],
                 ];
             });
@@ -177,13 +188,16 @@ class BookingController extends Controller
         
         $days = $startDate->diffInDays($endDate) ?: 1;
         
-        $totalPrice = 0;
+        $rentalAmount = 0;
         if ($request->bookable_type === 'App\Models\Car') {
-            $totalPrice = $bookable->daily_rate * $days;
+            $rentalAmount = $bookable->daily_rate * $days;
         } else {
             $dailyRate = $bookable->monthly_rate / 30;
-            $totalPrice = $dailyRate * $days;
+            $rentalAmount = $dailyRate * $days;
         }
+
+        $securityDeposit = 3000.00; // Default Security Deposit
+        $totalPrice = $rentalAmount + $securityDeposit;
 
         Booking::create([
             'user_id' => Auth::id(),
@@ -191,6 +205,8 @@ class BookingController extends Controller
             'bookable_type' => $request->bookable_type,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'rental_amount' => $rentalAmount,
+            'security_deposit' => $securityDeposit,
             'total_price' => $totalPrice,
             'customer_name' => $request->customer_name,
             'customer_email' => $request->customer_email,
@@ -248,17 +264,23 @@ class BookingController extends Controller
 
         $days = $startDate->diffInDays($endDate) ?: 1;
 
-        $totalPrice = 0;
+        $rentalAmount = 0;
         if ($booking->bookable_type === 'App\Models\Car') {
-            $totalPrice = $booking->bookable->daily_rate * $days;
+            $rentalAmount = $booking->bookable->daily_rate * $days;
         } else {
             $dailyRate = $booking->bookable->monthly_rate / 30;
-            $totalPrice = $dailyRate * $days;
+            $rentalAmount = $dailyRate * $days;
         }
+
+        // Keep existing deposit or apply default if missing
+        $securityDeposit = $booking->security_deposit ?: 3000.00;
+        $totalPrice = $rentalAmount + $securityDeposit;
 
         $booking->update([
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'rental_amount' => $rentalAmount,
+            'security_deposit' => $securityDeposit,
             'total_price' => $totalPrice,
             'customer_name' => $request->customer_name,
             'customer_email' => $request->customer_email,
@@ -289,15 +311,8 @@ class BookingController extends Controller
         $user = Auth::user();
         
         // Authorization check
-        if ($user->role === 'admin') {
-            // Admin can update any booking
-        } elseif ($user->role === 'affiliate') {
-            // Affiliate can only update bookings for their own items
-            if ($booking->bookable->user_id !== $user->id) {
-                abort(403);
-            }
-        } else {
-            abort(403);
+        if ($user->role !== 'admin') {
+            abort(403, 'Unauthorized. Only administrators can update booking status.');
         }
 
         $request->validate([
@@ -306,19 +321,55 @@ class BookingController extends Controller
             'inspection_notes' => 'nullable|string',
             'rental_amount' => 'required_if:status,confirmed|nullable|numeric',
             'security_deposit' => 'required_if:status,confirmed|nullable|numeric',
+            'deposit_deducted' => 'nullable|numeric|min:0',
         ]);
 
         $updateData = ['status' => $request->status];
 
         if ($request->status === 'confirmed') {
-            $updateData['rental_amount'] = $request->rental_amount;
-            $updateData['security_deposit'] = $request->security_deposit;
+            $rentalAmount = (float) $request->rental_amount;
+            $securityDeposit = (float) $request->security_deposit;
+
+            // Compute commission and earnings
+            $commissionRate = 20.00; // Default 20%
+            $owner = $booking->bookable?->user;
+            if ($owner) {
+                $detail = AffiliateDetail::where('user_id', $owner->id)->first();
+                if ($detail && $detail->commission_rate) {
+                    $commissionRate = (float) $detail->commission_rate;
+                }
+            }
+
+            $commission = round($rentalAmount * ($commissionRate / 100), 2);
+            $affiliateEarnings = round($rentalAmount - $commission, 2);
+
+            $updateData = array_merge($updateData, [
+                'rental_amount' => $rentalAmount,
+                'security_deposit' => $securityDeposit,
+                'total_price' => $rentalAmount + $securityDeposit,
+                'commission_rate' => $commissionRate,
+                'platform_commission' => $commission,
+                'affiliate_earnings' => $affiliateEarnings,
+            ]);
         }
 
-        $booking->update($updateData);
+        if ($request->status === 'completed') {
+            $deducted = 0;
+            if ($request->inspection_condition === 'damaged') {
+                $deducted = (float) ($booking->security_deposit ?? 0);
+            }
+            $refunded = (float) ($booking->security_deposit ?? 0) - $deducted;
 
-        // If completing, save inspection
-        if ($request->status === 'completed' && $request->has('inspection_condition')) {
+            $updateData['deposit_deducted'] = $deducted;
+            $updateData['deposit_refunded'] = $refunded;
+
+            // Damage deductions go to the affiliate (owner) to cover repair costs
+            if ($deducted > 0) {
+                $currentEarnings = $booking->affiliate_earnings ?? 0;
+                $updateData['affiliate_earnings'] = $currentEarnings + $deducted;
+            }
+
+            // Save inspection
             Inspection::updateOrCreate(
                 ['booking_id' => $booking->id],
                 [
@@ -326,10 +377,9 @@ class BookingController extends Controller
                     'notes' => $request->inspection_notes,
                 ]
             );
-            
-            // If carriage is damaged, we might want to flag the car later. 
-            // For now, we just save the record.
         }
+
+        $booking->update($updateData);
 
         return redirect()->back()->with('success', 'Booking status updated to ' . ucfirst($request->status) . '.');
     }

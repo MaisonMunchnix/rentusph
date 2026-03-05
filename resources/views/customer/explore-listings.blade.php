@@ -234,6 +234,7 @@
                         <div class="listing-footer">
                             <div class="listing-price">
                                 <span>₱{{ number_format($item->daily_rate) }}</span><small>/day</small>
+                                <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱3,000 refundable deposit</div>
                             </div>
                             <a href="javascript:void(0);" class="btn btn-primary btn-book shadow-none" 
                                 data-id="{{ $item->id }}" 
@@ -264,6 +265,7 @@
                         <div class="listing-footer">
                             <div class="listing-price">
                                 <span>₱{{ number_format($item->monthly_rate) }}</span><small>/mo</small>
+                                <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱3,000 refundable deposit</div>
                             </div>
                             <a href="javascript:void(0);" class="btn btn-success btn-book shadow-none" 
                                 data-id="{{ $item->id }}" 
@@ -377,6 +379,11 @@
                                     <div class="p-2">
                                         <h4 class="mb-0 text-dark font-w800" id="detail_price"></h4>
                                         <span class="text-muted small" id="detail_price_unit"></span>
+                                        <div class="mt-2">
+                                            <span class="badge badge-md light badge-warning text-dark font-w600" style="font-size: 0.85rem; border: 1px solid rgba(0,0,0,0.05);">
+                                                <i class="fas fa-shield-alt me-2 text-primary"></i> +₱3,000 Refundable Security Deposit
+                                            </span>
+                                        </div>
                                     </div>
                                     <div id="detail_booking_info" style="display:none;">
                                         <!-- Store relevant ID/Type for button -->
@@ -450,7 +457,28 @@
 
                         <div class="mb-3">
                             <label class="form-label font-w600">Special Requests (Optional)</label>
-                            <textarea name="special_requests" class="form-control" rows="3"></textarea>
+                            <textarea name="special_requests" class="form-control" rows="2"></textarea>
+                        </div>
+
+                        <div class="card bg-light border-0 mb-0">
+                            <div class="card-body p-3">
+                                <h6 class="font-w700 mb-3 text-dark">Price Breakdown</h6>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Rental Amount (<span id="calc_days">0</span> days)</span>
+                                    <span class="font-w600 text-dark">₱<span id="calc_rental">0.00</span></span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">Security Deposit (Refundable)</span>
+                                    <span class="font-w600 text-dark">₱3,000.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between border-top pt-3">
+                                    <span class="font-w700 text-primary h5 mb-0">Total Amount to Prepare</span>
+                                    <span class="font-w800 text-primary h4 mb-0">₱<span id="calc_total">0.00</span></span>
+                                </div>
+                                <div class="alert alert-success light py-2 px-3 mt-3 mb-0 small">
+                                    <i class="fas fa-info-circle me-2"></i> <strong>Note:</strong> A ₱3,000 refundable security deposit is included and will be returned after the rental.
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -479,6 +507,7 @@
                 if ($('#end_date').datepicker('getDate') < e.date) {
                     $('#end_date').datepicker('setDate', e.date);
                 }
+                calculateTotal();
             });
 
             $('#end_date').datepicker({
@@ -487,7 +516,39 @@
                 autoclose: true,
                 todayHighlight: true,
                 datesDisabled: takenDates
+            }).on('changeDate', function(e) {
+                calculateTotal();
             });
+        }
+
+        function calculateTotal() {
+            const startStr = $('#start_date').val();
+            const endStr = $('#end_date').val();
+            const rateStr = $('#modal_item_rate').val(); // e.g., "₱1,000/day" or "₱30,000/mo"
+            
+            if (!startStr || !endStr || !rateStr) return;
+
+            const start = new Date(startStr);
+            const end = new Date(endStr);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+
+            const rate = parseFloat(rateStr.replace(/[^\d.]/g, ''));
+            const isMonthly = rateStr.includes('/mo');
+            
+            let rentalAmount = 0;
+            if (isMonthly) {
+                rentalAmount = (rate / 30) * diffDays;
+            } else {
+                rentalAmount = rate * diffDays;
+            }
+
+            const deposit = 3000;
+            const total = rentalAmount + deposit;
+
+            $('#calc_days').text(diffDays);
+            $('#calc_rental').text(rentalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            $('#calc_total').text(total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
         }
 
         $(document).on('click', '.btn-book', function(e) {
@@ -554,7 +615,7 @@
                 // For booking from modal
                 $('#detail_id').val($(this).find('.btn-book').data('id'));
                 $('#detail_full_type').val('App\\Models\\Car');
-                $('.btn-book-from-modal').removeClass('btn-success').addClass('btn-primary').text('Book Now');
+                $('.btn-book-from-modal').removeClass('btn-success').addClass('btn-primary').text('Book');
             } else {
                 $('#detail_title').text(data.title);
                 $('#detail_location').text(data.address + ', ' + data.city + ', ' + data.region);

@@ -36,18 +36,7 @@ Route::get('/register/affiliate', function () { return view('auth.affiliate-regi
 Route::get('/forgot-password', function () { return view('auth.forgot-password'); })->name('password.request');
 
 // Role-based Dashboard
-Route::get('/dashboard', function () {
-    if (Auth::user()->role === 'admin') {
-        return view('admin.index');
-    } elseif (Auth::user()->role === 'customer') {
-        return redirect()->route('customer.explore');
-    } elseif (Auth::user()->role === 'affiliate') {
-        return view('affiliate.index');
-    }
-    
-    // Fallback for unrecognized roles
-    return redirect()->route('login');
-})->name('dashboard')->middleware(['auth', 'affiliate.status']);
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'affiliate.status']);
 
 // Admin Dashboard Redirect (legacy name support)
 Route::get('/admin-dashboard', function() {

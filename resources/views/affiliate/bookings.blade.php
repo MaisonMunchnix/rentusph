@@ -6,9 +6,11 @@
             #bookingDetailModal .modal-header { border-bottom: none; }
             .detail-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
             .detail-icon { 
-                width: 32px; height: 32px; border-radius: 8px; 
+                width: 24px; 
                 display: flex; align-items: center; justify-content: center; 
-                font-size: 0.85rem; flex-shrink: 0;
+                font-size: 1.1rem; flex-shrink: 0;
+                color: #f1bc19 !important;
+                background: transparent !important;
             }
             .detail-label { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
             .detail-value { font-size: 0.9rem; color: #0f172a; font-weight: 500; }
@@ -93,7 +95,7 @@
                 </div>
                 <div class="modal-body pt-3">
                     <div class="detail-row">
-                        <div class="detail-icon bg-primary-light text-primary"><i class="fas fa-user"></i></div>
+                        <div class="detail-icon"><i class="fas fa-user"></i></div>
                         <div>
                             <div class="detail-label">Customer</div>
                             <div class="detail-value" id="modal_customer"></div>
@@ -101,54 +103,61 @@
                         </div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-icon bg-info-light text-info"><i class="fas fa-phone"></i></div>
+                        <div class="detail-icon"><i class="fas fa-phone"></i></div>
                         <div>
                             <div class="detail-label">Phone</div>
                             <div class="detail-value" id="modal_phone"></div>
                         </div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-icon bg-success-light text-success"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="detail-icon"><i class="fas fa-calendar-alt"></i></div>
                         <div>
                             <div class="detail-label">Dates</div>
                             <div class="detail-value" id="modal_dates"></div>
                         </div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-icon bg-warning-light text-warning"><i id="modal_type_icon" class="fas fa-car"></i></div>
+                        <div class="detail-icon"><i id="modal_type_icon" class="fas fa-car"></i></div>
                         <div>
                             <div class="detail-label" id="modal_type_label">Item</div>
                             <div class="detail-value" id="modal_item"></div>
                         </div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-icon bg-danger-light text-danger"><i class="fas fa-peso-sign"></i></div>
+                        <div class="detail-icon"><i class="fas fa-peso-sign"></i></div>
                         <div>
                             <div class="detail-label">Total Amount</div>
                             <div class="detail-value fw-bold" id="modal_total"></div>
                         </div>
                     </div>
                     <div class="detail-row" id="modal_special_row" style="display:none;">
-                        <div class="detail-icon bg-dark-light text-dark"><i class="fas fa-comment-alt"></i></div>
+                        <div class="detail-icon"><i class="fas fa-comment-alt"></i></div>
                         <div>
                             <div class="detail-label">Special Requests</div>
                             <div class="detail-value" id="modal_special"></div>
                         </div>
                     </div>
+
+                    <div id="settlementSection" style="display:none; border-top: 1px solid #eee; margin-top: 15px; padding-top: 15px;">
+                        <h6 class="font-w600 text-primary mb-3">Deposit Settlement</h6>
+                        <div class="row mb-3">
+                            <div class="col-6 mb-2">
+                                <small class="text-muted d-block">Deducted</small>
+                                <span class="fw-bold text-danger" id="modal_deducted">₱0.00</span>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <small class="text-muted d-block">Refunded</small>
+                                <span class="fw-bold text-success" id="modal_refunded">₱0.00</span>
+                            </div>
+                        </div>
+                        <div id="modal_inspection_notes_row" style="display:none;">
+                            <small class="text-muted d-block mb-1">Inspection Notes</small>
+                            <div class="p-2 bg-light rounded small italic" id="modal_inspection_notes"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <form id="statusUpdateForm" method="POST">
-                        @csrf @method('PATCH')
-                        <div class="d-flex align-items-center gap-2">
-                            <select name="status" id="modal_status_select" class="form-control default-select form-control-sm" style="width:140px;">
-                                <option value="pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary btn-sm px-3">Update Status</button>
-                        </div>
-                    </form>
+                    <button type="button" class="btn btn-primary btn-sm px-4" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -217,13 +226,24 @@
                             specialRow.style.display = 'none';
                         }
 
-                        document.getElementById('modal_status_select').value = p.status;
-                        // if nice-select is used, we have to update it
-                        if($.fn.selectpicker) {
-                             $('#modal_status_select').selectpicker('refresh');
+                        const settlementSection = document.getElementById('settlementSection');
+                        if (p.status === 'completed') {
+                            settlementSection.style.display = 'block';
+                            document.getElementById('modal_deducted').textContent = '₱' + Number(p.deposit_deducted || 0).toLocaleString(undefined, {minimumFractionDigits:2});
+                            document.getElementById('modal_refunded').textContent = '₱' + Number(p.deposit_refunded || p.security_deposit || 0).toLocaleString(undefined, {minimumFractionDigits:2});
+                            
+                            const notesRow = document.getElementById('modal_inspection_notes_row');
+                            if (p.inspection && p.inspection.notes) {
+                                document.getElementById('modal_inspection_notes').textContent = `"${p.inspection.notes}"`;
+                                notesRow.style.display = 'block';
+                            } else {
+                                notesRow.style.display = 'none';
+                            }
+                        } else {
+                            settlementSection.style.display = 'none';
                         }
 
-                        document.getElementById('statusUpdateForm').action = '/bookings/' + info.event.id + '/status';
+                        // Status updates restricted to admin
 
                         var myModal = new bootstrap.Modal(document.getElementById('bookingDetailModal'));
                         myModal.show();
@@ -240,21 +260,6 @@
 
                 calendar.render();
 
-                // Handle ajax form submission to avoid reload
-                document.getElementById('statusUpdateForm').addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    const form = this;
-                    fetch(form.action, {
-                        method: 'POST',
-                        body: new FormData(form),
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    }).then(r => {
-                        if (r.ok || r.redirected) {
-                            bootstrap.Modal.getInstance(document.getElementById('bookingDetailModal')).hide();
-                            calendar.refetchEvents();
-                        }
-                    });
-                });
             });
         </script>
     </x-slot>

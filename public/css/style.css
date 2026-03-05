@@ -404,7 +404,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
   --bs-body-font-family: "Roboto", sans-serif;
-  --bs-body-font-size: 0.875rem;
+  --bs-body-font-size: 0.9375rem;
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.5;
   --bs-body-color: #495057;
@@ -530,6 +530,37 @@ body {
   background-color: var(--bs-body-bg);
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Global Font Size Adjustments for Readability */
+small,
+.small {
+  font-size: 0.85rem !important;
+}
+
+label {
+  font-size: 0.95rem !important;
+}
+
+.table td,
+.table th {
+  font-size: 0.9375rem !important;
+}
+
+.modal-body {
+  font-size: 0.9375rem !important;
+}
+
+.fs-12 {
+  font-size: 13px !important;
+}
+
+.fs-13 {
+  font-size: 14px !important;
+}
+
+.fs-14 {
+  font-size: 15px !important;
 }
 
 hr {

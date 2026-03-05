@@ -50,7 +50,14 @@
                                                 </div>
                                             </td>
                                             <td>{{ $booking->start_date->format('M d, Y') }} - {{ $booking->end_date->format('M d, Y') }}</td>
-                                            <td>₱{{ number_format($booking->total_price, 2) }}</td>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <strong>₱{{ number_format($booking->total_price, 2) }}</strong>
+                                                    <small class="text-muted" style="font-size: 0.65rem;">
+                                                        R: ₱{{ number_format($booking->rental_amount, 2) }} | D: ₱{{ number_format($booking->security_deposit, 2) }}
+                                                    </small>
+                                                </div>
+                                            </td>
                                             <td>
                                                 @php
                                                     $badgeClass = match($booking->status) {
@@ -62,6 +69,14 @@
                                                     };
                                                 @endphp
                                                 <span class="badge light {{ $badgeClass }}">{{ ucfirst($booking->status) }}</span>
+                                                @if($booking->status === 'completed')
+                                                    <div class="mt-1" style="line-height: 1.2;">
+                                                        <small class="text-success fw-bold" style="font-size: 0.6rem;">Refunded: ₱{{ number_format($booking->deposit_refunded, 2) }}</small>
+                                                        @if($booking->deposit_deducted > 0)
+                                                            <br><small class="text-danger" style="font-size: 0.6rem;">Deducted: ₱{{ number_format($booking->deposit_deducted, 2) }}</small>
+                                                        @endif
+                                                    </div>
+                                                @endif
                                             </td>
                                             <td>
                                                 @if($booking->proof_of_payment)
@@ -142,11 +157,26 @@
                                                                             <input type="text" name="end_date" id="end_date_{{ $booking->id }}" class="form-control" value="{{ $booking->end_date ? $booking->end_date->format('Y-m-d') : '' }}" {{ $booking->status !== 'pending' ? 'readonly' : 'required' }} autocomplete="off">
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label class="form-label font-w600">Total Price</label>
-                                                                            <div class="input-group">
-                                                                                <span class="input-group-text">₱</span>
-                                                                                <input type="text" class="form-control" value="{{ number_format($booking->total_price, 2) }}" readonly>
+                                                                            <label class="form-label font-w600 text-muted small">Rental Amount</label>
+                                                                            <div class="input-group input-group-sm">
+                                                                                <span class="input-group-text bg-light">₱</span>
+                                                                                <input type="text" class="form-control bg-light" value="{{ number_format($booking->rental_amount, 2) }}" readonly>
                                                                             </div>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label font-w600 text-muted small">Security Deposit (Refundable)</label>
+                                                                            <div class="input-group input-group-sm">
+                                                                                <span class="input-group-text bg-light">₱</span>
+                                                                                <input type="text" class="form-control bg-light" value="{{ number_format($booking->security_deposit, 2) }}" readonly>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 mb-3">
+                                                                            <label class="form-label font-w700 text-primary">Total Amount to Prepare</label>
+                                                                            <div class="input-group">
+                                                                                <span class="input-group-text bg-primary text-white">₱</span>
+                                                                                <input type="text" class="form-control fw-bold text-primary" value="{{ number_format($booking->total_price, 2) }}" readonly>
+                                                                            </div>
+                                                                            <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle me-1"></i> Includes a refundable security deposit of ₱{{ number_format($booking->security_deposit, 2) }}.</small>
                                                                         </div>
                                                                     </div>
 
@@ -154,6 +184,33 @@
                                                                         <label class="form-label font-w600">Special Requests</label>
                                                                         <textarea name="special_requests" class="form-control" rows="3" {{ $booking->status !== 'pending' ? 'readonly' : '' }}>{{ $booking->special_requests }}</textarea>
                                                                     </div>
+
+                                                                    @if($booking->status === 'completed')
+                                                                        <hr>
+                                                                        <h6 class="mb-3 text-primary">Deposit Refund Settlement</h6>
+                                                                        <div class="alert alert-light border-0 py-3 px-4 mb-3">
+                                                                            <div class="row align-items-center">
+                                                                                <div class="col-sm-4 mb-2 mb-sm-0">
+                                                                                    <small class="text-muted d-block">Original Deposit</small>
+                                                                                    <span class="fs-18 fw-bold">₱{{ number_format($booking->security_deposit, 2) }}</span>
+                                                                                </div>
+                                                                                <div class="col-sm-4 mb-2 mb-sm-0">
+                                                                                    <small class="text-muted d-block">Deductions</small>
+                                                                                    <span class="fs-18 fw-bold text-danger">₱{{ number_format($booking->deposit_deducted, 2) }}</span>
+                                                                                </div>
+                                                                                <div class="col-sm-4">
+                                                                                    <small class="text-muted d-block">Final Refund</small>
+                                                                                    <span class="fs-20 fw-bold text-success">₱{{ number_format($booking->deposit_refunded, 2) }}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            @if($booking->inspection && $booking->inspection->notes)
+                                                                                <div class="mt-3 pt-2 border-top">
+                                                                                    <small class="text-muted d-block mb-1">Inspection Notes:</small>
+                                                                                    <p class="mb-0 fs-13 italic text-dark">"{{ $booking->inspection->notes }}"</p>
+                                                                                </div>
+                                                                            @endif
+                                                                        </div>
+                                                                    @endif
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>

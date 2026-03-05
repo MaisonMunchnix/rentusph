@@ -25,12 +25,24 @@ class Booking extends Model
         'proof_of_payment',
         'rental_amount',
         'security_deposit',
+        'commission_rate',
+        'platform_commission',
+        'affiliate_earnings',
+        'deposit_deducted',
+        'deposit_refunded',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
     ];
+
+    protected $appends = ['deposit_refunded_amount'];
+
+    public function getDepositRefundedAmountAttribute()
+    {
+        return ($this->security_deposit ?? 0) - ($this->deposit_deducted ?? 0);
+    }
 
     public function bookable()
     {

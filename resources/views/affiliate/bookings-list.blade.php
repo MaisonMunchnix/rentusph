@@ -54,7 +54,14 @@
                                         @endif
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($booking->start_date)->format('M d') }} - {{ $booking->end_date ? \Carbon\Carbon::parse($booking->end_date)->format('M d, Y') : 'N/A' }}</td>
-                                    <td>₱{{ number_format($booking->total_price, 2) }}</td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <strong>₱{{ number_format($booking->total_price, 2) }}</strong>
+                                            <small class="text-muted" style="font-size: 0.65rem;">
+                                                R: ₱{{ number_format($booking->rental_amount, 2) }} | D: ₱{{ number_format($booking->security_deposit, 2) }}
+                                            </small>
+                                        </div>
+                                    </td>
                                     <td>
                                         @php
                                             $statusClasses = [
@@ -67,23 +74,17 @@
                                         <span class="badge light {{ $statusClasses[$booking->status] ?? 'badge-secondary' }}">
                                             {{ ucfirst($booking->status) }}
                                         </span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex justify-content-end">
-                                            <div class="dropdown">
-                                                <button type="button" class="btn btn-primary light btn-xs sharp" data-bs-toggle="dropdown">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </button>
-                                                <div class="dropdown-menu dropdown-menu-end">
-                                                    <form action="{{ route('bookings.status', $booking->id) }}" method="POST">
-                                                        @csrf @method('PATCH')
-                                                        <button type="submit" name="status" value="confirmed" class="dropdown-item">Confirm</button>
-                                                        <button type="submit" name="status" value="completed" class="dropdown-item">Complete</button>
-                                                        <button type="submit" name="status" value="cancelled" class="dropdown-item">Cancel</button>
-                                                    </form>
-                                                </div>
+                                        @if($booking->status === 'completed')
+                                            <div class="mt-1" style="line-height: 1.2;">
+                                                <small class="text-success fw-bold" style="font-size: 0.6rem;">Ref: ₱{{ number_format($booking->deposit_refunded, 2) }}</small>
+                                                @if($booking->deposit_deducted > 0)
+                                                    <br><small class="text-danger" style="font-size: 0.6rem;">Ded: ₱{{ number_format($booking->deposit_deducted, 2) }}</small>
+                                                @endif
                                             </div>
-                                        </div>
+                                        @endif
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="text-muted small">View Only</span>
                                     </td>
                                 </tr>
                                 @empty

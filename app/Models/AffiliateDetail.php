@@ -13,6 +13,7 @@ class AffiliateDetail extends Model
         'user_id',
         'status',
         'vehicles_submitted',
+        'commission_rate',
     ];
 
     public function user()
