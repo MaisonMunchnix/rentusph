@@ -77,20 +77,36 @@
             width: auto !important;
         }
 
-        /* Card Customization (iOS Style) */
+        /* Ensure entire page and content area is white */
+        body,
+        #main-wrapper,
+        [data-theme-version="dark"] .content-body,
+        .content-body {
+            background-color: #f8fafc !important; /* Slightly off-white for contrast */
+        }
+
+        /* Card Customization (iOS Style) - NO GRADIENTS */
         [data-theme-version="dark"] .card,
         [data-theme-version="dark"] .card-body,
         .card,
         .card-body {
-            background-color: #ffffff !important;
+            background: #ffffff !important;
             color: #0f172a !important;
             border-radius: 1.25rem !important;
-            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
-            border: 1px solid rgba(0, 0, 0, 0.05) !important;
-            transition: none !important;
-            transform: none !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+            border: 1px solid #f1f5f9 !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
         }
 
+        .card:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        /* Override any background gradients in cards or common elements */
+        .card, .card-header, .btn, .badge, .progress-bar {
+            background-image: none !important;
+        }
 
         [data-theme-version="dark"] .card-title,
         [data-theme-version="dark"] .card-header,
@@ -98,83 +114,41 @@
         .card-header {
             background-color: #ffffff !important;
             color: #0f172a !important;
-            border-bottom: none !important;
+            border-bottom: none !important; /* Removed divider */
             border-radius: 1.25rem 1.25rem 0 0 !important;
-        }
-
-        .card:hover {
-            transform: none !important;
-            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
-        }
-
-        /* Ensure entire page and content area is white */
-        body,
-        #main-wrapper,
-        [data-theme-version="dark"] .content-body,
-        .content-body {
-            background-color: #ffffff !important;
+            padding: 1.25rem 1.5rem 0.5rem 1.5rem !important; /* Reduced bottom padding */
         }
 
         .footer {
-            background-color: #ffffff !important;
+            background-color: transparent !important;
             border-top: none !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
         }
 
-        .footer .copyright {
+        /* Sidebar refinements */
+        .dlabnav {
             background-color: #ffffff !important;
-        }
-
-        /* Sidebar Logout Positioning */
-        .dlabnav-scroll {
-            height: calc(100vh - 80px) !important; /* Adjust based on header height */
-            display: flex !important;
-            flex-direction: column !important;
-        }
-
-        .sidebar-footer {
-            margin-top: auto !important;
-            padding: 1.5rem !important;
-        }
-
-        .logout-btn {
-            border-radius: 0.75rem !important;
-            font-weight: 500 !important;
-            padding: 0.75rem !important;
-            transition: all 0.2s ease !important;
-        }
-
-        .logout-btn:hover {
-            background-color: #ff5e5e !important;
-            color: white !important;
-            border-color: #ff5e5e !important;
-        }
-
-        /* Hide text when sidebar is collapsed */
-        [data-sidebar-style="compact"] .logout-btn span,
-        [data-sidebar-style="mini"] .logout-btn span {
-            display: none !important;
-        }
-
-        [data-sidebar-style="compact"] .logout-btn,
-        [data-sidebar-style="mini"] .logout-btn {
-            padding: 0.75rem 0 !important;
-            width: 45px !important;
-            margin: 0 auto !important;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.02) !important;
         }
 
         /* Sidebar Active State Fix */
         .dlabnav .metismenu > li.mm-active > a {
-            background-color: rgba(234, 179, 8, 0.15) !important;
-            color: var(--primary) !important;
-            border-radius: 0 0 1.5rem 0 !important;
-            margin: 0;
+            background-color: rgba(234, 179, 8, 0.1) !important;
+            color: #854d0e !important; /* Darker yellow for contrast */
+            border-radius: 0 2rem 2rem 0 !important;
+            margin-right: 1rem;
+            font-weight: 600;
         }
         
         .dlabnav .metismenu > li.mm-active > a i {
             color: var(--primary) !important;
         }
+
+        /* Stats Typography */
+        .fs-32 { font-size: 2rem !important; }
+        .font-w700 { font-weight: 700 !important; }
+        .text-success { color: #10b981 !important; }
+        .text-warning { color: #f59e0b !important; }
+        .text-danger { color: #ef4444 !important; }
 
         .dlabnav .metismenu > li > a {
             transition: all 0.2s ease;

@@ -43,6 +43,13 @@ class DashboardController extends Controller
         $activeBookings = Booking::where('status', 'confirmed')->count();
         $totalAffiliates = User::where('role', 'affiliate')->count();
 
+        // Active/Ongoing Bookings
+        $ongoingBookings = Booking::with(['bookable'])
+            ->where('status', 'confirmed')
+            ->orderByDesc('updated_at')
+            ->take(5)
+            ->get();
+
         // Recent Commission History
         $recentBookings = Booking::with(['bookable'])
             ->whereIn('status', ['confirmed', 'completed'])
@@ -55,7 +62,8 @@ class DashboardController extends Controller
             'monthlyCommission',
             'activeBookings',
             'totalAffiliates',
-            'recentBookings'
+            'recentBookings',
+            'ongoingBookings'
         ));
     }
 
