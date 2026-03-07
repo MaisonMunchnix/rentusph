@@ -90,6 +90,10 @@ Route::middleware(['auth'])->group(function () {
     // Admin Reports
     Route::get('/admin/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('admin.reports');
 
+    // Admin Profile
+    Route::get('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'index'])->name('admin.profile');
+    Route::put('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'update'])->name('admin.profile.update');
+
     // Admin Payments
     Route::get('/admin/payments', [\App\Http\Controllers\BookingController::class, 'payments'])->name('admin.payments');
 
