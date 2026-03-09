@@ -10,6 +10,17 @@
     <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('images/rentus.svg') }}">
     <link href="{{ asset('vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #eab308;
+            --primary-hover: #fef08a; /* pale yellow */
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover) !important;
+            border-color: var(--primary-hover) !important;
+            color: #0f172a !important; /* Dark text on pale yellow */
+        }
+    </style>
 </head>
 <body>
     <div class="fix-wrapper">

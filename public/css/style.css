@@ -40877,6 +40877,72 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: #888888;
 }
 
+/* FullCalendar Button Overrides (Yellow Theme) */
+.fc .fc-button-primary {
+  background-color: #eab308 !important;
+  border-color: #eab308 !important;
+  color: #0f172a !important;
+  transition: all 0.2s ease !important;
+}
+
+.fc .fc-button-primary:hover {
+  background-color: #fef08a !important;
+  border-color: #fef08a !important;
+  color: #0f172a !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: #ca8a04 !important;
+  border-color: #ca8a04 !important;
+  color: #0f172a !important;
+}
+
+.fc .fc-button-primary:disabled {
+  background-color: #fef08a !important;
+  border-color: #fef08a !important;
+  opacity: 0.65;
+}
+
+/* Global Yellow Theme Hover Overrides */
+:root {
+  --primary: #eab308;
+  --primary-hover: #fef08a;
+  /* pale yellow */
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.show>.btn-primary.dropdown-toggle {
+  background-color: #fef08a !important;
+  border-color: #fef08a !important;
+  color: #0f172a !important;
+  /* Dark text for readability on pale yellow */
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:active,
+.btn-outline-primary.active {
+  background-color: #fef08a !important;
+  border-color: #fef08a !important;
+  color: #0f172a !important;
+}
+
+.text-primary {
+  color: #eab308 !important;
+}
+
+/* Fix any remaining purple gradients/backgrounds */
+.bg-primary,
+.badge-primary,
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+  background-color: #eab308 !important;
+  background-image: none !important;
+}
+
 .fix-wrapper .card .card-body .form-control:focus {
   background-color: #060606;
   border-color: #dfa100;

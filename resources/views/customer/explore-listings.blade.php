@@ -120,6 +120,16 @@
                 font-weight: 600 !important;
                 font-size: 0.85rem !important;
             }
+
+            /* Datepicker Booked Dates Styling */
+            .datepicker table tr td.disabled.booked-date,
+            .datepicker table tr td.disabled.booked-date:hover {
+                background-color: #fee2e2 !important; /* light red */
+                color: #ef4444 !important; /* red */
+                text-decoration: line-through !important;
+                opacity: 1 !important;
+                cursor: not-allowed !important;
+            }
         </style>
     </x-slot>
 
@@ -550,7 +560,16 @@
                 startDate: new Date(),
                 autoclose: true,
                 todayHighlight: true,
-                datesDisabled: takenDates
+                datesDisabled: takenDates,
+                beforeShowDay: function(date) {
+                    var ymd = date.getFullYear() + "-" + 
+                              ("0" + (date.getMonth() + 1)).slice(-2) + "-" + 
+                              ("0" + date.getDate()).slice(-2);
+                    if (takenDates.indexOf(ymd) !== -1) {
+                        return { classes: 'booked-date' };
+                    }
+                    return {};
+                }
             }).on('changeDate', function(e) {
                 $('#end_date').datepicker('setStartDate', e.date);
                 if ($('#end_date').datepicker('getDate') < e.date) {
@@ -564,7 +583,16 @@
                 startDate: new Date(),
                 autoclose: true,
                 todayHighlight: true,
-                datesDisabled: takenDates
+                datesDisabled: takenDates,
+                beforeShowDay: function(date) {
+                    var ymd = date.getFullYear() + "-" + 
+                              ("0" + (date.getMonth() + 1)).slice(-2) + "-" + 
+                              ("0" + date.getDate()).slice(-2);
+                    if (takenDates.indexOf(ymd) !== -1) {
+                        return { classes: 'booked-date' };
+                    }
+                    return {};
+                }
             }).on('changeDate', function(e) {
                 calculateTotal();
             });
