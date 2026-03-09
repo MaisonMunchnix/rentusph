@@ -102,6 +102,9 @@ Route::middleware(['auth'])->group(function () {
         $customers = \App\Models\User::where('role', 'customer')->latest()->get();
         return view('admin.customers', compact('customers'));
     })->name('admin.customers');
+
+    // Affiliate Earnings
+    Route::get('/affiliate/earnings', [\App\Http\Controllers\AffiliateEarningsController::class, 'index'])->name('affiliate.earnings');
 });
 
 // Authentication API / Endpoints

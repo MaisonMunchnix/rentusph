@@ -30,7 +30,7 @@
                 </a>
             </li>
             <li class="{{ request()->is('affiliate/earnings*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('affiliate/earnings*') ? 'mm-active active' : '' }}" href="#" aria-expanded="false">
+                <a class="{{ request()->is('affiliate/earnings*') ? 'mm-active active' : '' }}" href="{{ route('affiliate.earnings') }}" aria-expanded="false">
                     <i class="fas fa-dollar-sign"></i>
                     <span class="nav-text">Earnings</span>
                 </a>
