@@ -196,7 +196,7 @@ class BookingController extends Controller
             $rentalAmount = $dailyRate * $days;
         }
 
-        $securityDeposit = 3000.00; // Default Security Deposit
+        $securityDeposit = $bookable->security_deposit ?? 3000.00;
         $totalPrice = $rentalAmount + $securityDeposit;
 
         Booking::create([
@@ -222,7 +222,7 @@ class BookingController extends Controller
             Auth::user()->update(['address' => $request->customer_address]);
         }
 
-        return redirect()->back()->with('success', 'Booking submitted successfully!');
+        return redirect()->back()->with('success', 'Booking submitted successfully!')->with('booking_success', true);
     }
 
     public function update(Request $request, Booking $booking)
@@ -272,8 +272,8 @@ class BookingController extends Controller
             $rentalAmount = $dailyRate * $days;
         }
 
-        // Keep existing deposit or apply default if missing
-        $securityDeposit = $booking->security_deposit ?: 3000.00;
+        // Keep existing deposit or apply bookable's default
+        $securityDeposit = $booking->security_deposit ?? ($booking->bookable->security_deposit ?? 3000.00);
         $totalPrice = $rentalAmount + $securityDeposit;
 
         $booking->update([

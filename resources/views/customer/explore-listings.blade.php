@@ -201,6 +201,7 @@
                         data-monthly_rate="{{ number_format($item->monthly_rate) }}"
                         data-description="{{ $item->description }}"
                     @endif
+                    data-security_deposit="{{ $item->security_deposit }}"
                     data-image="{{ $item->image ? asset($item->image) : '' }}">
                     
                     <div class="image-container">
@@ -234,12 +235,13 @@
                         <div class="listing-footer">
                             <div class="listing-price">
                                 <span>₱{{ number_format($item->daily_rate) }}</span><small>/day</small>
-                                <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱3,000 refundable deposit</div>
+                                <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱{{ number_format($item->security_deposit) }} refundable deposit</div>
                             </div>
                             <a href="javascript:void(0);" class="btn btn-primary btn-book shadow-none" 
                                 data-id="{{ $item->id }}" 
                                 data-type="App\Models\Car" 
                                 data-name="{{ $item->brand }} {{ $item->model }}" 
+                                data-security_deposit="{{ $item->security_deposit }}"
                                 data-rate="₱{{ number_format($item->daily_rate) }}/day">Book Now</a>
                         </div>
                     @else
@@ -265,12 +267,13 @@
                         <div class="listing-footer">
                             <div class="listing-price">
                                 <span>₱{{ number_format($item->monthly_rate) }}</span><small>/mo</small>
-                                <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱3,000 refundable deposit</div>
+                                <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱{{ number_format($item->security_deposit) }} refundable deposit</div>
                             </div>
                             <a href="javascript:void(0);" class="btn btn-success btn-book shadow-none" 
                                 data-id="{{ $item->id }}" 
                                 data-type="App\Models\Property" 
                                 data-name="{{ $item->title }}" 
+                                data-security_deposit="{{ $item->security_deposit }}"
                                 data-rate="₱{{ number_format($item->monthly_rate) }}/mo">Book Stay</a>
                         </div>
                     @endif
@@ -381,7 +384,7 @@
                                         <span class="text-muted small" id="detail_price_unit"></span>
                                         <div class="mt-2">
                                             <span class="badge badge-md light badge-warning text-dark font-w600" style="font-size: 0.85rem; border: 1px solid rgba(0,0,0,0.05);">
-                                                <i class="fas fa-shield-alt me-2 text-primary"></i> +₱3,000 Refundable Security Deposit
+                                                <i class="fas fa-shield-alt me-2 text-primary"></i> +₱<span id="detail_deposit">3,000</span> Refundable Security Deposit
                                             </span>
                                         </div>
                                     </div>
@@ -389,6 +392,7 @@
                                         <!-- Store relevant ID/Type for button -->
                                         <input type="hidden" id="detail_id">
                                         <input type="hidden" id="detail_full_type">
+                                        <input type="hidden" id="detail_deposit_val">
                                         <button type="button" class="btn btn-primary btn-book-from-modal px-4">Book Now</button>
                                     </div>
                                 </div>
@@ -413,6 +417,7 @@
                     <div class="modal-body">
                         <input type="hidden" name="bookable_id" id="modal_bookable_id">
                         <input type="hidden" name="bookable_type" id="modal_bookable_type">
+                        <input type="hidden" name="security_deposit" id="modal_security_deposit">
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -469,14 +474,14 @@
                                 </div>
                                 <div class="d-flex justify-content-between mb-3">
                                     <span class="text-muted">Security Deposit (Refundable)</span>
-                                    <span class="font-w600 text-dark">₱3,000.00</span>
+                                    <span class="font-w600 text-dark">₱<span id="calc_deposit">3,000.00</span></span>
                                 </div>
                                 <div class="d-flex justify-content-between border-top pt-3">
                                     <span class="font-w700 text-primary h5 mb-0">Total Amount to Prepare</span>
                                     <span class="font-w800 text-primary h4 mb-0">₱<span id="calc_total">0.00</span></span>
                                 </div>
                                 <div class="alert alert-success light py-2 px-3 mt-3 mb-0 small">
-                                    <i class="fas fa-info-circle me-2"></i> <strong>Note:</strong> A ₱3,000 refundable security deposit is included and will be returned after the rental.
+                                    <i class="fas fa-info-circle me-2"></i> <strong>Note:</strong> A ₱<span id="note_deposit">3,000</span> refundable security deposit is included and will be returned after the rental.
                                 </div>
                             </div>
                         </div>
@@ -490,9 +495,53 @@
         </div>
     </div>
 
+    <!-- Booking Success Modal -->
+    <div class="modal fade" id="bookingSuccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content overflow-hidden border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle shadow-sm" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <h2 class="font-w700 text-dark mb-3">Booking Submitted!</h2>
+                    <p class="text-muted mb-4 fs-5">Your booking is currently pending. Please stay tuned as our team reviews your request.</p>
+                    
+                    <div class="bg-light p-4 rounded-4 text-start mb-4 border border-1 border-opacity-10 border-dark" style="border-radius: 15px;">
+                        <h6 class="font-w700 text-dark mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Next Steps:</h6>
+                        <ul class="list-unstyled mb-0 d-grid gap-3">
+                            <li class="d-flex align-items-start gap-3">
+                                <span class="badge badge-primary rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; min-width: 24px;">1</span>
+                                <span class="small text-dark fw-600">Wait for our team to contact you or confirm your booking via email.</span>
+                            </li>
+                            <li class="d-flex align-items-start gap-3">
+                                <span class="badge badge-primary rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; min-width: 24px;">2</span>
+                                <span class="small text-dark fw-600">Prepare the total amount (Rental Fees + Security Deposit) for payment.</span>
+                            </li>
+                            <li class="d-flex align-items-start gap-3">
+                                <span class="badge badge-primary rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; min-width: 24px;">3</span>
+                                <span class="small text-dark fw-600">You can track your booking status in your <a href="{{ route('customer.profile') }}" class="text-primary text-decoration-underline">Profile</a>.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary w-100 py-3 rounded-pill font-w600 shadow-sm" data-bs-dismiss="modal">Got it, thanks!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <x-slot name="scripts">
     <script src="{{ asset('vendor/bootstrap-datepicker-master/js/bootstrap-datepicker.min.js') }}"></script>
     <script>
+        @if(session('booking_success'))
+            $(document).ready(function() {
+                var successModal = new bootstrap.Modal(document.getElementById('bookingSuccessModal'));
+                successModal.show();
+            });
+        @endif
+
         function initDatepickers(takenDates) {
             $('.datepicker-input').datepicker('destroy');
             
@@ -525,6 +574,7 @@
             const startStr = $('#start_date').val();
             const endStr = $('#end_date').val();
             const rateStr = $('#modal_item_rate').val(); // e.g., "₱1,000/day" or "₱30,000/mo"
+            const deposit = parseFloat($('#modal_security_deposit').val()) || 0;
             
             if (!startStr || !endStr || !rateStr) return;
 
@@ -543,7 +593,6 @@
                 rentalAmount = rate * diffDays;
             }
 
-            const deposit = 3000;
             const total = rentalAmount + deposit;
 
             $('#calc_days').text(diffDays);
@@ -559,12 +608,16 @@
             const type = $(this).attr('data-type');
             const name = $(this).attr('data-name');
             const rate = $(this).attr('data-rate');
+            const security_deposit = $(this).attr('data-security_deposit');
             const label = type === 'App\\Models\\Car' ? 'Book Car' : 'Book Stay';
-
+ 
             $('#modal_bookable_id').val(id);
             $('#modal_bookable_type').val(type);
             $('#modal_item_name').val(name);
             $('#modal_item_rate').val(rate);
+            $('#modal_security_deposit').val(security_deposit);
+            $('#calc_deposit').text(parseFloat(security_deposit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            $('#note_deposit').text(parseFloat(security_deposit).toLocaleString());
             $('#bookingModalLabel').text(label);
 
             $.ajax({
@@ -611,10 +664,12 @@
                 $('#detail_color').text(data.color);
                 $('#detail_price').text('₱' + data.daily_rate);
                 $('#detail_price_unit').text('per day');
+                $('#detail_deposit').text(parseFloat(data.security_deposit).toLocaleString());
                 
                 // For booking from modal
                 $('#detail_id').val($(this).find('.btn-book').data('id'));
                 $('#detail_full_type').val('App\\Models\\Car');
+                $('#detail_deposit_val').val(data.security_deposit);
                 $('.btn-book-from-modal').removeClass('btn-success').addClass('btn-primary').text('Book');
             } else {
                 $('#detail_title').text(data.title);
@@ -629,10 +684,12 @@
                 $('#detail_floor_area').text(data.floor_area);
                 $('#detail_price').text('₱' + data.monthly_rate);
                 $('#detail_price_unit').text('per month');
+                $('#detail_deposit').text(parseFloat(data.security_deposit).toLocaleString());
                 
                 // For booking from modal
                 $('#detail_id').val($(this).find('.btn-book').data('id'));
                 $('#detail_full_type').val('App\\Models\\Property');
+                $('#detail_deposit_val').val(data.security_deposit);
                 $('.btn-book-from-modal').removeClass('btn-primary').addClass('btn-success').text('Book Stay');
             }
             
@@ -646,6 +703,7 @@
             const type = $('#detail_full_type').val();
             const name = $('#detail_title').text();
             const rate = $('#detail_price').text() + '/' + ($('#detail_price_unit').text().includes('day') ? 'day' : 'mo');
+            const security_deposit = $('#detail_deposit_val').val();
             const label = type === 'App\\Models\\Car' ? 'Book Car' : 'Book Stay';
 
             $('#detailModal').modal('hide');
@@ -654,6 +712,9 @@
             $('#modal_bookable_type').val(type);
             $('#modal_item_name').val(name);
             $('#modal_item_rate').val(rate);
+            $('#modal_security_deposit').val(security_deposit);
+            $('#calc_deposit').text(parseFloat(security_deposit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            $('#note_deposit').text(parseFloat(security_deposit).toLocaleString());
             $('#bookingModalLabel').text(label);
 
             $.ajax({

@@ -77,8 +77,8 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group mb-4">
-                                            <label class="form-label" for="phone">Phone number (optional)</label>
-                                            <input type="tel" name="phone" class="form-control" placeholder="Enter phone number" id="phone">
+                                            <label class="form-label" for="phone">Phone number</label>
+                                            <input type="tel" name="phone" class="form-control" placeholder="Enter phone number" id="phone" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">

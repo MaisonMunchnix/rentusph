@@ -22,6 +22,7 @@
                                     <th><strong>DETAILS</strong></th>
                                     <th><strong>RATE TYPE</strong></th>
                                     <th><strong>RATE</strong></th>
+                                    <th><strong>SECURITY DEPOSIT</strong></th>
                                     <th><strong>STATUS</strong></th>
                                     @if(auth()->user() && auth()->user()->role == 'admin')
                                     <th><strong>OWNER</strong></th>
@@ -48,6 +49,7 @@
                                     <td>{{ $property->bedrooms }} BR | {{ $property->bathrooms }} BA | {{ $property->floor_area }} sqm</td>
                                     <td><span class="badge light badge-info">{{ ucfirst($property->rate_type ?? 'daily') }}</span></td>
                                     <td>₱{{ number_format($property->monthly_rate, 2) }}</td>
+                                    <td>₱{{ number_format($property->security_deposit, 2) }}</td>
                                     <td>
                                         @if($property->is_available)
                                             <span class="badge light badge-success">Available</span>
@@ -71,7 +73,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="{{ (auth()->user() && auth()->user()->role == 'admin') ? '7' : '6' }}" class="text-center">No properties found.</td>
+                                    <td colspan="{{ (auth()->user() && auth()->user()->role == 'admin') ? '8' : '7' }}" class="text-center">No properties found.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -146,16 +148,20 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6 form-group mb-3">
+                            <div class="col-md-4 form-group mb-3">
                                 <label class="text-black font-w500">Rate Type</label>
                                 <select name="rate_type" class="form-control">
                                     <option value="daily" selected>Daily</option>
                                     <option value="monthly">Monthly</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 form-group mb-3">
+                            <div class="col-md-4 form-group mb-3">
                                 <label class="text-black font-w500">Rate (₱)</label>
                                 <input type="number" step="0.01" name="monthly_rate" class="form-control" required placeholder="0.00">
+                            </div>
+                            <div class="col-md-4 form-group mb-3">
+                                <label class="text-black font-w500">Sec. Deposit (₱)</label>
+                                <input type="number" step="0.01" name="security_deposit" class="form-control" value="3000.00" required>
                             </div>
                         </div>
                         <div class="form-group mb-3">
@@ -236,16 +242,20 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6 form-group mb-3">
+                            <div class="col-md-4 form-group mb-3">
                                 <label class="text-black font-w500">Rate Type</label>
                                 <select id="edit_rate_type" name="rate_type" class="form-control">
                                     <option value="daily">Daily</option>
                                     <option value="monthly">Monthly</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 form-group mb-3">
+                            <div class="col-md-4 form-group mb-3">
                                 <label class="text-black font-w500">Rate (₱)</label>
                                 <input type="number" step="0.01" id="edit_monthly_rate" name="monthly_rate" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 form-group mb-3">
+                                <label class="text-black font-w500">Sec. Deposit (₱)</label>
+                                <input type="number" step="0.01" id="edit_security_deposit" name="security_deposit" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group mb-3">
@@ -273,6 +283,7 @@
         document.getElementById('edit_floor_area').value = property.floor_area;
         document.getElementById('edit_rate_type').value = property.rate_type || 'daily';
         document.getElementById('edit_monthly_rate').value = property.monthly_rate;
+        document.getElementById('edit_security_deposit').value = property.security_deposit;
         document.getElementById('edit_description').value = property.description;
         
         // Dynamically update the form action URL

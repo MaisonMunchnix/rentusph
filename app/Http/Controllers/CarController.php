@@ -64,7 +64,8 @@ class CarController extends Controller
             'capacity' => 'nullable|integer',
             'transmission' => 'nullable|string',
             'fuel_type' => 'nullable|string',
-            'daily_rate' => 'required|numeric',
+            'daily_rate' => 'required|numeric|min:500|max:20000',
+            'security_deposit' => 'required|numeric|min:1000|max:50000',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
@@ -98,7 +99,8 @@ class CarController extends Controller
             'capacity' => 'nullable|integer',
             'transmission' => 'nullable|string',
             'fuel_type' => 'nullable|string',
-            'daily_rate' => 'required|numeric',
+            'daily_rate' => 'required|numeric|min:500|max:20000',
+            'security_deposit' => 'required|numeric|min:1000|max:50000',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);

@@ -20,6 +20,7 @@ class Car extends Model
         'transmission',
         'fuel_type',
         'daily_rate',
+        'security_deposit',
         'description',
         'is_available',
         'image',

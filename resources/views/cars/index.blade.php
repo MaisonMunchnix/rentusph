@@ -22,6 +22,7 @@
                                     <th><strong>PLATE NO.</strong></th>
                                     <th><strong>CAPACITY/TYPE</strong></th>
                                     <th><strong>DAILY RATE</strong></th>
+                                    <th><strong>SECURITY DEPOSIT</strong></th>
                                     <th><strong>STATUS</strong></th>
                                     @if(auth()->user() && auth()->user()->role == 'admin')
                                     <th><strong>OWNER</strong></th>
@@ -48,6 +49,7 @@
                                     <td>{{ $car->plate_number }}</td>
                                     <td>{{ $car->capacity }} Pax / {{ $car->transmission }}</td>
                                     <td>₱{{ number_format($car->daily_rate, 2) }}</td>
+                                    <td>₱{{ number_format($car->security_deposit, 2) }}</td>
                                     <td>
                                         @if($car->is_available)
                                             <span class="badge light badge-success">Available</span>
@@ -71,7 +73,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="{{ (auth()->user() && auth()->user()->role == 'admin') ? '8' : '7' }}" class="text-center">No cars found.</td>
+                                    <td colspan="{{ (auth()->user() && auth()->user()->role == 'admin') ? '9' : '8' }}" class="text-center">No cars found.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -147,9 +149,15 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Daily Rate (₱)</label>
-                            <input type="number" step="0.01" name="daily_rate" class="form-control" required>
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="text-black font-w500 text-nowrap">Daily Rate (₱) <small class="text-muted">(500-20k)</small></label>
+                                <input type="number" step="0.01" name="daily_rate" class="form-control" min="500" max="20000" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="text-black font-w500 text-nowrap">Security Deposit (₱) <small class="text-muted">(1k-50k)</small></label>
+                                <input type="number" step="0.01" name="security_deposit" class="form-control" value="3000.00" min="1000" max="50000" required>
+                            </div>
                         </div>
                         <div class="form-group mb-3">
                             <label class="text-black font-w500">Description</label>
@@ -230,9 +238,15 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Daily Rate (₱)</label>
-                            <input type="number" step="0.01" id="edit_daily_rate" name="daily_rate" class="form-control" required>
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="text-black font-w500 text-nowrap">Daily Rate (₱) <small class="text-muted">(500-20k)</small></label>
+                                <input type="number" step="0.01" id="edit_daily_rate" name="daily_rate" class="form-control" min="500" max="20000" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="text-black font-w500 text-nowrap">Security Deposit (₱) <small class="text-muted">(1k-50k)</small></label>
+                                <input type="number" step="0.01" id="edit_security_deposit" name="security_deposit" class="form-control" min="1000" max="50000" required>
+                            </div>
                         </div>
                         <div class="form-group mb-3">
                             <label class="text-black font-w500">Description</label>
@@ -294,6 +308,7 @@
             document.getElementById('edit_transmission').value = car.transmission;
             document.getElementById('edit_fuel_type').value = car.fuel_type;
             document.getElementById('edit_daily_rate').value = car.daily_rate;
+            document.getElementById('edit_security_deposit').value = car.security_deposit;
             document.getElementById('edit_description').value = car.description;
             
             const form = document.getElementById('editCarForm');

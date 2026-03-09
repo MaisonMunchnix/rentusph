@@ -405,7 +405,7 @@
                                 <input type="hidden" name="inspection_condition" id="inspection_condition" value="good">
                                 
                                 <div id="damageDeductionNotice" class="mt-3 mb-3 alert alert-danger py-2 px-3 small shadow-sm" style="display:none; border-left: 4px solid #b91c1c;">
-                                    <i class="fas fa-exclamation-circle me-1"></i> <strong>Note:</strong> When marked as damaged, the security deposit (₱<span id="modal_deposit_val">3,000</span>) will <strong>not</strong> be refunded.
+                                    <i class="fas fa-exclamation-circle me-1"></i> <strong>Note:</strong> When marked as damaged, the security deposit (₱<span id="modal_deposit_val"></span>) will <strong>not</strong> be refunded.
                                 </div>
 
                                 <textarea name="inspection_notes" class="form-control inspection-notes" rows="2" placeholder="Describe any new scratches, fuel level, or issues..."></textarea>
@@ -589,8 +589,8 @@
                         statusSelect.dataset.totalRaw = p.total.replace(/[^\d.-]/g, '');
                         
                         if (p.rental_amount || p.status === 'pending') {
-                            const r = p.rental_amount || (p.total_raw - 3000); // fallback for legacy
-                            const d = p.security_deposit || 3000;
+                            const r = p.rental_amount || p.total_raw; // fallback
+                            const d = p.security_deposit || 0;
                             commissionSection.style.display = 'block';
                             document.getElementById('modal_rental_amount_display').textContent = '₱' + Number(r).toLocaleString();
                             document.getElementById('modal_commission_rate').textContent = p.commission_rate || 20;
@@ -696,7 +696,11 @@
                             const rentalInput = document.getElementById('modal_rental_amount');
                             const depositInput = document.getElementById('modal_security_deposit');
                             if (!rentalInput.value) rentalInput.value = statusSelect.dataset.totalRaw || '';
-                            if (!depositInput.value) depositInput.value = '3000';
+                            if (!depositInput.value) {
+                                // Try to get the deposit from the breakdown display if available
+                                const currentDeposit = document.getElementById('modal_deposit_display').textContent.replace(/[^\d.]/g, '');
+                                depositInput.value = currentDeposit || '3000';
+                            }
                         }
                     } else {
                         $(paymentSection).slideUp();
