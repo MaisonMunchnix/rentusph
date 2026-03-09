@@ -1,4 +1,10 @@
-<x-layouts.admin>
+@php
+    $layout = Auth::user()->role === 'admin' ? 'layouts.admin' : 'layouts.affiliate';
+    $title = Auth::user()->role === 'admin' ? 'Admin Profile' : 'Affiliate Profile';
+    $subtitle = Auth::user()->role === 'admin' ? 'Manage your administrative account settings' : 'Manage your affiliate account settings';
+@endphp
+
+<x-dynamic-component :component="$layout">
     <x-slot name="styles">
         <style>
             .profile-card {
@@ -73,8 +79,8 @@
                     </div>
                 </div>
                 <div>
-                    <h2 class="font-w700 mb-0 fs-24">Admin Profile</h2>
-                    <p class="text-muted mb-0 fs-14">Manage your administrative account settings</p>
+                    <h2 class="font-w700 mb-0 fs-24">{{ $title }}</h2>
+                    <p class="text-muted mb-0 fs-14">{{ $subtitle }}</p>
                 </div>
             </div>
 
@@ -142,4 +148,4 @@
             </form>
         </div>
     </div>
-</x-layouts.admin>
+</x-dynamic-component>

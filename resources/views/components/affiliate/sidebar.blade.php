@@ -35,8 +35,8 @@
                     <span class="nav-text">Earnings</span>
                 </a>
             </li>
-            <li class="{{ request()->is('affiliate/profile*') ? 'mm-active active' : '' }}">
-                <a class="{{ request()->is('affiliate/profile*') ? 'mm-active active' : '' }}" href="#" aria-expanded="false">
+            <li class="{{ request()->routeIs('admin.profile') ? 'mm-active active' : '' }}">
+                <a class="{{ request()->routeIs('admin.profile') ? 'mm-active active' : '' }}" href="{{ route('admin.profile') }}" aria-expanded="false">
                     <i class="fas fa-user"></i>
                     <span class="nav-text">Profile</span>
                 </a>
