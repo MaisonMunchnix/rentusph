@@ -22,7 +22,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($customers as $customer)
+                                    @foreach($customers as $customer)
                                     <tr>
                                         <td><strong>{{ $loop->iteration }}</strong></td>
                                         <td>{{ $customer->name }}</td>
@@ -40,37 +40,7 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Delete Confirmation Modal -->
-                                    <div class="modal fade" id="deleteModal{{ $customer->id }}">
-                                        <div class="modal-dialog modal-dialog-centered" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Confirm Deletion</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body text-center py-4">
-                                                    <div class="mb-3 text-danger">
-                                                        <i class="fas fa-exclamation-triangle fa-4x"></i>
-                                                    </div>
-                                                    <p class="mb-0 fs-5 text-danger fw-bold">Warning: Permanent Action</p>
-                                                    <p class="mt-2 fs-5">Are you sure you want to delete customer <strong>{{ $customer->name }}</strong>? This cannot be undone.</p>
-                                                </div>
-                                                <div class="modal-footer border-0 pt-0 justify-content-center">
-                                                    <button type="button" class="btn btn-light btn-sm px-4" data-bs-dismiss="modal">Cancel</button>
-                                                    <form action="{{ route('affiliates.destroy', $customer) }}" method="POST">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm px-4">Yes, Delete Permanently</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center">No customers found.</td>
-                                    </tr>
-                                    @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -79,4 +49,33 @@
             </div>
         </div>
     </div>
+
+    @foreach($customers as $customer)
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal{{ $customer->id }}">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3 text-danger">
+                        <i class="fas fa-exclamation-triangle fa-4x"></i>
+                    </div>
+                    <p class="mb-0 fs-5 text-danger fw-bold">Warning: Permanent Action</p>
+                    <p class="mt-2 fs-5">Are you sure you want to delete customer <strong>{{ $customer->name }}</strong>? This cannot be undone.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-light btn-sm px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ route('affiliates.destroy', $customer) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm px-4">Yes, Delete Permanently</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
 </x-layouts.admin>

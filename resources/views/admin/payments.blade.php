@@ -143,97 +143,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Proof Modal -->
-                                            @if($booking->proof_of_payment && !Str::endsWith($booking->proof_of_payment, '.pdf'))
-                                            <div class="modal fade" id="viewProofModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-lg modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Proof of Payment - #{{ $booking->id }}</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body text-center p-0">
-                                                            <img src="{{ asset('storage/' . $booking->proof_of_payment) }}" class="img-fluid" alt="Proof of Payment">
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <a href="{{ asset('storage/' . $booking->proof_of_payment) }}" download class="btn btn-primary btn-sm">
-                                                                <i class="fas fa-download me-1"></i> Download
-                                                            </a>
-                                                            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endif
-
-                                            <!-- Booking Details Modal -->
-                                            <div class="modal fade" id="bookingDetailsModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Booking details - #{{ $booking->id }}</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <div class="row mb-3">
-                                                                <div class="col-6">
-                                                                    <small class="text-muted d-block">Booking Dates</small>
-                                                                    <strong>{{ $booking->start_date->format('M d, Y') }} - {{ $booking->end_date->format('M d, Y') }}</strong>
-                                                                </div>
-                                                                <div class="col-6">
-                                                                    <small class="text-muted d-block">Customer Phone</small>
-                                                                    <strong>{{ $booking->customer_phone ?? 'N/A' }}</strong>
-                                                                </div>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <small class="text-muted d-block">Special Requests</small>
-                                                                <p class="mb-0">{{ $booking->special_requests ?? 'No special requests' }}</p>
-                                                            </div>
-                                                            <hr>
-                                                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                                                <div>
-                                                                    <small class="text-muted d-block">Total Amount</small>
-                                                                    <h4 class="mb-0 text-primary">₱{{ number_format($booking->total_price, 2) }}</h4>
-                                                                    <small class="text-muted" style="font-size: 0.75rem;">
-                                                                        Rental: ₱{{ number_format($booking->rental_amount, 2) }} + Deposit: ₱{{ number_format($booking->security_deposit, 2) }}
-                                                                    </small>
-                                                                </div>
-                                                                <div class="text-end">
-                                                                    <small class="text-muted d-block">Current Status</small>
-                                                                    <span class="badge light" style="background-color: {{ $statusColor }}22; color: {{ $statusColor }};">
-                                                                        {{ ucfirst($booking->status) }}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            @if($booking->status === 'completed')
-                                                                <div class="bg-light p-3 rounded">
-                                                                    <h6 class="font-w600 text-primary mb-3" style="font-size: 0.85rem;">Deposit Settlement</h6>
-                                                                    <div class="row">
-                                                                        <div class="col-6 mb-2">
-                                                                            <small class="text-muted d-block">Deducted</small>
-                                                                            <span class="fw-bold text-danger">₱{{ number_format($booking->deposit_deducted, 2) }}</span>
-                                                                        </div>
-                                                                        <div class="col-6 mb-2">
-                                                                            <small class="text-muted d-block">Refunded</small>
-                                                                            <span class="fw-bold text-success">₱{{ number_format($booking->deposit_refunded, 2) }}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    @if($booking->inspection && $booking->inspection->notes)
-                                                                        <div class="mt-2 pt-2 border-top">
-                                                                            <small class="text-muted d-block mb-1">Inspection Notes</small>
-                                                                            <p class="mb-0 fs-12 italic text-dark">"{{ $booking->inspection->notes }}"</p>
-                                                                        </div>
-                                                                    @endif
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </td>
                                     </tr>
                                 @empty
@@ -255,4 +164,107 @@
             </div>
         </div>
     </div>
+
+    @foreach($bookings as $booking)
+        <!-- Proof Modal -->
+        @if($booking->proof_of_payment && !Str::endsWith($booking->proof_of_payment, '.pdf'))
+        <div class="modal fade" id="viewProofModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Proof of Payment - #{{ $booking->id }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center p-0">
+                        <img src="{{ asset('storage/' . $booking->proof_of_payment) }}" class="img-fluid" alt="Proof of Payment">
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ asset('storage/' . $booking->proof_of_payment) }}" download class="btn btn-primary btn-sm">
+                            <i class="fas fa-download me-1"></i> Download
+                        </a>
+                        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Booking Details Modal -->
+        <div class="modal fade" id="bookingDetailsModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Booking details - #{{ $booking->id }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @php
+                            $statusColor = match($booking->status) {
+                                'pending' => '#eab308',
+                                'confirmed' => '#22c55e',
+                                'cancelled' => '#ef4444',
+                                'completed' => '#3b82f6',
+                                default => '#6b7280'
+                            };
+                        @endphp
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Booking Dates</small>
+                                <strong>{{ $booking->start_date->format('M d, Y') }} - {{ $booking->end_date->format('M d, Y') }}</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Customer Phone</small>
+                                <strong>{{ $booking->customer_phone ?? 'N/A' }}</strong>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Special Requests</small>
+                            <p class="mb-0">{{ $booking->special_requests ?? 'No special requests' }}</p>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <small class="text-muted d-block">Total Amount</small>
+                                <h4 class="mb-0 text-primary">₱{{ number_format($booking->total_price, 2) }}</h4>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    Rental: ₱{{ number_format($booking->rental_amount, 2) }} + Deposit: ₱{{ number_format($booking->security_deposit, 2) }}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Current Status</small>
+                                <span class="badge light" style="background-color: {{ $statusColor }}22; color: {{ $statusColor }};">
+                                    {{ ucfirst($booking->status) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        @if($booking->status === 'completed')
+                            <div class="bg-light p-3 rounded">
+                                <h6 class="font-w600 text-primary mb-3" style="font-size: 0.85rem;">Deposit Settlement</h6>
+                                <div class="row">
+                                    <div class="col-6 mb-2">
+                                        <small class="text-muted d-block">Deducted</small>
+                                        <span class="fw-bold text-danger">₱{{ number_format($booking->deposit_deducted, 2) }}</span>
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <small class="text-muted d-block">Refunded</small>
+                                        <span class="fw-bold text-success">₱{{ number_format($booking->deposit_refunded, 2) }}</span>
+                                    </div>
+                                </div>
+                                @if($booking->inspection && $booking->inspection->notes)
+                                    <div class="mt-2 pt-2 border-top">
+                                        <small class="text-muted d-block mb-1">Inspection Notes</small>
+                                        <p class="mb-0 fs-12 italic text-dark">"{{ $booking->inspection->notes }}"</p>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 </x-layouts.admin>

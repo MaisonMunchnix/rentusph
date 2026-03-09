@@ -60,18 +60,11 @@
                                         <div class="d-flex justify-content-end">
                                             <a href="#" class="btn btn-primary shadow btn-xs sharp me-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editPropertyModal" onclick="populateEditModal({{ json_encode($property) }})"><i class="fas fa-pencil-alt"></i></a>
                                             <a href="#" class="btn btn-warning shadow btn-xs sharp me-1" title="Toggle Status" onclick="event.preventDefault(); document.getElementById('toggle-status-{{ $property->id }}').submit();"><i class="fas fa-power-off"></i></a>
-                                            <a href="#" class="btn btn-danger shadow btn-xs sharp" title="Delete" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this property?')) document.getElementById('delete-property-{{ $property->id }}').submit();"><i class="fa fa-trash"></i></a>
+                                            <button type="button" class="btn btn-danger shadow btn-xs sharp" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $property->id }}">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
                                         </div>
                                         
-                                        <!-- Actions Hidden Forms -->
-                                        <form id="toggle-status-{{ $property->id }}" action="{{ route('properties.toggle-status', $property->id) }}" method="POST" style="display: none;">
-                                            @csrf
-                                            @method('PATCH')
-                                        </form>
-                                        <form id="delete-property-{{ $property->id }}" action="{{ route('properties.destroy', $property->id) }}" method="POST" style="display: none;">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
                                     </td>
                                 </tr>
                                 @empty
@@ -293,4 +286,32 @@
         }
     }
     </script>
+    @foreach($properties as $property)
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal{{ $property->id }}">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3 text-danger">
+                        <i class="fas fa-exclamation-triangle fa-4x"></i>
+                    </div>
+                    <p class="mb-0 fs-5 text-danger fw-bold">Warning: Permanent Action</p>
+                    <p class="mt-2 fs-5">Are you sure you want to delete property <strong>{{ $property->title }}</strong>? This cannot be undone.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-light btn-sm px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ route('properties.destroy', $property) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm px-4">Yes, Delete Permanently</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
 </x-dynamic-component>
