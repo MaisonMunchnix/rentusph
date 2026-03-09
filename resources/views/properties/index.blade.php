@@ -20,7 +20,8 @@
                                     <th><strong>TITLE & TYPE</strong></th>
                                     <th><strong>LOCATION</strong></th>
                                     <th><strong>DETAILS</strong></th>
-                                    <th><strong>MONTHLY RATE</strong></th>
+                                    <th><strong>RATE TYPE</strong></th>
+                                    <th><strong>RATE</strong></th>
                                     <th><strong>STATUS</strong></th>
                                     @if(auth()->user() && auth()->user()->role == 'admin')
                                     <th><strong>OWNER</strong></th>
@@ -45,6 +46,7 @@
                                     </td>
                                     <td>{{ $property->city }}, {{ $property->region }}</td>
                                     <td>{{ $property->bedrooms }} BR | {{ $property->bathrooms }} BA | {{ $property->floor_area }} sqm</td>
+                                    <td><span class="badge light badge-info">{{ ucfirst($property->rate_type ?? 'daily') }}</span></td>
                                     <td>₱{{ number_format($property->monthly_rate, 2) }}</td>
                                     <td>
                                         @if($property->is_available)
@@ -138,21 +140,30 @@
                         </div>
                         <div class="row">
                             <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500">Bedrooms</label>
+                                <label class="text-black font-w500 text-nowrap">Bedrooms</label>
                                 <input type="number" name="bedrooms" class="form-control">
                             </div>
                             <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500">Bathrooms</label>
+                                <label class="text-black font-w500 text-nowrap">Bathrooms</label>
                                 <input type="number" name="bathrooms" class="form-control">
                             </div>
                             <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500">Floor Area (sqm)</label>
+                                <label class="text-black font-w500 text-nowrap">Floor Area (sqm)</label>
                                 <input type="number" name="floor_area" class="form-control">
                             </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Monthly Rate (₱)</label>
-                            <input type="number" step="0.01" name="monthly_rate" class="form-control" required>
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="text-black font-w500">Rate Type</label>
+                                <select name="rate_type" class="form-control">
+                                    <option value="daily" selected>Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="text-black font-w500">Rate (₱)</label>
+                                <input type="number" step="0.01" name="monthly_rate" class="form-control" required placeholder="0.00">
+                            </div>
                         </div>
                         <div class="form-group mb-3">
                             <label class="text-black font-w500">Description</label>
@@ -219,21 +230,30 @@
                         </div>
                         <div class="row">
                             <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500">Bedrooms</label>
+                                <label class="text-black font-w500 text-nowrap">Bedrooms</label>
                                 <input type="number" id="edit_bedrooms" name="bedrooms" class="form-control">
                             </div>
                             <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500">Bathrooms</label>
+                                <label class="text-black font-w500 text-nowrap">Bathrooms</label>
                                 <input type="number" id="edit_bathrooms" name="bathrooms" class="form-control">
                             </div>
                             <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500">Floor Area (sqm)</label>
+                                <label class="text-black font-w500 text-nowrap">Floor Area (sqm)</label>
                                 <input type="number" id="edit_floor_area" name="floor_area" class="form-control">
                             </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Monthly Rate (₱)</label>
-                            <input type="number" step="0.01" id="edit_monthly_rate" name="monthly_rate" class="form-control" required>
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="text-black font-w500">Rate Type</label>
+                                <select id="edit_rate_type" name="rate_type" class="form-control">
+                                    <option value="daily">Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="text-black font-w500">Rate (₱)</label>
+                                <input type="number" step="0.01" id="edit_monthly_rate" name="monthly_rate" class="form-control" required>
+                            </div>
                         </div>
                         <div class="form-group mb-3">
                             <label class="text-black font-w500">Description</label>
@@ -258,6 +278,7 @@
         document.getElementById('edit_bedrooms').value = property.bedrooms;
         document.getElementById('edit_bathrooms').value = property.bathrooms;
         document.getElementById('edit_floor_area').value = property.floor_area;
+        document.getElementById('edit_rate_type').value = property.rate_type || 'daily';
         document.getElementById('edit_monthly_rate').value = property.monthly_rate;
         document.getElementById('edit_description').value = property.description;
         

@@ -61,6 +61,7 @@ class PropertyController extends Controller
             'address' => 'required|string',
             'city' => 'required|string|max:255',
             'monthly_rate' => 'required|numeric',
+            'rate_type' => 'required|string|in:daily,monthly',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -90,6 +91,7 @@ class PropertyController extends Controller
             'address' => 'required|string',
             'city' => 'required|string|max:255',
             'monthly_rate' => 'required|numeric',
+            'rate_type' => 'required|string|in:daily,monthly',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 

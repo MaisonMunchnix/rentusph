@@ -21,6 +21,7 @@ class Property extends Model
         'bathrooms',
         'floor_area',
         'monthly_rate',
+        'rate_type',
         'description',
         'is_available',
         'image',
