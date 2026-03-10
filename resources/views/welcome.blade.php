@@ -772,17 +772,17 @@
         <div class="steps-container">
             <div class="step">
                 <div class="step-icon">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
                 </div>
-                <h3 class="step-title">1. Choose Date & Time</h3>
-                <p class="step-desc">Select your pickup and return dates according to your schedule. We offer flexible renting durations.</p>
+                <h3 class="step-title">1. Select Your Car</h3>
+                <p class="step-desc">Browse our diverse collection of reliable vehicles to find the best match for your journey.</p>
             </div>
             <div class="step">
                 <div class="step-icon">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 </div>
-                <h3 class="step-title">2. Select Your Car</h3>
-                <p class="step-desc">Browse our diverse collection of reliable vehicles to find the best match for your journey.</p>
+                <h3 class="step-title">2. Choose Date & Time</h3>
+                <p class="step-desc">Select your pickup and return dates according to your schedule. We offer flexible renting durations.</p>
             </div>
             <div class="step">
                 <div class="step-icon">
