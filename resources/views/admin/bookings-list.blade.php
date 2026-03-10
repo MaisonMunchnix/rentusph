@@ -2,8 +2,8 @@
     <x-slot name="styles">
         <style>
             .badge-blue {
-                background-color: #3065D0 !important;
-                color: #fff !important;
+                background-color: #88c3ffb9 !important;
+                color: #0063c5ff !important;
             }
         </style>
     </x-slot>
@@ -64,11 +64,13 @@
                                     </td>
                                     <td>
                                         @if($booking->bookable_type === 'App\Models\Car')
-                                            <span class="badge badge-xs light badge-primary">Car</span>
-                                            {{ $booking->bookable->brand ?? 'N/A' }} {{ $booking->bookable->model ?? '' }}
+                                            <span class="badge light badge-primary text-dark">
+                                                {{ $booking->bookable->brand ?? 'N/A' }} {{ $booking->bookable->model ?? '' }}
+                                            </span>
                                         @else
-                                            <span class="badge badge-xs light badge-info">Property</span>
-                                            {{ $booking->bookable->title ?? 'N/A' }}
+                                            <span class="badge dark badge-dark">
+                                                {{ $booking->bookable->title ?? 'N/A' }}
+                                            </span>
                                         @endif
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($booking->start_date)->format('M d') }} - {{ $booking->end_date ? \Carbon\Carbon::parse($booking->end_date)->format('M d, Y') : 'N/A' }}</td>

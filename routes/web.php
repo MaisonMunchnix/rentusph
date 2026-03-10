@@ -73,6 +73,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings', [\App\Http\Controllers\BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/events', [\App\Http\Controllers\BookingController::class, 'events'])->name('bookings.events');
     Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])->name('bookings.store');
+    Route::post('/admin/bookings/manual', [\App\Http\Controllers\BookingController::class, 'manualStore'])->name('admin.bookings.manual');
     Route::put('/bookings/{booking}', [\App\Http\Controllers\BookingController::class, 'update'])->name('bookings.update');
     Route::delete('/bookings/{booking}', [\App\Http\Controllers\BookingController::class, 'destroy'])->name('bookings.destroy');
     Route::delete('/bookings/{booking}/cancel', [\App\Http\Controllers\BookingController::class, 'cancel'])->name('bookings.cancel');

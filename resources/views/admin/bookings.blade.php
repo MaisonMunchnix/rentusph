@@ -227,7 +227,10 @@
                         </div>
 
                         <div class="mt-4 pt-3 border-top">
-                            <a href="{{ route('bookings.index', ['view' => 'list']) }}" class="btn btn-primary d-block w-100">
+                            <button type="button" class="btn btn-primary d-block w-100 mb-2" data-bs-toggle="modal" data-bs-target="#manualBookingModal">
+                                <i class="fas fa-plus me-2"></i> New Booking
+                            </button>
+                            <a href="{{ route('bookings.index', ['view' => 'list']) }}" class="btn btn-light d-block w-100">
                                 <i class="fas fa-list me-2"></i> Table View
                             </a>
                         </div>
@@ -424,20 +427,150 @@
         </div>
     </div>
 
-    {{-- Delete Confirmation Modal --}}
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+    {{-- Manual Booking Modal --}}
+    <div class="modal fade" id="manualBookingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-body text-center pt-4 pb-3 px-4">
-                    <div class="mb-3" style="font-size: 2.5rem; color: #ef4444;"><i class="fas fa-trash-alt"></i></div>
-                    <h5 class="fw-700 mb-2">Delete Booking?</h5>
-                    <p class="text-muted mb-4" style="font-size: 0.9rem;">This will permanently delete the booking and all associated records. <strong>This action cannot be undone.</strong></p>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger flex-fill" id="confirmDeleteBtn">
-                            <i class="fas fa-trash-alt me-1"></i> Delete
-                        </button>
+                <div class="modal-header">
+                    <h5 class="modal-title fw-700"><i class="fas fa-plus-circle me-2 text-primary"></i>New Manual Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="manualBookingForm" action="{{ route('admin.bookings.manual') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="row">
+                            {{-- Customer Selection Section --}}
+                            <div class="col-md-12 mb-4">
+                                <label class="detail-label mb-2">Customer Information</label>
+                                <div class="card bg-light border-0">
+                                    <div class="card-body p-3">
+                                        <div class="row align-items-end">
+                                            <div class="col-md-4">
+                                                <label class="form-label font-w600 small">Booking For</label>
+                                                <select name="customer_type" id="customer_type" class="form-control default-select">
+                                                    <option value="existing">Existing Customer</option>
+                                                    <option value="new">New / Guest Customer</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-8" id="existing_customer_div">
+                                                <label class="form-label font-w600 small">Select User</label>
+                                                <select name="user_id" id="user_id" class="form-control default-select" data-live-search="true">
+                                                    <option value="">Choose customer...</option>
+                                                    @foreach($customers as $customer)
+                                                        <option value="{{ $customer->id }}" data-email="{{ $customer->email }}" data-phone="{{ $customer->phone }}">
+                                                            {{ $customer->name }} ({{ $customer->email }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div id="new_customer_fields" style="display: none;" class="mt-3 pt-3 border-top">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label font-w600 small">Full Name</label>
+                                                    <input type="text" name="customer_name" class="form-control" placeholder="Enter guest name">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label font-w600 small">Email Address</label>
+                                                    <input type="email" name="customer_email" class="form-control" placeholder="Enter guest email">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label font-w600 small">Phone Number</label>
+                                                    <input type="text" name="customer_phone" class="form-control" placeholder="Enter guest phone">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label font-w600 small">Physical Address</label>
+                                                    <input type="text" name="customer_address" class="form-control" placeholder="Enter guest address">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Item Selection Section --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Reservation Item</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-car-side"></i></span>
+                                    <select name="bookable_id_with_type" id="bookable_id_with_type" class="form-control default-select" data-live-search="true">
+                                        <optgroup label="Cars">
+                                            @foreach($cars as $car)
+                                                <option value="{{ $car->id }}|App\Models\Car" data-rate="{{ $car->daily_rate }}" data-deposit="{{ $car->security_deposit ?? 3000 }}">
+                                                    {{ $car->brand }} {{ $car->model }} ({{ $car->plate_number }})
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                        <optgroup label="Properties">
+                                            @foreach($properties as $prop)
+                                                <option value="{{ $prop->id }}|App\Models\Property" data-rate="{{ $prop->monthly_rate / 30 }}" data-deposit="{{ $prop->security_deposit ?? 3000 }}">
+                                                    {{ $prop->title }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <input type="hidden" name="bookable_id" id="manual_bookable_id">
+                                <input type="hidden" name="bookable_type" id="manual_bookable_type">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Booking Status</label>
+                                <select name="status" class="form-control default-select">
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed" selected>Confirmed (Manual)</option>
+                                </select>
+                            </div>
+
+                            {{-- Dates Section --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">Start Date</label>
+                                <input type="date" name="start_date" id="manual_start_date" class="form-control" value="{{ date('Y-m-d') }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label font-w600">End Date</label>
+                                <input type="date" name="end_date" id="manual_end_date" class="form-control" value="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                            </div>
+
+                            {{-- Pricing Override Section --}}
+                            <div class="col-md-12">
+                                <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                                    <div class="flex-grow-1 me-3">
+                                        <label class="form-label font-w600 small mb-1">Rental Amount (₱)</label>
+                                        <input type="number" name="rental_amount" id="manual_rental_amount" class="form-control font-w700" step="0.01" placeholder="Auto-calculated">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <label class="form-label font-w600 small mb-1">Security Deposit (₱)</label>
+                                        <input type="number" name="security_deposit" id="manual_security_deposit" class="form-control font-w700" step="0.01" placeholder="3000.00">
+                                    </div>
+                                </div>
+                                <div class="text-muted small mt-1 ms-1">
+                                    <i class="fas fa-info-circle me-1"></i> Leave blank to use system default rates.
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4">Create Booking</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Manual Booking Success Modal --}}
+    <div class="modal fade" id="manualSuccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+            <div class="modal-content text-center py-4">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="fw-700 mb-2">Success!</h4>
+                    <p class="text-muted mb-4">Manual booking created successfully!</p>
+                    <button type="button" class="btn btn-primary px-5" data-bs-dismiss="modal">Great!</button>
                 </div>
             </div>
         </div>
@@ -525,6 +658,8 @@
                         const hasProof = p.proof_url && p.proof_url.length > 0;
                         if (hasProof) {
                             proofStatus.innerHTML = `<a href="${p.proof_url}" target="_blank" class="text-primary fw-bold" style="text-decoration: underline;">View Attachment</a>`;
+                        } else if (p.status === 'confirmed' || p.status === 'completed') {
+                            proofStatus.innerHTML = `<span class="text-success small fw-bold">Manually Confirmed</span>`;
                         } else {
                             proofStatus.innerHTML = `<span class="text-danger small fw-bold">Not Uploaded</span>`;
                         }
@@ -582,6 +717,7 @@
                         }
 
                         document.getElementById('modal_status_select').value = p.status;
+                        statusSelect.dataset.initialStatus = p.status;
                         
                         // Handle Commission Breakdown Display
                         const commissionSection = document.getElementById('commissionBreakdown');
@@ -649,6 +785,79 @@
                     });
                 }
 
+                // --- Manual Booking Logic ---
+                const manualModal = document.getElementById('manualBookingModal');
+                const customerTypeSelect = document.getElementById('customer_type');
+                const existingCustomerDiv = document.getElementById('existing_customer_div');
+                const newCustomerFields = document.getElementById('new_customer_fields');
+                const bookableSelect = document.getElementById('bookable_id_with_type');
+                
+                function updateBookableHiddenFields() {
+                    const val = bookableSelect.value;
+                    const parts = val.split('|');
+                    document.getElementById('manual_bookable_id').value = parts[0];
+                    document.getElementById('manual_bookable_type').value = parts[1];
+                    
+                    // Update deposit placeholder
+                    const option = bookableSelect.options[bookableSelect.selectedIndex];
+                    const deposit = option.dataset.deposit;
+                    document.getElementById('manual_security_deposit').placeholder = Number(deposit).toFixed(2);
+                }
+
+                if (bookableSelect) {
+                    bookableSelect.addEventListener('change', updateBookableHiddenFields);
+                    updateBookableHiddenFields();
+                }
+
+                if (customerTypeSelect) {
+                    customerTypeSelect.addEventListener('change', function() {
+                        if (this.value === 'existing') {
+                            existingCustomerDiv.style.display = 'block';
+                            newCustomerFields.style.display = 'none';
+                        } else {
+                            existingCustomerDiv.style.display = 'none';
+                            newCustomerFields.style.display = 'block';
+                        }
+                    });
+                }
+
+                // Handle manual form submission
+                const manualForm = document.getElementById('manualBookingForm');
+                if (manualForm) {
+                    manualForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const form = this;
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
+
+                        fetch(form.action, {
+                            method: 'POST',
+                            body: new FormData(form),
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        }).then(r => r.json()).then(data => {
+                            if (data.success) {
+                                bootstrap.Modal.getInstance(manualModal).hide();
+                                form.reset();
+                                if($.fn.selectpicker) $('.default-select').selectpicker('refresh');
+                                calendar.refetchEvents();
+                                
+                                // Show success modal
+                                const successModal = new bootstrap.Modal(document.getElementById('manualSuccessModal'));
+                                successModal.show();
+                            } else {
+                                alert('Error: ' + (data.error || 'Check fields and try again.'));
+                            }
+                        }).catch(err => {
+                            console.error(err);
+                            alert('An unexpected error occurred.');
+                        }).finally(() => {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = 'Create Booking';
+                        });
+                    });
+                }
+
                 // Toggle sections based on status
                 const statusSelect = document.getElementById('modal_status_select');
                 const inspectionSection = document.getElementById('inspectionSection');
@@ -669,13 +878,17 @@
                     if (!statusSelect) return;
                     
                     const status = statusSelect.value;
+                    const initialStatus = statusSelect.dataset.initialStatus;
                     const hasProof = statusSelect.dataset.hasProof === '1';
 
-                    // Show warning if trying to select confirmed without proof
-                    if (status === 'confirmed' && !hasProof) {
+                    // Only show warning and block if:
+                    // 1. Status is "confirmed"
+                    // 2. There is no proof of payment
+                    // 3. AND it wasn't ALREADY confirmed in the database (which happens for manual/admin bookings)
+                    if (status === 'confirmed' && !hasProof && initialStatus !== 'confirmed') {
                         proofWarning.style.display = 'block';
-                        // Revert selection without triggering infinite loop
-                        statusSelect.value = 'pending';
+                        // Revert selection
+                        statusSelect.value = initialStatus || 'pending';
                         if ($.fn.selectpicker) $(statusSelect).selectpicker('refresh');
                         return;
                     } else {

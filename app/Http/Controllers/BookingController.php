@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\AffiliateDetail;
 use App\Models\Inspection;
+use App\Models\User;
 
 class BookingController extends Controller
 {
@@ -32,12 +33,15 @@ class BookingController extends Controller
 
                 $bookings = $query->latest()->paginate(15);
                 $cars = Car::orderBy('brand')->orderBy('model')->get();
+                $customers = User::where('role', 'customer')->orderBy('name')->get();
                 
-                return view('admin.bookings-list', compact('bookings', 'cars'));
+                return view('admin.bookings-list', compact('bookings', 'cars', 'customers'));
             }
 
             $cars = Car::orderBy('brand')->orderBy('model')->get();
-            return view('admin.bookings', compact('cars'));
+            $customers = User::where('role', 'customer')->orderBy('name')->get();
+            $properties = Property::orderBy('title')->get();
+            return view('admin.bookings', compact('cars', 'customers', 'properties'));
         }
 
         if ($user->role === 'affiliate') {
@@ -443,24 +447,109 @@ class BookingController extends Controller
         return response()->json(array_unique($takenDates));
     }
 
-    public function destroy(Booking $booking)
+    public function manualStore(Request $request)
     {
         if (Auth::user()->role !== 'admin') {
             abort(403);
         }
 
-        // Delete associated inspection if exists
-        if ($booking->inspection) {
-            $booking->inspection->delete();
+        $request->validate([
+            'bookable_id' => 'required',
+            'bookable_type' => 'required|in:App\Models\Car,App\Models\Property',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'customer_type' => 'required|in:existing,new',
+            'user_id' => 'required_if:customer_type,existing|nullable|exists:users,id',
+            'customer_name' => 'required_if:customer_type,new|nullable|string|max:255',
+            'customer_email' => 'required_if:customer_type,new|nullable|email|max:255',
+            'customer_phone' => 'nullable|string|max:255',
+            'status' => 'required|in:pending,confirmed',
+        ]);
+
+        $startDate = Carbon::parse($request->start_date);
+        $endDate = $request->end_date ? Carbon::parse($request->end_date) : $startDate;
+
+        // Check for overlapping bookings
+        $overlap = Booking::where('bookable_id', $request->bookable_id)
+            ->where('bookable_type', $request->bookable_type)
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate])
+                    ->orWhere(function ($q) use ($startDate, $endDate) {
+                        $q->where('start_date', '<=', $startDate)
+                          ->where('end_date', '>=', $endDate);
+                    });
+            })
+            ->exists();
+
+        if ($overlap) {
+            return response()->json(['error' => 'This item is already booked for the selected dates.'], 422);
         }
 
-        // Delete proof of payment if exists
-        if ($booking->proof_of_payment) {
-            Storage::disk('public')->delete($booking->proof_of_payment);
+        $bookableClass = $request->bookable_type;
+        $bookable = $bookableClass::findOrFail($request->bookable_id);
+        
+        $days = $startDate->diffInDays($endDate) ?: 1;
+        
+        $rentalAmount = 0;
+        if ($request->bookable_type === 'App\Models\Car') {
+            $rentalAmount = (float)($request->rental_amount ?? ($bookable->daily_rate * $days));
+        } else {
+            $dailyRate = $bookable->monthly_rate / 30;
+            $rentalAmount = (float)($request->rental_amount ?? ($dailyRate * $days));
         }
 
-        $booking->delete();
+        $securityDeposit = (float)($request->security_deposit ?? ($bookable->security_deposit ?? 3000.00));
+        $totalPrice = $rentalAmount + $securityDeposit;
 
-        return redirect()->back()->with('success', 'Booking deleted successfully!');
+        $bookingData = [
+            'bookable_id' => $request->bookable_id,
+            'bookable_type' => $request->bookable_type,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'rental_amount' => $rentalAmount,
+            'security_deposit' => $securityDeposit,
+            'total_price' => $totalPrice,
+            'status' => $request->status,
+            'payment_status' => $request->status === 'confirmed' ? 'paid' : 'pending',
+        ];
+
+        if ($request->customer_type === 'existing') {
+            $customer = User::findOrFail($request->user_id);
+            $bookingData['user_id'] = $customer->id;
+            $bookingData['customer_name'] = $customer->name;
+            $bookingData['customer_email'] = $customer->email;
+            $bookingData['customer_phone'] = $customer->phone;
+            $bookingData['customer_address'] = $customer->address;
+        } else {
+            $bookingData['user_id'] = Auth::id(); // Admin booked it
+            $bookingData['customer_name'] = $request->customer_name;
+            $bookingData['customer_email'] = $request->customer_email;
+            $bookingData['customer_phone'] = $request->customer_phone;
+            $bookingData['customer_address'] = $request->customer_address;
+        }
+
+        // Commission calculation if confirmed
+        if ($request->status === 'confirmed') {
+            $commissionRate = 20.00;
+            $owner = $bookable->user;
+            if ($owner) {
+                $detail = AffiliateDetail::where('user_id', $owner->id)->first();
+                if ($detail && $detail->commission_rate) {
+                    $commissionRate = (float) $detail->commission_rate;
+                }
+            }
+            $commission = round($rentalAmount * ($commissionRate / 100), 2);
+            $affiliateEarnings = round($rentalAmount - $commission, 2);
+
+            $bookingData['commission_rate'] = $commissionRate;
+            $bookingData['platform_commission'] = $commission;
+            $bookingData['affiliate_earnings'] = $affiliateEarnings;
+        }
+
+        Booking::create($bookingData);
+
+        return response()->json(['success' => 'Manual booking created successfully!']);
     }
 }
