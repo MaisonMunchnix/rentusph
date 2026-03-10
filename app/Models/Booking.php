@@ -46,7 +46,7 @@ class Booking extends Model
 
     public function bookable()
     {
-        return $this->morphTo();
+        return $this->morphTo()->withTrashed();
     }
 
     public function user()

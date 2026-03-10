@@ -309,6 +309,27 @@ class BookingController extends Controller
         return redirect()->back()->with('success', 'Booking updated successfully!');
     }
 
+    public function destroy(Booking $booking)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized. Only administrators can delete bookings.');
+        }
+
+        // Delete associated inspection record if it exists
+        if ($booking->inspection) {
+            $booking->inspection->delete();
+        }
+
+        // Delete proof of payment file if it exists
+        if ($booking->proof_of_payment) {
+            Storage::disk('public')->delete($booking->proof_of_payment);
+        }
+
+        $booking->delete();
+
+        return redirect()->back()->with('success', 'Booking deleted successfully.');
+    }
+
     public function cancel(Booking $booking)
     {
         if ($booking->user_id !== Auth::id()) {

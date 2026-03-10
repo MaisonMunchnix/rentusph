@@ -160,7 +160,7 @@
                                                     @endif
                                                     <div class="dropdown-divider"></div>
                                                     <button type="button" class="dropdown-item text-danger"
-                                                        onclick="confirmDeleteBooking('{{ route('bookings.destroy', $booking->id) }}')">
+                                                        onclick="confirmDeleteBooking('{{ route('bookings.destroy', $booking->id) }}', '{{ route('bookings.status', $booking->id) }}')">
                                                         <i class="fas fa-trash-alt me-1"></i> Delete Booking
                                                     </button>
                                                 </div>
@@ -184,19 +184,25 @@
         </div>
     </div>
 
-    {{-- Delete Confirmation Modal --}}
+    {{-- Delete/Cancel Confirmation Modal --}}
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
             <div class="modal-content">
-                <div class="modal-body text-center pt-4 pb-3 px-4">
-                    <div class="mb-3" style="font-size: 2.5rem; color: #ef4444;"><i class="fas fa-trash-alt"></i></div>
-                    <h5 class="fw-700 mb-2">Delete Booking?</h5>
-                    <p class="text-muted mb-4" style="font-size: 0.9rem;">This will permanently delete the booking and all associated records. <strong>This action cannot be undone.</strong></p>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger flex-fill" id="confirmDeleteListBtn">
-                            <i class="fas fa-trash-alt me-1"></i> Delete
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-700">Manage Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-4 pb-4 pt-2">
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">Would you like to <strong>cancel</strong> this booking (recommended), or <strong>delete</strong> it permanently?</p>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-warning" id="confirmCancelListBtn">
+                            <i class="fas fa-ban me-2"></i> Cancel Booking
                         </button>
+                        <button type="button" class="btn btn-outline-danger flex-fill" id="confirmDeleteListBtn"
+                                onclick="document.getElementById('deleteBookingListForm').submit()">
+                            <i class="fas fa-trash-alt me-2"></i> Delete Permanently
+                        </button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Keep Booking</button>
                     </div>
                 </div>
             </div>
@@ -273,6 +279,41 @@
 
     <x-slot name="scripts">
         <script>
+            window.confirmDeleteBooking = function(deleteUrl, cancelUrl) {
+                const form = document.getElementById('deleteBookingListForm');
+                form.action = deleteUrl;
+                // Store cancel URL on the modal for the cancel button
+                document.getElementById('deleteConfirmModal').dataset.cancelUrl = cancelUrl || '';
+                const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                modal.show();
+            };
+
+            document.getElementById('confirmCancelListBtn').addEventListener('click', function () {
+                const cancelUrl = document.getElementById('deleteConfirmModal').dataset.cancelUrl;
+                if (!cancelUrl) return;
+
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('_method', 'PATCH');
+                formData.append('status', 'cancelled');
+
+                fetch(cancelUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).then(r => {
+                    if (r.ok || r.redirected) {
+                        bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+                        window.location.reload();
+                    } else {
+                        alert('Could not cancel this booking. It may already be completed.');
+                    }
+                }).catch(err => {
+                    console.error(err);
+                    alert('An unexpected error occurred.');
+                });
+            });
+
             window.openStatusModal = function(id, status, rental = '', deposit = '3000') {
                 const form = document.getElementById('statusUpdateForm');
                 form.action = `/bookings/${id}/status`;

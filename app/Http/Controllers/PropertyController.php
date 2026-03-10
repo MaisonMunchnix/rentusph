@@ -133,8 +133,14 @@ class PropertyController extends Controller
             abort(403);
         }
 
+        // Check for active bookings
+        $activeBookings = $property->bookings()->whereIn('status', ['pending', 'confirmed'])->count();
+        if ($activeBookings > 0) {
+            return redirect()->back()->with('error', 'Cannot delete property while it has active bookings (pending or confirmed).');
+        }
+
         $property->delete();
 
-        return redirect()->back()->with('success', 'Property deleted successfully.');
+        return redirect()->back()->with('success', 'Property deleted and moved to history.');
     }
 }

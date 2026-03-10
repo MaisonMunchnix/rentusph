@@ -417,10 +417,34 @@
                     <div class="w-100 text-center mt-3">
                         <form id="deleteBookingForm" method="POST" class="d-inline">
                             @csrf @method('DELETE')
-                            <button type="button" class="btn btn-link text-danger p-0" onclick="confirmDelete()">
+                            <button type="button" class="btn btn-link text-danger p-0" id="openDeleteModal">
                                 <i class="fas fa-trash-alt me-1"></i> Delete Booking Permanently
                             </button>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Delete/Cancel Confirmation Modal --}}
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-700">Manage Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-4 pb-4 pt-2">
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">Would you like to <strong>cancel</strong> this booking (recommended), or <strong>delete</strong> it permanently?</p>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-warning" id="confirmCancelBtn">
+                            <i class="fas fa-ban me-2"></i> Cancel Booking
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" id="confirmDeleteBtn">
+                            <i class="fas fa-trash-alt me-2"></i> Delete Permanently
+                        </button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Keep Booking</button>
                     </div>
                 </div>
             </div>
@@ -759,6 +783,12 @@
                         document.getElementById('statusUpdateForm').action = '/bookings/' + info.event.id + '/status';
                         document.getElementById('deleteBookingForm').action = '/bookings/' + info.event.id;
 
+                        // Wire delete button to pass booking ID
+                        const openDeleteBtn = document.getElementById('openDeleteModal');
+                        if (openDeleteBtn) {
+                            openDeleteBtn.onclick = function() { confirmDelete(info.event.id); };
+                        }
+
                         var myModal = new bootstrap.Modal(document.getElementById('bookingDetailModal'));
                         myModal.show();
                         
@@ -973,13 +1003,45 @@
                     });
                 }
 
-                window.confirmDelete = function() {
+                window.confirmDelete = function(bookingId) {
+                    // Store booking ID on the modal for cancel/delete handlers to use
+                    document.getElementById('deleteConfirmModal').dataset.bookingId = bookingId;
+
                     const detailModal = bootstrap.Modal.getInstance(document.getElementById('bookingDetailModal'));
                     if (detailModal) detailModal.hide();
 
                     const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
                     deleteModal.show();
                 };
+
+                // "Cancel Booking" button — sends PATCH to change status to cancelled
+                document.getElementById('confirmCancelBtn').addEventListener('click', function () {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+                    const bookingId = document.getElementById('deleteConfirmModal').dataset.bookingId
+                                    || document.getElementById('deleteBookingForm').action.split('/').at(-1);
+
+                    const formData = new FormData();
+                    formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.content
+                                              || '{{ csrf_token() }}');
+                    formData.append('_method', 'PATCH');
+                    formData.append('status', 'cancelled');
+
+                    fetch('/bookings/' + bookingId + '/status', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    }).then(r => {
+                        if (r.ok || r.redirected) {
+                            if (modal) modal.hide();
+                            calendar.refetchEvents();
+                        } else {
+                            alert('Could not cancel the booking. It may already be completed.');
+                        }
+                    }).catch(err => {
+                        console.error(err);
+                        alert('An unexpected error occurred.');
+                    });
+                });
 
                 document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
                     bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();

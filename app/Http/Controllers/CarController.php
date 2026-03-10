@@ -141,8 +141,14 @@ class CarController extends Controller
             abort(403);
         }
 
+        // Check for active bookings
+        $activeBookings = $car->bookings()->whereIn('status', ['pending', 'confirmed'])->count();
+        if ($activeBookings > 0) {
+            return redirect()->back()->with('error', 'Cannot delete car while it has active bookings (pending or confirmed).');
+        }
+
         $car->delete();
 
-        return redirect()->back()->with('success', 'Car deleted successfully.');
+        return redirect()->back()->with('success', 'Car deleted and moved to history.');
     }
 }
