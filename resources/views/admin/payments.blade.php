@@ -68,7 +68,7 @@
                                                 <span class="badge badge-outline-primary btn-xs mb-1">Car</span>
                                                 <div class="fs-13">{{ $booking->bookable->brand ?? 'N/A' }} {{ $booking->bookable->model ?? '' }}</div>
                                             @else
-                                                <span class="badge badge-outline-info btn-xs mb-1">Property</span>
+                                                <span class="badge badge-outline-secondary btn-xs mb-1">Property</span>
                                                 <div class="fs-13">{{ $booking->bookable->title ?? 'N/A' }}</div>
                                             @endif
                                         </td>
@@ -107,12 +107,12 @@
                                             @if($booking->proof_of_payment)
                                                 <div class="d-flex align-items-center">
                                                     @if(Str::endsWith($booking->proof_of_payment, '.pdf'))
-                                                        <a href="{{ asset('storage/' . $booking->proof_of_payment) }}" target="_blank" class="btn btn-info btn-xs light shadow-none">
+                                                        <a href="{{ asset('storage/' . $booking->proof_of_payment) }}" target="_blank" class="btn btn-danger btn-xs light shadow-none">
                                                             <i class="fas fa-file-pdf me-1"></i> View PDF
                                                         </a>
                                                     @else
                                                         <img src="{{ asset('storage/' . $booking->proof_of_payment) }}" class="proof-preview me-2" alt="Proof" data-bs-toggle="modal" data-bs-target="#viewProofModal{{ $booking->id }}">
-                                                        <button type="button" class="btn btn-info btn-xs light shadow-none" data-bs-toggle="modal" data-bs-target="#viewProofModal{{ $booking->id }}">
+                                                        <button type="button" class="btn btn-secondary btn-xs light shadow-none" data-bs-toggle="modal" data-bs-target="#viewProofModal{{ $booking->id }}">
                                                             <i class="fas fa-eye me-1"></i> View
                                                         </button>
                                                     @endif
@@ -128,14 +128,20 @@
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-end">
                                                     @if($booking->status === 'pending')
-                                                        <form action="{{ route('bookings.status', $booking->id) }}" method="POST">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <input type="hidden" name="status" value="confirmed">
-                                                            <button type="submit" class="dropdown-item text-success">
-                                                                <i class="fas fa-check-circle me-2"></i> Confirm Booking
+                                                        @if($booking->proof_of_payment)
+                                                            <form action="{{ route('bookings.status', $booking->id) }}" method="POST">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <input type="hidden" name="status" value="confirmed">
+                                                                <button type="submit" class="dropdown-item text-success">
+                                                                    <i class="fas fa-check-circle me-2"></i> Confirm Booking
+                                                                </button>
+                                                            </form>
+                                                        @else
+                                                            <button type="button" class="dropdown-item text-warning" data-bs-toggle="modal" data-bs-target="#paymentWarningModal{{ $booking->id }}">
+                                                                <i class="fas fa-exclamation-triangle me-2"></i> Confirm Booking
                                                             </button>
-                                                        </form>
+                                                        @endif
                                                     @endif
                                                     <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#bookingDetailsModal{{ $booking->id }}">
                                                         <i class="fas fa-info-circle me-2"></i> View Details
@@ -166,6 +172,29 @@
     </div>
 
     @foreach($bookings as $booking)
+        <!-- Payment Warning Modal -->
+        @if(!$booking->proof_of_payment)
+        <div class="modal fade" id="paymentWarningModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Action Restricted</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                        <h4 class="mb-2">Proof of Payment Required</h4>
+                        <p class="text-muted px-3">This booking cannot be confirmed because the customer has not yet uploaded their proof of payment.</p>
+                        <p class="mb-0 text-dark">Please wait for the customer to upload their receipt or bank transfer confirmation.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">I Understand</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Proof Modal -->
         @if($booking->proof_of_payment && !Str::endsWith($booking->proof_of_payment, '.pdf'))
         <div class="modal fade" id="viewProofModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">

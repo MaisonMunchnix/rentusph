@@ -46,7 +46,7 @@
                                     </td>
                                     <td>{{ $property->city }}, {{ $property->region }}</td>
                                     <td>{{ $property->bedrooms }} BR | {{ $property->bathrooms }} BA | {{ $property->floor_area }} sqm</td>
-                                    <td><span class="badge light badge-info">{{ ucfirst($property->rate_type ?? 'daily') }}</span></td>
+                                    <td><span class="badge light badge-dark">{{ ucfirst($property->rate_type ?? 'daily') }}</span></td>
                                     <td>₱{{ number_format($property->monthly_rate, 2) }}</td>
                                     <td>
                                         @if($property->is_available)
@@ -61,19 +61,16 @@
                                     <td>
                                         <div class="d-flex justify-content-end">
                                             <a href="#" class="btn btn-primary shadow btn-xs sharp me-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editPropertyModal" onclick="populateEditModal({{ json_encode($property) }})"><i class="fas fa-pencil-alt"></i></a>
-                                            <a href="#" class="btn btn-warning shadow btn-xs sharp me-1" title="Toggle Status" onclick="event.preventDefault(); document.getElementById('toggle-status-{{ $property->id }}').submit();"><i class="fas fa-power-off"></i></a>
-                                            <a href="#" class="btn btn-danger shadow btn-xs sharp" title="Delete" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this property?')) document.getElementById('delete-property-{{ $property->id }}').submit();"><i class="fa fa-trash"></i></a>
+                                            <a href="#" class="btn btn-warning shadow btn-xs sharp me-1" title="Toggle Status" 
+                                               data-bs-toggle="modal" data-bs-target="#statusModal{{ $property->id }}">
+                                                <i class="fas fa-power-off"></i>
+                                            </a>
+                                            <a href="#" class="btn btn-danger shadow btn-xs sharp" title="Delete" 
+                                               data-bs-toggle="modal" data-bs-target="#deleteModal{{ $property->id }}">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
                                         </div>
                                         
-                                        <!-- Actions Hidden Forms -->
-                                        <form id="toggle-status-{{ $property->id }}" action="{{ route('properties.toggle-status', $property->id) }}" method="POST" style="display: none;">
-                                            @csrf
-                                            @method('PATCH')
-                                        </form>
-                                        <form id="delete-property-{{ $property->id }}" action="{{ route('properties.destroy', $property->id) }}" method="POST" style="display: none;">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
                                     </td>
                                 </tr>
                                 @empty
@@ -91,86 +88,127 @@
 
     <!-- Add Property Modal -->
     <div class="modal fade" id="addPropertyModal">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Property</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal">
-                    </button>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-700">
+                        <i class="fas fa-plus-circle text-primary me-2"></i>Add New Property
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body pt-2">
                     <form action="{{ route('properties.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <div class="form-group mb-3 text-center">
-                            <label class="text-black font-w500 d-block">Property Image</label>
-                            <div class="image-placeholder mb-2">
-                                <img id="add_image_preview" src="#" alt="Preview" class="d-none" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;">
-                                <div id="add_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 150px;">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
+                        <div class="row">
+                            <!-- Left Column: Image and Basic Info -->
+                            <div class="col-md-5 border-end">
+                                <div class="form-group mb-4 text-center">
+                                    <label class="text-black fw-600 d-block mb-2">Property Photo</label>
+                                    <div class="image-placeholder mb-3 position-relative overflow-hidden rounded-lg shadow-sm" style="height: 200px; background: #f8f9fa;">
+                                        <img id="add_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
+                                        <div id="add_image_icon" class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                                            <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
+                                            <small>Click to upload image</small>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="image" class="form-control" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="text-black fw-600 mb-1"><i class="fas fa-tag me-1 small text-primary"></i> Property Title</label>
+                                    <input type="text" name="title" class="form-control" required placeholder="e.g. Modern 2BR Condo">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="text-black fw-600 mb-1"><i class="fas fa-building me-1 small text-primary"></i> Property Type</label>
+                                    <select name="type" class="form-control default-select">
+                                        <option value="Apartment">Apartment</option>
+                                        <option value="House">House</option>
+                                        <option value="Condo">Condo</option>
+                                        <option value="Commercial">Commercial</option>
+                                    </select>
                                 </div>
                             </div>
-                            <input type="file" name="image" class="form-control" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Property Title</label>
-                            <input type="text" name="title" class="form-control" required placeholder="e.g. Modern 2BR Condo">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Property Type</label>
-                            <select name="type" class="form-control">
-                                <option value="Apartment">Apartment</option>
-                                <option value="House">House</option>
-                                <option value="Condo">Condo</option>
-                                <option value="Commercial">Commercial</option>
-                            </select>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Address</label>
-                            <textarea name="address" class="form-control" rows="2" required></textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 form-group mb-3">
-                                <label class="text-black font-w500">City</label>
-                                <input type="text" name="city" class="form-control" required>
+
+                            <!-- Right Column: Location and Details -->
+                            <div class="col-md-7 ps-md-4">
+                                <h6 class="text-primary fw-700 mb-3 border-bottom pb-2">Location & Details</h6>
+                                
+                                <div class="form-group mb-3">
+                                    <label class="text-black fw-600 mb-1"><i class="fas fa-map-marker-alt me-1 small text-primary"></i> Full Address</label>
+                                    <textarea name="address" class="form-control" rows="2" required placeholder="Street address, Village/Bldg..."></textarea>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                        <label class="text-black fw-600 mb-1">City</label>
+                                        <input type="text" name="city" class="form-control" required placeholder="City">
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="text-black fw-600 mb-1">Region</label>
+                                        <input type="text" name="region" class="form-control" placeholder="Province/Region">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-4">
+                                        <label class="text-black fw-600 mb-1 small text-nowrap">Bedrooms</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-bed text-muted"></i></span>
+                                            <input type="number" name="bedrooms" class="form-control border-start-0 ps-0" placeholder="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="text-black fw-600 mb-1 small text-nowrap">Bathrooms</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-bath text-muted"></i></span>
+                                            <input type="number" name="bathrooms" class="form-control border-start-0 ps-0" placeholder="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="text-black fw-600 mb-1 small text-nowrap">Area (sqm)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-vector-square text-muted"></i></span>
+                                            <input type="number" name="floor_area" class="form-control border-start-0 ps-0" placeholder="0">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-sm-4">
+                                        <label class="text-black fw-600 mb-1">Rate Type</label>
+                                        <select name="rate_type" class="form-control default-select form-control-lg">
+                                            <option value="daily" selected>Daily Payment</option>
+                                            <option value="monthly">Monthly Payment</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="text-black fw-600 mb-1">Price (₱)</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-success text-white border-0">₱</span>
+                                            <input type="number" step="0.01" name="monthly_rate" class="form-control" required placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="text-black fw-600 mb-1">Deposit (₱)</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-warning text-white border-0">₱</span>
+                                            <input type="number" step="0.01" name="security_deposit" class="form-control" required placeholder="0.00">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-0">
+                                    <label class="text-black fw-600 mb-1">Description</label>
+                                    <textarea name="description" class="form-control" rows="3" placeholder="Additional features, amenities, or rules..."></textarea>
+                                </div>
                             </div>
-                            <div class="col-md-6 form-group mb-3">
-                                <label class="text-black font-w500">Region</label>
-                                <input type="text" name="region" class="form-control">
-                            </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500 text-nowrap">Bedrooms</label>
-                                <input type="number" name="bedrooms" class="form-control">
-                            </div>
-                            <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500 text-nowrap">Bathrooms</label>
-                                <input type="number" name="bathrooms" class="form-control">
-                            </div>
-                            <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500 text-nowrap">Floor Area (sqm)</label>
-                                <input type="number" name="floor_area" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 form-group mb-3">
-                                <label class="text-black font-w500">Rate Type</label>
-                                <select name="rate_type" class="form-control">
-                                    <option value="daily" selected>Daily</option>
-                                    <option value="monthly">Monthly</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 form-group mb-3">
-                                <label class="text-black font-w500">Rate (₱)</label>
-                                <input type="number" step="0.01" name="monthly_rate" class="form-control" required placeholder="0.00">
-                            </div>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Description</label>
-                            <textarea name="description" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="form-group mb-3">
-                            <button type="submit" class="btn btn-primary d-block w-100">Add Property</button>
+                        <div class="modal-footer border-0 px-0 pb-0 mt-3 d-flex justify-content-center">
+                            <button type="button" class="btn btn-outline-light px-4 me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-5">
+                                <i class="fas fa-check-circle me-1"></i> Register Property
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -180,95 +218,138 @@
     
     <!-- Edit Property Modal -->
     <div class="modal fade" id="editPropertyModal">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Property</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal">
-                    </button>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-700">
+                        <i class="fas fa-edit text-primary me-2"></i>Edit Property
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body pt-2">
                     <form id="editPropertyForm" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        <div class="form-group mb-3 text-center">
-                            <label class="text-black font-w500 d-block">Property Image</label>
-                            <div class="image-placeholder mb-2">
-                                <img id="edit_image_preview" src="#" alt="Preview" class="d-none" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;">
-                                <div id="edit_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 150px;">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-5 border-end">
+                                <div class="form-group mb-4 text-center">
+                                    <label class="text-black fw-600 d-block mb-2">Property Photo</label>
+                                    <div class="image-placeholder mb-3 position-relative overflow-hidden rounded-lg shadow-sm" style="height: 200px; background: #f8f9fa;">
+                                        <img id="edit_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
+                                        <div id="edit_image_icon" class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                                            <i class="fas fa-image fa-3x mb-2"></i>
+                                            <small>No image uploaded</small>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="image" class="form-control" onchange="previewImage(this, 'edit_image_preview', 'edit_image_icon')">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="text-black fw-600 mb-1">Property Title</label>
+                                    <input type="text" id="edit_title" name="title" class="form-control" required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="text-black fw-600 mb-1">Property Type</label>
+                                    <select id="edit_type" name="type" class="form-control default-select">
+                                        <option value="Apartment">Apartment</option>
+                                        <option value="House">House</option>
+                                        <option value="Condo">Condo</option>
+                                        <option value="Commercial">Commercial</option>
+                                    </select>
                                 </div>
                             </div>
-                            <input type="file" name="image" class="form-control" onchange="previewImage(this, 'edit_image_preview', 'edit_image_icon')">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Property Title</label>
-                            <input type="text" id="edit_title" name="title" class="form-control" required>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Property Type</label>
-                            <select id="edit_type" name="type" class="form-control">
-                                <option value="Apartment">Apartment</option>
-                                <option value="House">House</option>
-                                <option value="Condo">Condo</option>
-                                <option value="Commercial">Commercial</option>
-                            </select>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Address</label>
-                            <textarea id="edit_address" name="address" class="form-control" rows="2" required></textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 form-group mb-3">
-                                <label class="text-black font-w500">City</label>
-                                <input type="text" id="edit_city" name="city" class="form-control" required>
+
+                            <!-- Right Column -->
+                            <div class="col-md-7 ps-md-4">
+                                <h6 class="text-primary fw-700 mb-3 border-bottom pb-2">Location & Details</h6>
+                                
+                                <div class="form-group mb-3">
+                                    <label class="text-black fw-600 mb-1">Full Address</label>
+                                    <textarea id="edit_address" name="address" class="form-control" rows="2" required></textarea>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="text-black fw-600 mb-1">City</label>
+                                        <input type="text" id="edit_city" name="city" class="form-control" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="text-black fw-600 mb-1">Region</label>
+                                        <input type="text" id="edit_region" name="region" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-4">
+                                        <label class="text-black fw-600 mb-1 small text-nowrap">Bedrooms</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white"><i class="fas fa-bed text-muted"></i></span>
+                                            <input type="number" id="edit_bedrooms" name="bedrooms" class="form-control border-start-0 ps-1">
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="text-black fw-600 mb-1 small text-nowrap">Bathrooms</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white"><i class="fas fa-bath text-muted"></i></span>
+                                            <input type="number" id="edit_bathrooms" name="bathrooms" class="form-control border-start-0 ps-1">
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="text-black fw-600 mb-1 small text-nowrap">Area (sqm)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white"><i class="fas fa-vector-square text-muted"></i></span>
+                                            <input type="number" id="edit_floor_area" name="floor_area" class="form-control border-start-0 ps-1">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-4">
+                                        <label class="text-black fw-600 mb-1">Rate Type</label>
+                                        <select id="edit_rate_type" name="rate_type" class="form-control default-select form-control-lg">
+                                            <option value="daily">Daily</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="text-black fw-600 mb-1">Price (₱)</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-success text-white border-0">₱</span>
+                                            <input type="number" step="0.01" id="edit_monthly_rate" name="monthly_rate" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="text-black fw-600 mb-1">Deposit (₱)</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-warning text-white border-0">₱</span>
+                                            <input type="number" step="0.01" id="edit_security_deposit" name="security_deposit" class="form-control" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-0">
+                                    <label class="text-black fw-600 mb-1">Description</label>
+                                    <textarea id="edit_description" name="description" class="form-control" rows="3"></textarea>
+                                </div>
                             </div>
-                            <div class="col-md-6 form-group mb-3">
-                                <label class="text-black font-w500">Region</label>
-                                <input type="text" id="edit_region" name="region" class="form-control">
-                            </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500 text-nowrap">Bedrooms</label>
-                                <input type="number" id="edit_bedrooms" name="bedrooms" class="form-control">
-                            </div>
-                            <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500 text-nowrap">Bathrooms</label>
-                                <input type="number" id="edit_bathrooms" name="bathrooms" class="form-control">
-                            </div>
-                            <div class="col-md-4 form-group mb-3">
-                                <label class="text-black font-w500 text-nowrap">Floor Area (sqm)</label>
-                                <input type="number" id="edit_floor_area" name="floor_area" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 form-group mb-3">
-                                <label class="text-black font-w500">Rate Type</label>
-                                <select id="edit_rate_type" name="rate_type" class="form-control">
-                                    <option value="daily">Daily</option>
-                                    <option value="monthly">Monthly</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 form-group mb-3">
-                                <label class="text-black font-w500">Rate (₱)</label>
-                                <input type="number" step="0.01" id="edit_monthly_rate" name="monthly_rate" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="text-black font-w500">Description</label>
-                            <textarea id="edit_description" name="description" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="form-group mb-3">
-                            <button type="submit" class="btn btn-primary d-block w-100">Update Property</button>
+                        <div class="modal-footer border-0 px-0 pb-0 mt-3 d-flex justify-content-center">
+                            <button type="button" class="btn btn-outline-light px-4 me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-5">
+                                <i class="fas fa-save me-1"></i> Update Changes
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
     
     <script>
+
     function populateEditModal(property) {
         document.getElementById('edit_title').value = property.title;
         document.getElementById('edit_type').value = property.type;
@@ -280,6 +361,7 @@
         document.getElementById('edit_floor_area').value = property.floor_area;
         document.getElementById('edit_rate_type').value = property.rate_type || 'daily';
         document.getElementById('edit_monthly_rate').value = property.monthly_rate;
+        document.getElementById('edit_security_deposit').value = property.security_deposit || 0;
         document.getElementById('edit_description').value = property.description;
         
         // Dynamically update the form action URL
@@ -313,5 +395,80 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
+    @if(session('success'))
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalEl = document.getElementById('successModal');
+            if(modalEl) {
+                const successModal = new bootstrap.Modal(modalEl);
+                successModal.show();
+            }
+        });
+    @endif
     </script>
+    @foreach($properties as $property)
+    <!-- Status Toggle Modal -->
+    <div class="modal fade" id="statusModal{{ $property->id }}">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-700">{{ $property->is_available ? 'Deactivate' : 'Activate' }} Property</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        @if($property->is_available)
+                            <div class="d-inline-flex align-items-center justify-content-center bg-warning-light rounded-circle mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-power-off fa-2x text-warning"></i>
+                            </div>
+                            <p class="mb-0 fs-5 text-warning fw-bold">Disable Property Listing</p>
+                        @else
+                            <div class="d-inline-flex align-items-center justify-content-center bg-success-light rounded-circle mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            </div>
+                            <p class="mb-0 fs-5 text-success fw-bold">Enable Property Listing</p>
+                        @endif
+                    </div>
+                    <p class="mt-2 fs-6">Are you sure you want to <strong>{{ $property->is_available ? 'deactivate' : 'activate' }}</strong> the listing for <strong>{{ $property->title }}</strong>?</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center pb-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ route('properties.toggle-status', $property) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn {{ $property->is_available ? 'btn-warning' : 'btn-success' }} px-4">
+                            Yes, {{ $property->is_available ? 'Deactivate' : 'Activate' }} Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal{{ $property->id }}">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-700">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3 text-danger">
+                        <i class="fas fa-trash-alt fa-3x"></i>
+                    </div>
+                    <p class="mb-0 fs-5 text-danger fw-bold">Warning: Permanent Action</p>
+                    <p class="mt-2 fs-6">Are you sure you want to delete <strong>{{ $property->title }}</strong>? This cannot be undone.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center pb-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ route('properties.destroy', $property) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger px-4">Delete Permanently</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
 </x-dynamic-component>

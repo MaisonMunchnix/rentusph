@@ -17,23 +17,46 @@
                         <a href="{{ route('bookings.index') }}" class="btn btn-primary btn-sm me-2">
                             <i class="fas fa-calendar me-2"></i>Calendar View
                         </a>
-                        <form action="{{ route('bookings.index') }}" method="GET" class="d-flex align-items-center">
+                        <form action="{{ route('bookings.index') }}" method="GET" class="row g-2 align-items-center">
                             <input type="hidden" name="view" value="list">
-                            <select name="status" class="form-control default-select form-control-sm me-2" onchange="this.form.submit()">
-                                <option value="">All Status</option>
-                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                            </select>
-                            <select name="car_id" class="form-control default-select form-control-sm me-2" onchange="this.form.submit()">
-                                <option value="">All Cars</option>
-                                @foreach($cars as $car)
-                                    <option value="{{ $car->id }}" {{ request('car_id') == $car->id ? 'selected' : '' }}>
-                                        {{ $car->brand }} {{ $car->model }} ({{ $car->plate_number }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div class="col-auto">
+                                <input type="text" name="search" class="form-control form-control-sm" placeholder="Search customer..." value="{{ request('search') }}">
+                            </div>
+                            <div class="col-auto">
+                                <select name="status" class="form-control default-select form-control-sm" onchange="this.form.submit()">
+                                    <option value="">All Status</option>
+                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <select name="car_id" class="form-control default-select form-control-sm" onchange="this.form.submit()">
+                                    <option value="">All Cars</option>
+                                    @foreach($cars as $car)
+                                        <option value="{{ $car->id }}" {{ request('car_id') == $car->id ? 'selected' : '' }}>
+                                            {{ $car->brand }} {{ $car->model }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <select name="property_id" class="form-control default-select form-control-sm" onchange="this.form.submit()">
+                                    <option value="">All Properties</option>
+                                    @foreach($properties as $property)
+                                        <option value="{{ $property->id }}" {{ request('property_id') == $property->id ? 'selected' : '' }}>
+                                            {{ $property->title }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                                @if(request()->hasAny(['search', 'status', 'car_id', 'property_id']))
+                                    <a href="{{ route('bookings.index', ['view' => 'list']) }}" class="btn btn-light btn-sm ms-1">Reset</a>
+                                @endif
+                            </div>
                         </form>
                     </div>
                 </div>

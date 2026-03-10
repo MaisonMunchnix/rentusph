@@ -31,11 +31,24 @@ class BookingController extends Controller
                     $query->where('bookable_type', 'App\Models\Car')->where('bookable_id', $request->car_id);
                 }
 
+                if ($request->filled('property_id')) {
+                    $query->where('bookable_type', 'App\Models\Property')->where('bookable_id', $request->property_id);
+                }
+
+                if ($request->filled('search')) {
+                    $search = $request->search;
+                    $query->where(function($q) use ($search) {
+                        $q->where('customer_name', 'LIKE', "%{$search}%")
+                          ->orWhere('customer_email', 'LIKE', "%{$search}%");
+                    });
+                }
+
                 $bookings = $query->latest()->paginate(15);
                 $cars = Car::orderBy('brand')->orderBy('model')->get();
+                $properties = Property::orderBy('title')->get();
                 $customers = User::where('role', 'customer')->orderBy('name')->get();
                 
-                return view('admin.bookings-list', compact('bookings', 'cars', 'customers'));
+                return view('admin.bookings-list', compact('bookings', 'cars', 'properties', 'customers'));
             }
 
             $cars = Car::orderBy('brand')->orderBy('model')->get();
