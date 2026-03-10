@@ -25,6 +25,10 @@ class Car extends Model
         'description',
         'is_available',
         'image',
+        'or_file',
+        'cr_file',
+        'verification_status',
+        'rejection_reason',
     ];
 
     public function user()

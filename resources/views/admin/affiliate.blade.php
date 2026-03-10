@@ -108,7 +108,7 @@
                                 @forelse($affiliate->cars as $car)
                                     <div class="card bg-light border-0 mb-3">
                                         <div class="card-body p-3">
-                                            <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center mb-2">
                                                 @if($car->image)
                                                     <img src="{{ str_contains($car->image, '/') ? asset($car->image) : asset('images/cars/' . $car->image) }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
                                                 @endif
@@ -117,6 +117,14 @@
                                                     <p class="mb-0 text-muted small">Plate: {{ $car->plate_number }}</p>
                                                     <p class="mb-0 text-primary small">Daily Rate: ₱{{ number_format($car->daily_rate, 2) }}</p>
                                                 </div>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                @if($car->or_file)
+                                                    <a href="{{ Storage::url($car->or_file) }}" target="_blank" class="badge badge-light text-primary border text-decoration-none" style="font-size: 0.75rem;"><i class="fas fa-file-alt me-1"></i> View OR</a>
+                                                @endif
+                                                @if($car->cr_file)
+                                                    <a href="{{ Storage::url($car->cr_file) }}" target="_blank" class="badge badge-light text-success border text-decoration-none" style="font-size: 0.75rem;"><i class="fas fa-file-alt me-1"></i> View CR</a>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

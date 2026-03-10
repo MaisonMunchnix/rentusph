@@ -14,12 +14,14 @@ class CarController extends Controller
     {
         $user = Auth::user();
         if ($user->role === 'admin') {
-            $cars = Car::with('user')->get();
+            $cars = Car::with('user')->where('verification_status', 'approved')->get();
+            $pendingCarsCount = Car::where('verification_status', 'pending')->count();
         } else {
             $cars = Car::where('user_id', $user->id)->get();
+            $pendingCarsCount = 0;
         }
 
-        return view('cars.index', compact('cars'));
+        return view('cars.index', compact('cars', 'pendingCarsCount'));
     }
 
     public function customerIndex(Request $request)
@@ -68,10 +70,14 @@ class CarController extends Controller
             'security_deposit' => 'required|numeric|min:1000|max:50000',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'or_file' => (Auth::user()->role === 'admin') ? 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120' : 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'cr_file' => (Auth::user()->role === 'admin') ? 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120' : 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
 
-        $data = $request->except('image');
+        $data = $request->except(['image', 'or_file', 'cr_file']);
         $data['user_id'] = Auth::id();
+        $data['is_available'] = false; // Unavailable until verified
+        $data['verification_status'] = 'pending';
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
@@ -79,9 +85,17 @@ class CarController extends Controller
             $data['image'] = 'images/cars/' . $imageName;
         }
 
+        if ($request->hasFile('or_file')) {
+            $data['or_file'] = $request->file('or_file')->store('car-docs', 'public');
+        }
+
+        if ($request->hasFile('cr_file')) {
+            $data['cr_file'] = $request->file('cr_file')->store('car-docs', 'public');
+        }
+
         Car::create($data);
 
-        return redirect()->back()->with('success', 'Car added successfully.');
+        return redirect()->back()->with('success', 'Car listing submitted for admin verification.');
     }
 
     public function update(Request $request, Car $car)
@@ -103,9 +117,11 @@ class CarController extends Controller
             'security_deposit' => 'required|numeric|min:1000|max:50000',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'or_file' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'cr_file' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
 
-        $data = $request->except('image');
+        $data = $request->except(['image', 'or_file', 'cr_file']);
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
@@ -118,9 +134,75 @@ class CarController extends Controller
             $data['image'] = 'images/cars/' . $imageName;
         }
 
+        if ($request->hasFile('or_file')) {
+            $data['or_file'] = $request->file('or_file')->store('car-docs', 'public');
+        }
+
+        if ($request->hasFile('cr_file')) {
+            $data['cr_file'] = $request->file('cr_file')->store('car-docs', 'public');
+        }
+
+        // If the car was rejected and new documents were uploaded, automatically resend for verification
+        if ($car->verification_status === 'rejected' && ($request->hasFile('or_file') || $request->hasFile('cr_file'))) {
+            $data['verification_status'] = 'pending';
+            $data['rejection_reason'] = null;
+        }
+
         $car->update($data);
 
         return redirect()->back()->with('success', 'Car updated successfully.');
+    }
+
+    public function verificationIndex()
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $pendingCars = Car::with('user')
+            ->where('verification_status', 'pending')
+            ->latest()
+            ->get();
+
+        return view('admin.car-verification', compact('pendingCars'));
+    }
+
+    public function verify(Request $request, Car $car)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $request->validate([
+            'action' => 'required|in:approve,reject',
+            'rejection_reason' => 'required_if:action,reject|nullable|string|max:500',
+        ]);
+
+        if ($request->action === 'approve') {
+            $car->update([
+                'verification_status' => 'approved',
+                'is_available' => true,
+                'rejection_reason' => null,
+            ]);
+
+            // Auto-approve the affiliate if this was their first car and they are still pending
+            $carOwner = $car->user;
+            if ($carOwner && $carOwner->role === 'affiliate' && $carOwner->status === 'pending') {
+                $carOwner->update(['status' => 'approved']);
+                if ($carOwner->affiliateDetail) {
+                    $carOwner->affiliateDetail->update(['status' => 'approved']);
+                }
+            }
+
+            return redirect()->back()->with('success', "Car '{$car->brand} {$car->model}' has been approved and is now available.");
+        } else {
+            $car->update([
+                'verification_status' => 'rejected',
+                'is_available' => false,
+                'rejection_reason' => $request->rejection_reason,
+            ]);
+            return redirect()->back()->with('success', "Car '{$car->brand} {$car->model}' has been rejected.");
+        }
     }
 
     public function toggleStatus(Car $car)

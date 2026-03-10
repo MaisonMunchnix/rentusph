@@ -8,9 +8,19 @@
             <div class="card">
                 <div class="card-header border-0 pb-0 flex-wrap">
                     <h4 class="card-title">{{ auth()->user()->role === 'admin' ? 'Car Management' : 'My Cars' }}</h4>
-                    <button class="btn btn-primary btn-sm mt-3 mt-sm-0" data-bs-toggle="modal" data-bs-target="#addCarModal">
-                        <i class="fas fa-plus me-2"></i>Add Car
-                    </button>
+                    <div class="d-flex mt-3 mt-sm-0 gap-2">
+                        @if(auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.car-verification') }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-shield-alt me-2"></i>Verify Cars 
+                                @if(isset($pendingCarsCount) && $pendingCarsCount > 0)
+                                    <span class="badge badge-danger ms-1 text-light">{{ $pendingCarsCount }}</span>
+                                @endif
+                            </a>
+                        @endif
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addCarModal">
+                            <i class="fas fa-plus me-2"></i>Add Car
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -24,6 +34,7 @@
                                     <th><strong>DAILY RATE</strong></th>
                                     <th><strong>SECURITY DEPOSIT</strong></th>
                                     <th><strong>STATUS</strong></th>
+                                    <th><strong>VERIFICATION</strong></th>
                                     @if(auth()->user() && auth()->user()->role == 'admin')
                                     <th><strong>OWNER</strong></th>
                                     @endif
@@ -57,6 +68,21 @@
                                             <span class="badge light badge-warning">Unavailable</span>
                                         @endif
                                     </td>
+                                    <td>
+                                        @php
+                                            $vClasses = [
+                                                'pending'  => 'badge-warning',
+                                                'approved' => 'badge-success',
+                                                'rejected' => 'badge-danger',
+                                            ];
+                                        @endphp
+                                        <span class="badge light {{ $vClasses[$car->verification_status] ?? 'badge-secondary' }}">
+                                            {{ ucfirst($car->verification_status ?? 'pending') }}
+                                        </span>
+                                        @if($car->verification_status === 'rejected' && $car->rejection_reason)
+                                            <br><small class="text-danger" style="font-size:0.7rem;">{{ Str::limit($car->rejection_reason, 40) }}</small>
+                                        @endif
+                                    </td>
                                     @if(auth()->user() && auth()->user()->role == 'admin')
                                     <td>{{ $car->user->name ?? 'N/A' }}</td>
                                     @endif
@@ -73,7 +99,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="{{ (auth()->user() && auth()->user()->role == 'admin') ? '9' : '8' }}" class="text-center">No cars found.</td>
+                                    <td colspan="{{ (auth()->user() && auth()->user()->role == 'admin') ? '10' : '9' }}" class="text-center">No cars found.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -112,6 +138,23 @@
                                     </div>
                                     <input type="file" name="image" class="form-control" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')" style="cursor: pointer;">
                                 </div>
+
+                                @if(auth()->user()->role !== 'admin')
+                                <hr class="my-3 opacity-50">
+                                <h6 class="text-primary font-w700 mb-3"><i class="fas fa-file-alt me-2"></i>LTO Documents <span class="text-danger">*</span></h6>
+                                
+                                <div class="form-group mb-3">
+                                    <label class="text-black font-w600">Official Receipt (OR) <span class="text-danger">*</span></label>
+                                    <input type="file" name="or_file" class="form-control" accept="image/*,.pdf" required>
+                                    <small class="text-muted">JPG, PNG, or PDF · Max 5MB</small>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="text-black font-w600">Certificate of Registration (CR) <span class="text-danger">*</span></label>
+                                    <input type="file" name="cr_file" class="form-control" accept="image/*,.pdf" required>
+                                    <small class="text-muted">JPG, PNG, or PDF · Max 5MB</small>
+                                </div>
+                                @endif
+
                                 
                                 <div class="form-group mb-3">
                                     <label class="text-black font-w600">Plate Number</label>
@@ -235,6 +278,24 @@
                                     <small class="text-muted d-block mt-2">Upload a new image to replace the current one.</small>
                                 </div>
 
+                                @if(auth()->user()->role !== 'admin')
+                                <hr class="my-3 opacity-50">
+                                <h6 class="text-primary font-w700 mb-3"><i class="fas fa-file-alt me-2"></i>LTO Documents</h6>
+                                <div class="alert alert-info py-2 px-3 small border-0 mb-3" style="background: rgba(59, 130, 246, 0.1); color: #1d4ed8;">
+                                    <i class="fas fa-info-circle me-1"></i> Uploading new documents will require admin verification again.
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="text-black font-w600">Official Receipt (OR)</label>
+                                    <input type="file" name="or_file" class="form-control" accept="image/*,.pdf">
+                                    <small class="text-muted">Upload only to update documents (Max 5MB)</small>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="text-black font-w600">Certificate of Registration (CR)</label>
+                                    <input type="file" name="cr_file" class="form-control" accept="image/*,.pdf">
+                                    <small class="text-muted">Upload only to update documents (Max 5MB)</small>
+                                </div>
+                                @endif
+
                                 <div class="form-group mb-3">
                                     <label class="text-black font-w600">Plate Number</label>
                                     <div class="input-group">
@@ -337,13 +398,49 @@
             // Deprecated - using Bootstrap Modals now
         }
 
+        @if($errors->any())
+            let errorMessages = '';
+            @foreach ($errors->all() as $error)
+                errorMessages += '{{ $error }}<br>';
+            @endforeach
+            Swal.fire({
+                html: `
+                <div class="py-2 text-center">
+                    <div class="mb-3 text-danger">
+                        <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    </div>
+                    <p class="mb-0 fs-5 text-danger fw-bold">Validation Error!</p>
+                    <p class="mt-2 text-muted fs-6">` + errorMessages + `</p>
+                </div>
+                `,
+                showConfirmButton: true,
+                confirmButtonText: 'Okay',
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: 'btn btn-danger px-4',
+                    popup: 'rounded-lg border-0 shadow-sm'
+                }
+            });
+        @endif
 
         @if(session('success'))
             Swal.fire({
-                title: 'Success!',
-                text: "{{ session('success') }}",
-                icon: 'success',
-                confirmButtonColor: '#eab308'
+                html: `
+                <div class="py-2 text-center">
+                    <div class="mb-3 text-success">
+                        <i class="fas fa-check-circle fa-3x"></i>
+                    </div>
+                    <p class="mb-0 fs-5 text-success fw-bold">Success!</p>
+                    <p class="mt-2 text-muted fs-6">{{ session('success') }}</p>
+                </div>
+                `,
+                showConfirmButton: true,
+                confirmButtonText: 'Okay',
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: 'btn btn-success px-4',
+                    popup: 'rounded-lg border-0 shadow-sm'
+                }
             });
         @endif
 

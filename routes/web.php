@@ -61,6 +61,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/cars/{car}', [\App\Http\Controllers\CarController::class, 'update'])->name('cars.update');
     Route::delete('/cars/{car}', [\App\Http\Controllers\CarController::class, 'destroy'])->name('cars.destroy');
     Route::patch('/cars/{car}/toggle-status', [\App\Http\Controllers\CarController::class, 'toggleStatus'])->name('cars.toggle-status');
+    Route::get('/admin/car-verification', [\App\Http\Controllers\CarController::class, 'verificationIndex'])->name('admin.car-verification');
+    Route::patch('/cars/{car}/verify', [\App\Http\Controllers\CarController::class, 'verify'])->name('cars.verify');
 
     // Property Management
     Route::get('/properties', [\App\Http\Controllers\PropertyController::class, 'index'])->name('properties.index');

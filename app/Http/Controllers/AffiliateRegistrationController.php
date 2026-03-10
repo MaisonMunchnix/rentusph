@@ -45,9 +45,17 @@ class AffiliateRegistrationController extends Controller
             'brand' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'color' => 'nullable|string|max:255',
             'plate_number' => 'required|string|unique:cars,plate_number',
-            'daily_rate' => 'required|numeric|min:0',
+            'capacity' => 'nullable|integer',
+            'transmission' => 'nullable|string',
+            'fuel_type' => 'nullable|string',
+            'daily_rate' => 'required|numeric|min:500',
+            'security_deposit' => 'required|numeric|min:1000',
+            'description' => 'nullable|string',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'or_file' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'cr_file' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
 
         $user = Auth::user();
@@ -59,14 +67,33 @@ class AffiliateRegistrationController extends Controller
             $imagePath = 'images/cars/' . $imageName;
         }
 
+        $orPath = null;
+        if ($request->hasFile('or_file')) {
+            $orPath = $request->file('or_file')->store('car-docs', 'public');
+        }
+
+        $crPath = null;
+        if ($request->hasFile('cr_file')) {
+            $crPath = $request->file('cr_file')->store('car-docs', 'public');
+        }
+
         Car::create([
             'user_id' => $user->id,
             'brand' => $request->brand,
             'model' => $request->model,
             'year' => $request->year,
+            'color' => $request->color,
             'plate_number' => $request->plate_number,
+            'capacity' => $request->capacity,
+            'transmission' => $request->transmission,
+            'fuel_type' => $request->fuel_type,
             'daily_rate' => $request->daily_rate,
+            'security_deposit' => $request->security_deposit,
+            'description' => $request->description,
             'image' => $imagePath,
+            'or_file' => $orPath,
+            'cr_file' => $crPath,
+            'verification_status' => 'pending',
             'is_available' => false, // Keep unavailable until approved
         ]);
 

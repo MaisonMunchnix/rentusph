@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #eab308; /* Using the yellow brand color from affiliate layout */
+            --primary: #eab308;
             --primary-hover: #ca8a04;
             --bg-card: #000000;
             --border-card: #2d2d2d;
@@ -30,10 +30,10 @@
         }
         .container-box {
             background: var(--bg-card);
-            border-radius: 2rem;
-            padding: 3rem;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            max-width: 750px;
             width: 100%;
             border: 1px solid var(--border-card);
             transition: all 0.3s ease;
@@ -79,26 +79,40 @@
             font-size: 1rem;
             line-height: 1.5;
         }
+        .section-title {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #333;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+        .section-title i {
+            margin-right: 0.5rem;
+        }
         .form-group {
-            margin-bottom: 1.25rem;
+            margin-bottom: 1rem;
             text-align: left;
         }
         .form-label {
             display: block;
             font-weight: 600;
             color: #ffffff;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
+            margin-bottom: 0.35rem;
+            font-size: 0.8rem;
         }
         .form-control {
             width: 100%;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
+            padding: 0.6rem 0.875rem;
+            border-radius: 0.5rem;
             border: 1px solid #333;
             background: #1a1a1a;
             color: #ffffff;
             transition: all 0.2s;
-            font-size: 1rem;
+            font-size: 0.875rem;
         }
         .form-control:focus {
             outline: none;
@@ -108,7 +122,7 @@
         .row-flex {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
+            gap: 1rem;
             width: 100%;
             margin-bottom: 0px;
         }
@@ -125,14 +139,15 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.5rem;
             font-weight: 700;
             width: 100%;
             cursor: pointer;
             transition: all 0.2s;
             box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-            margin-top: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
         }
         .btn-primary:hover {
             background: var(--primary-hover);
@@ -188,48 +203,106 @@
 
         @if(!$vehicles_submitted)
             <div class="status-header">
-                <div class="icon-box icon-pending">
-                    <i class="fas fa-car"></i>
-                </div>
                 <h2>Almost There!</h2>
                 <p class="subtitle">To complete your application, please submit your first vehicle details for review.</p>
             </div>
 
             <form action="{{ route('pending-review.vehicles') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                
+                <h3 class="section-title"><i class="fas fa-car-side"></i> Vehicle Identification</h3>
                 <div class="row-flex">
                     <div class="form-group">
-                        <label class="form-label">Brand</label>
+                        <label class="form-label">Brand <span class="text-danger">*</span></label>
                         <input type="text" name="brand" class="form-control" placeholder="e.g. Toyota" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Model</label>
+                        <label class="form-label">Model <span class="text-danger">*</span></label>
                         <input type="text" name="model" class="form-control" placeholder="e.g. Vios" required>
                     </div>
                 </div>
 
                 <div class="row-flex">
                     <div class="form-group">
-                        <label class="form-label">Year</label>
+                        <label class="form-label">Manufacture Year <span class="text-danger">*</span></label>
                         <input type="number" name="year" class="form-control" placeholder="2023" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Plate Number</label>
+                        <label class="form-label">Plate Number <span class="text-danger">*</span></label>
                         <input type="text" name="plate_number" class="form-control" placeholder="ABC 1234" required>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Daily Rate (₱)</label>
-                    <input type="number" name="daily_rate" class="form-control" placeholder="1500" required>
+                <h3 class="section-title"><i class="fas fa-cogs"></i> Specifications</h3>
+                <div class="row-flex">
+                    <div class="form-group">
+                        <label class="form-label">Exterior Color</label>
+                        <input type="text" name="color" class="form-control" placeholder="e.g. Black">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Seating Capacity</label>
+                        <input type="number" name="capacity" class="form-control" placeholder="5">
+                    </div>
+                </div>
+
+                <div class="row-flex">
+                    <div class="form-group">
+                        <label class="form-label">Transmission</label>
+                        <select name="transmission" class="form-control">
+                            <option value="">Select...</option>
+                            <option value="Automatic">Automatic</option>
+                            <option value="Manual">Manual</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fuel Type</label>
+                        <select name="fuel_type" class="form-control">
+                            <option value="">Select...</option>
+                            <option value="Gas">Gasoline</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Electric">Electric</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="section-title"><i class="fas fa-coins"></i> Pricing & Policies</h3>
+                <div class="row-flex">
+                    <div class="form-group">
+                        <label class="form-label">Daily Rental Rate (₱) <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" name="daily_rate" class="form-control" placeholder="1500" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Security Deposit (₱) <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" name="security_deposit" class="form-control" value="3000" min="1000" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Vehicle Photo</label>
+                    <label class="form-label">Additional Description</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Features, rental conditions, etc..."></textarea>
+                </div>
+
+                <h3 class="section-title"><i class="fas fa-file-alt"></i> Photos & Documentation</h3>
+                <div class="form-group">
+                    <label class="form-label">Vehicle Photo <span class="text-danger">*</span></label>
                     <input type="file" name="image" class="form-control" accept="image/*" required>
+                    <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem; display: block;">Clear exterior photo of the vehicle.</small>
                 </div>
 
-                <button type="submit" class="btn-primary">Submit Application</button>
+                <div class="row-flex">
+                    <div class="form-group">
+                        <label class="form-label">Official Receipt (OR) <span class="text-danger">*</span></label>
+                        <input type="file" name="or_file" class="form-control" accept="image/*,.pdf" required>
+                        <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem; display: block;">PDF, JPG, or PNG</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Certificate of Reg. (CR) <span class="text-danger">*</span></label>
+                        <input type="file" name="cr_file" class="form-control" accept="image/*,.pdf" required>
+                        <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem; display: block;">PDF, JPG, or PNG</small>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="margin-top: 2rem;">Submit Application</button>
             </form>
         @else
             <div class="status-header">
