@@ -615,10 +615,11 @@
                 <div class="collapse navbar-collapse justify-content-between">
                     <div class="header-left">
                         <ul class="nav-links flex-row d-md-flex d-none" style="list-style: none; gap: 2rem; margin-bottom: 0; padding-left: 1rem;">
-                            <li><a href="{{ route('public.cars') }}" style="font-weight: 600; font-size: 1.1rem;">Our Fleet</a></li>
-                            <li><a href="{{ route('public.properties') }}" style="font-weight: 600; font-size: 1.1rem;">Properties</a></li>
+                            <li><a href="#fleet" style="font-weight: 600; font-size: 1.1rem;">Our Fleet</a></li>
+                            <li><a href="#properties" style="font-weight: 600; font-size: 1.1rem;">Properties</a></li>
                             <li><a href="#how-it-works" style="font-weight: 600; font-size: 1.1rem;">How it Works</a></li>
                             <li><a href="#footer" style="font-weight: 600; font-size: 1.1rem;">Reach Us</a></li>
+                            <li><a href="{{ route('public.about') }}" style="font-weight: 600; font-size: 1.1rem;">About Us</a></li>
                         </ul>
                     </div>
                     <div class="header-right d-flex align-items-center">
@@ -809,15 +810,11 @@
                 <ul class="footer-links" style="list-style: none; padding: 0;">
                     <li style="margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.75rem;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent); position: relative; top: 3px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        <span>+63 915 047 5208<br>+63 915 0475 207<br>(043) 784-014</span>
+                        <span>09150475208<br>09150475207</span>
                     </li>
                     <li style="margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.75rem;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent); position: relative; top: 3px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                         <span>rentusph@gmail.com</span>
-                    </li>
-                    <li style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent); position: relative; top: 3px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>0220, Batangas City, Philippines, 4200</span>
                     </li>
                 </ul>
                 <div style="margin-top: 1.5rem;">

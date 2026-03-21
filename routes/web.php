@@ -29,6 +29,10 @@ Route::get('/public/properties', function() {
     return view('properties', compact('properties'));
 })->name('public.properties');
 
+Route::get('/about', function() {
+    return view('about');
+})->name('public.about');
+
 // Authentication Views
 Route::get('/login', function () { return view('auth.login'); })->name('login');
 Route::get('/register/customer', function () { return view('auth.customer-registration'); })->name('register.customer');
