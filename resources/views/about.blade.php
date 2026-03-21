@@ -685,11 +685,11 @@
     <!--**********************************
         Header end
     ***********************************-->
-
-    <div style="padding-top: 80px;"></div>
-
+    
     <!-- Hero Banner -->
     <div class="about-hero">
+    
+        <div style="padding-top: 50px;"></div>
         <div class="hero-badge">Est. 2020</div>
         <h1 class="about-hero-headline">
             <span class="hero-about-word">About</span>
