@@ -302,6 +302,25 @@
                     </div>
                 </div>
 
+                <div class="row-flex">
+                    <div class="form-group">
+                        <label class="form-label">Government ID 1 (Owner) <span class="text-danger">*</span></label>
+                        <input type="file" name="owner_id_1" class="form-control" accept="image/*,.pdf" required>
+                        <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem; display: block;">PDF, JPG, or PNG</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Government ID 2 (Owner) <span class="text-danger">*</span></label>
+                        <input type="file" name="owner_id_2" class="form-control" accept="image/*,.pdf" required>
+                        <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem; display: block;">PDF, JPG, or PNG</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Comprehensive Insurance <span class="text-danger">*</span></label>
+                    <input type="file" name="comprehensive_insurance" class="form-control" accept="image/*,.pdf" required>
+                    <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem; display: block;">PDF, JPG, or PNG</small>
+                </div>
+
                 <button type="submit" class="btn-primary" style="margin-top: 2rem;">Submit Application</button>
             </form>
         @else
@@ -322,5 +341,54 @@
             </button>
         </form>
     </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+    <script>
+        document.querySelectorAll('input[type="file"]').forEach(function(input) {
+            input.addEventListener('change', async function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                // Only compress images, skip PDFs or other documents
+                if (!file.type.startsWith('image/')) return;
+
+                const options = {
+                    maxSizeMB: 1,            // Target size in MB
+                    maxWidthOrHeight: 1920,   // Max dimensions
+                    useWebWorker: true        // Use web worker for faster compression
+                };
+
+                try {
+                    // Optional: show a loading indicator or disable submit button here
+                    const submitBtn = document.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerText = 'Compressing image...';
+                    }
+
+                    const compressedFile = await imageCompression(file, options);
+                    
+                    // Create a new FileList containing the compressed file
+                    const dataTransfer = new DataTransfer();
+                    const newFile = new File([compressedFile], file.name, {
+                        type: compressedFile.type,
+                        lastModified: Date.now()
+                    });
+                    dataTransfer.items.add(newFile);
+                    event.target.files = dataTransfer.files;
+
+                } catch (error) {
+                    console.error('Error compressing image:', error);
+                } finally {
+                    // Re-enable submit button
+                    const submitBtn = document.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = 'Submit Application';
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

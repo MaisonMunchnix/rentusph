@@ -27,6 +27,7 @@ class Car extends Model
         'image',
         'or_file',
         'cr_file',
+        'comprehensive_insurance',
         'verification_status',
         'rejection_reason',
     ];

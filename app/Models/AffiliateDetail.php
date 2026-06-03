@@ -14,6 +14,8 @@ class AffiliateDetail extends Model
         'status',
         'vehicles_submitted',
         'commission_rate',
+        'owner_id_1',
+        'owner_id_2',
     ];
 
     public function user()

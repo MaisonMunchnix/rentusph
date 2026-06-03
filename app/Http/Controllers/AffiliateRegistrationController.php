@@ -53,9 +53,12 @@ class AffiliateRegistrationController extends Controller
             'daily_rate' => 'required|numeric|min:500',
             'security_deposit' => 'required|numeric|min:1000',
             'description' => 'nullable|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'or_file' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
-            'cr_file' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'or_file' => 'required|file|mimes:jpeg,png,jpg,pdf|max:10240',
+            'cr_file' => 'required|file|mimes:jpeg,png,jpg,pdf|max:10240',
+            'owner_id_1' => 'required|file|mimes:jpeg,png,jpg,pdf|max:10240',
+            'owner_id_2' => 'required|file|mimes:jpeg,png,jpg,pdf|max:10240',
+            'comprehensive_insurance' => 'required|file|mimes:jpeg,png,jpg,pdf|max:10240',
         ]);
 
         $user = Auth::user();
@@ -77,6 +80,21 @@ class AffiliateRegistrationController extends Controller
             $crPath = $request->file('cr_file')->store('car-docs', 'public');
         }
 
+        $insurancePath = null;
+        if ($request->hasFile('comprehensive_insurance')) {
+            $insurancePath = $request->file('comprehensive_insurance')->store('car-docs', 'public');
+        }
+
+        $ownerId1Path = null;
+        if ($request->hasFile('owner_id_1')) {
+            $ownerId1Path = $request->file('owner_id_1')->store('affiliate-docs', 'public');
+        }
+
+        $ownerId2Path = null;
+        if ($request->hasFile('owner_id_2')) {
+            $ownerId2Path = $request->file('owner_id_2')->store('affiliate-docs', 'public');
+        }
+
         Car::create([
             'user_id' => $user->id,
             'brand' => $request->brand,
@@ -93,13 +111,18 @@ class AffiliateRegistrationController extends Controller
             'image' => $imagePath,
             'or_file' => $orPath,
             'cr_file' => $crPath,
+            'comprehensive_insurance' => $insurancePath,
             'verification_status' => 'pending',
             'is_available' => false, // Keep unavailable until approved
         ]);
 
         AffiliateDetail::updateOrCreate(
             ['user_id' => $user->id],
-            ['vehicles_submitted' => true]
+            [
+                'vehicles_submitted' => true,
+                'owner_id_1' => $ownerId1Path,
+                'owner_id_2' => $ownerId2Path,
+            ]
         );
 
         return redirect()->route('pending-review')->with('success', 'Vehicle submitted successfully. Your application is now under review.');
