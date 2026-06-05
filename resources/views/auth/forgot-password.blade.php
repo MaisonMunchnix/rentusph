@@ -10,82 +10,52 @@
     <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('images/rentus.svg') }}">
     <link href="{{ asset('vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    @include('auth.partials.auth-head')
     <style>
-        :root {
-            --card: #000000 !important;
-            --text-dark: #ffffff !important;
-            --text-gray: #cbd5e1 !important;
-            --text: #ffffff !important;
-            --bs-body-color: #ffffff !important;
-            --primary: #eab308 !important;
+        .auth-shell {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
         }
-        .fix-wrapper .card {
-            background-color: #000000 !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: #ffffff !important;
+
+        .auth-shell .card.auth-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: #f8fafc;
+            max-width: 520px;
+            width: 100%;
         }
-        .fix-wrapper .card-body {
-            background-color: #000000 !important;
-            color: #ffffff !important;
+
+        .auth-shell .card-body {
+            padding: 2.5rem 2.25rem;
         }
-        .fix-wrapper .card-body .form-label,
-        .fix-wrapper .card-body label,
-        .fix-wrapper .card-body .form-group label,
-        .fix-wrapper .card-body .form-check-label,
-        .fix-wrapper .card-body * label {
-            color: #ffffff !important;
-            font-weight: 800 !important;
-            opacity: 1 !important;
+
+        .auth-shell .form-label {
             text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.03em;
-            display: inline-block;
-            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
         }
-        .fix-wrapper h4, 
-        .fix-wrapper p, 
-        .fix-wrapper span:not(.badge) {
-            color: #ffffff !important;
-            font-weight: 600 !important;
+
+        .auth-shell .form-control {
+            height: 46px;
         }
-        .fix-wrapper .form-control {
-            background-color: rgba(255, 255, 255, 0.15) !important;
-            border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
-            color: #ffffff !important;
-            height: 45px;
-        }
-        .fix-wrapper .form-control:focus {
-            border-color: #eab308 !important;
-            background-color: rgba(255, 255, 255, 0.2) !important;
-        }
-        .fix-wrapper .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.7) !important;
-        }
-        .card a {
-            color: #eab308 !important;
-        }
-        .text-muted {
-            color: #cbd5e1 !important;
-        }
-        .btn-primary {
-            background-color: #eab308 !important;
-            border-color: #eab308 !important;
-            color: #000000 !important;
-            font-weight: 700 !important;
-        }
-        .btn-primary:hover {
-            background-color: #facc15 !important;
-            border-color: #facc15 !important;
-            color: #000000 !important;
+
+        .auth-shell h4 {
+            color: #f8fafc;
+            font-weight: 800;
         }
     </style>
 </head>
-<body>
-    <div class="fix-wrapper">
+<body class="auth-page" data-bs-theme="dark">
+    <div class="fix-wrapper auth-shell">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-5 col-md-6">
-                    <div class="card mb-0 h-auto">
+                    <div class="card auth-card mb-0 h-auto">
                         <div class="card-body">
                             <div class="text-center mb-3">
                                 <a href="{{ url('/') }}"><img class="logo-auth" src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs Logo" style="max-width: 200px;"></a>

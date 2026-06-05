@@ -9,6 +9,7 @@
     <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('images/rentus.svg') }}">
     <link href="{{ asset('vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    @include('auth.partials.auth-head')
 
     <style>
         /* ── Reset fix-wrapper so we control the full layout ── */
@@ -292,25 +293,12 @@
 
         /* ── No-car default: center the form on dark bg ── */
         .auth-split.no-car {
-            background-color: #0f172a;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(234, 179, 8, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(15, 23, 42, 1) 0px, transparent 50%);
+            background: transparent;
             justify-content: center;
             align-items: center;
             position: relative;
             overflow: hidden;
             padding: 2rem;
-        }
-        
-        .auth-split.no-car::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.03;
-            pointer-events: none;
         }
 
         .auth-split.no-car .auth-right {
@@ -340,7 +328,7 @@
         .auth-split.no-car .auth-footer-link { color: #94a3b8; }
     </style>
 </head>
-<body>
+<body class="auth-page">
 <div class="fix-wrapper">
 
 @if($selectedCar)
@@ -392,7 +380,7 @@
 
     {{-- ── RIGHT: Registration Form ── --}}
     <div class="auth-right">
-        <div class="auth-form-box">
+        <div class="auth-form-box auth-card">
             <a href="{{ url('/') }}">
                 <img src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs" class="auth-logo">
             </a>
@@ -468,7 +456,7 @@
 {{-- ════ DEFAULT CENTERED LAYOUT (no car selected) ════ --}}
 <div class="auth-split no-car">
     <div class="auth-right">
-        <div class="auth-form-box">
+        <div class="auth-form-box auth-card">
             <a href="{{ url('/') }}">
                 <img src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs" class="auth-logo">
             </a>

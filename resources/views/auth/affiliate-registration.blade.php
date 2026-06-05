@@ -10,7 +10,7 @@
     <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('images/rentus.svg') }}">
     <link href="{{ asset('vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    @include('auth.partials.auth-head')
 
     <style>
         /* Same base styles as login */
@@ -19,7 +19,6 @@
             margin: 0;
             padding: 0;
             background: #0f172a;
-            font-family: 'Inter', sans-serif;
         }
 
         .fix-wrapper {
@@ -32,25 +31,12 @@
         .auth-split.no-car {
             min-height: 100vh;
             display: flex;
-            background-color: #0f172a;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(234, 179, 8, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(15, 23, 42, 1) 0px, transparent 50%);
+            background: transparent;
             justify-content: center;
             align-items: center;
             position: relative;
             overflow: hidden;
             padding: 2rem;
-        }
-        
-        .auth-split.no-car::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.03;
-            pointer-events: none;
         }
 
         .auth-right {
@@ -62,13 +48,13 @@
 
         /* Glassmorphism Form Box */
         .auth-form-box {
-            background: rgba(15, 23, 42, 0.6);
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
             border-radius: 24px;
             padding: 3.5rem 3rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.02) inset;
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.02) inset;
         }
 
         .auth-logo {
@@ -89,7 +75,7 @@
         }
         .auth-subtitle {
             text-align: center;
-            color: #94a3b8;
+            color: var(--muted);
             font-size: 0.95rem;
             margin-bottom: 2.5rem;
         }
@@ -122,19 +108,19 @@
 
         .form-control {
             width: 100%;
-            border: 1px solid #334155;
+            border: 1px solid var(--field-border);
             border-radius: 12px;
             padding: 0.8rem 1rem 0.8rem 2.75rem;
             font-size: 0.95rem;
-            background: rgba(15, 23, 42, 0.4);
+            background: var(--field-bg);
             color: #f1f5f9;
             transition: all 0.3s ease;
         }
         .form-control::placeholder { color: #475569; }
         .form-control:focus {
-            border-color: #eab308;
+            border-color: var(--accent);
             background: rgba(15, 23, 42, 0.8);
-            box-shadow: 0 0 0 4px rgba(234,179,8,0.1);
+            box-shadow: 0 0 0 4px var(--field-focus);
             outline: none;
         }
         .form-control:focus + .input-icon { color: #eab308; }
@@ -202,11 +188,11 @@
             text-align: center;
             margin-top: 2rem;
             font-size: 0.9rem;
-            color: #94a3b8;
+            color: var(--muted);
             line-height: 1.6;
         }
         .auth-footer-link a {
-            color: #eab308;
+            color: var(--accent);
             font-weight: 600;
             text-decoration: none;
             transition: color 0.2s;
@@ -234,11 +220,11 @@
         }
     </style>
 </head>
-<body>
+<body class="auth-page">
     <div class="fix-wrapper">
         <div class="auth-split no-car">
             <div class="auth-right">
-                <div class="auth-form-box">
+                <div class="auth-form-box auth-card">
                     <div class="text-center mb-3">
                         <a href="{{ url('/') }}"><img class="auth-logo" src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs Logo"></a>
                     </div>
