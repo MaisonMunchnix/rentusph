@@ -380,6 +380,7 @@
                                 <span>Update</span>
                             </button>
                         </div>
+                        <div id="statusFeedback" class="alert alert-danger py-2 px-3 mt-2 small" style="display: none;"></div>
 
                         <div id="paymentSection" class="inspection-container" style="display: none;">
                             <h6 class="detail-label mb-3">Payment Confirmation Details</h6>
@@ -462,6 +463,7 @@
                 <form id="manualBookingForm" action="{{ route('admin.bookings.manual') }}" method="POST">
                     @csrf
                     <div class="modal-body">
+                        <div id="manualFormFeedback" class="alert alert-danger py-2 px-3 small" style="display: none;"></div>
                         <div class="row">
                             {{-- Customer Selection Section --}}
                             <div class="col-md-12 mb-4">
@@ -607,6 +609,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 var calendarEl = document.getElementById('calendar');
+                const statusFeedback = document.getElementById('statusFeedback');
 
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     headerToolbar: {
@@ -615,6 +618,7 @@
                         right: 'dayGridMonth,timeGridWeek,timeGridDay'
                     },
                     initialView: 'dayGridMonth',
+                    displayEventTime: false,
                     navLinks: true,
                     editable: false,
                     selectable: false,
@@ -670,23 +674,17 @@
                         document.getElementById('modal_dates').textContent    = start + (end !== start ? ' → ' + end : '');
                         document.getElementById('modal_item').textContent     = p.item;
                         document.getElementById('modal_total').textContent    = p.total;
-                        
+
                         const rental = parseFloat(p.rental_amount || 0);
                         const deposit = parseFloat(p.security_deposit || 0);
-                        document.getElementById('modal_total_breakdown').textContent = `Rental: ₱${rental.toLocaleString(undefined, {minimumFractionDigits:2})} + Deposit: ₱${deposit.toLocaleString(undefined, {minimumFractionDigits:2})}`;
+                        document.getElementById('modal_total_breakdown').textContent = `Rental: ${formatCurrency(rental)} + Deposit: ${formatCurrency(deposit)}`;
                         document.getElementById('modal_type_label').textContent = p.type;
                         document.getElementById('modal_type_icon').className  = p.type === 'Car' ? 'fas fa-car' : 'fas fa-building';
-                        document.getElementById('modal_item_image').src = p.image_url;
+                        document.getElementById('modal_item_image').src = p.image_url || fallbackImage;
 
                         const proofStatus = document.getElementById('modal_proof_status');
                         const hasProof = p.proof_url && p.proof_url.length > 0;
-                        if (hasProof) {
-                            proofStatus.innerHTML = `<a href="${p.proof_url}" target="_blank" class="text-primary fw-bold" style="text-decoration: underline;">View Attachment</a>`;
-                        } else if (p.status === 'confirmed' || p.status === 'completed') {
-                            proofStatus.innerHTML = `<span class="text-success small fw-bold">Manually Confirmed</span>`;
-                        } else {
-                            proofStatus.innerHTML = `<span class="text-danger small fw-bold">Not Uploaded</span>`;
-                        }
+                        setProofStatus(proofStatus, hasProof, p.proof_url, p.status);
 
                         // Disable "Confirmed" option if no proof of payment
                         const confirmedOption = document.querySelector('#modal_status_select option[value="confirmed"]');
@@ -752,22 +750,22 @@
                             const r = p.rental_amount || p.total_raw; // fallback
                             const d = p.security_deposit || 0;
                             commissionSection.style.display = 'block';
-                            document.getElementById('modal_rental_amount_display').textContent = '₱' + Number(r).toLocaleString();
+                            document.getElementById('modal_rental_amount_display').textContent = formatCurrency(r);
                             document.getElementById('modal_commission_rate').textContent = p.commission_rate || 20;
                             
                             // Estimate commission if not yet confirmed
                             const platformComm = p.platform_commission || (r * (p.commission_rate || 20) / 100);
                             const affiliateEarn = p.affiliate_earnings || (r - platformComm);
 
-                            document.getElementById('modal_commission_display').textContent = '-₱' + Number(platformComm).toLocaleString();
-                            document.getElementById('modal_earnings_display').textContent = '₱' + Number(affiliateEarn).toLocaleString();
-                            document.getElementById('modal_deposit_display').textContent = '₱' + Number(d).toLocaleString();
+                            document.getElementById('modal_commission_display').textContent = '-' + formatCurrency(platformComm);
+                            document.getElementById('modal_earnings_display').textContent = formatCurrency(affiliateEarn);
+                            document.getElementById('modal_deposit_display').textContent = formatCurrency(d);
 
                             const settlementSection = document.getElementById('settlementSummary');
                             if (p.status === 'completed') {
                                 settlementSection.style.display = 'block';
-                                document.getElementById('modal_deducted_display').textContent = '₱' + Number(p.deposit_deducted || 0).toLocaleString();
-                                document.getElementById('modal_refunded_display').textContent = '₱' + Number(p.deposit_refunded || p.security_deposit).toLocaleString();
+                                document.getElementById('modal_deducted_display').textContent = formatCurrency(p.deposit_deducted || 0);
+                                document.getElementById('modal_refunded_display').textContent = formatCurrency(p.deposit_refunded || p.security_deposit || 0);
                             } else {
                                 settlementSection.style.display = 'none';
                             }
@@ -782,6 +780,8 @@
 
                         document.getElementById('statusUpdateForm').action = '/bookings/' + info.event.id + '/status';
                         document.getElementById('deleteBookingForm').action = '/bookings/' + info.event.id;
+
+                        setAlert(statusFeedback, '');
 
                         // Wire delete button to pass booking ID
                         const openDeleteBtn = document.getElementById('openDeleteModal');
@@ -821,6 +821,49 @@
                 const existingCustomerDiv = document.getElementById('existing_customer_div');
                 const newCustomerFields = document.getElementById('new_customer_fields');
                 const bookableSelect = document.getElementById('bookable_id_with_type');
+                const manualFormFeedback = document.getElementById('manualFormFeedback');
+
+                const currencyFormatter = new Intl.NumberFormat('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const formatCurrency = (value) => '₱' + currencyFormatter.format(Number(value || 0));
+                const fallbackImage = 'https://placehold.co/600x400?text=No+Image';
+
+                const setAlert = (el, message, type = 'danger') => {
+                    if (!el) return;
+                    if (!message) {
+                        el.style.display = 'none';
+                        el.textContent = '';
+                        return;
+                    }
+                    el.className = `alert alert-${type} py-2 px-3 mt-2 small`;
+                    el.textContent = message;
+                    el.style.display = 'block';
+                };
+
+                const setProofStatus = (el, hasProof, proofUrl, status) => {
+                    if (!el) return;
+                    el.textContent = '';
+                    if (hasProof) {
+                        const link = document.createElement('a');
+                        link.href = proofUrl;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.className = 'text-primary fw-bold';
+                        link.style.textDecoration = 'underline';
+                        link.textContent = 'View Attachment';
+                        el.appendChild(link);
+                        return;
+                    }
+
+                    const span = document.createElement('span');
+                    if (status === 'confirmed' || status === 'completed') {
+                        span.className = 'text-success small fw-bold';
+                        span.textContent = 'Manually Confirmed';
+                    } else {
+                        span.className = 'text-danger small fw-bold';
+                        span.textContent = 'Not Uploaded';
+                    }
+                    el.appendChild(span);
+                };
                 
                 function updateBookableHiddenFields() {
                     const val = bookableSelect.value;
@@ -858,6 +901,7 @@
                         e.preventDefault();
                         const form = this;
                         const submitBtn = form.querySelector('button[type="submit"]');
+                        setAlert(manualFormFeedback, '');
                         submitBtn.disabled = true;
                         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
 
@@ -876,11 +920,11 @@
                                 const successModal = new bootstrap.Modal(document.getElementById('manualSuccessModal'));
                                 successModal.show();
                             } else {
-                                alert('Error: ' + (data.error || 'Check fields and try again.'));
+                                setAlert(manualFormFeedback, data.error || 'Check fields and try again.');
                             }
                         }).catch(err => {
                             console.error(err);
-                            alert('An unexpected error occurred.');
+                            setAlert(manualFormFeedback, 'An unexpected error occurred. Please try again.');
                         }).finally(() => {
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = 'Create Booking';
@@ -983,6 +1027,7 @@
                     updateForm.addEventListener('submit', function (e) {
                         e.preventDefault();
                         const form = this;
+                        setAlert(statusFeedback, '');
                         fetch(form.action, {
                             method: 'POST',
                             body: new FormData(form),
@@ -993,12 +1038,12 @@
                                 calendar.refetchEvents();
                             } else {
                                 return r.json().then(data => {
-                                    alert('Error: ' + (data.message || 'Validation failed. Please check your inputs.'));
+                                    setAlert(statusFeedback, data.message || 'Validation failed. Please check your inputs.');
                                 });
                             }
                         }).catch(err => {
                             console.error(err);
-                            alert('An unexpected error occurred. Please try again.');
+                            setAlert(statusFeedback, 'An unexpected error occurred. Please try again.');
                         });
                     });
                 }
