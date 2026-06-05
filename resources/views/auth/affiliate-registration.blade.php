@@ -226,7 +226,7 @@
             <div class="auth-right">
                 <div class="auth-form-box auth-card">
                     <div class="text-center mb-3">
-                        <a href="{{ url('/') }}"><img class="auth-logo" src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs Logo"></a>
+                        <a href="{{ url('/') }}"><img class="auth-logo" src="{{ asset('images/rentus.png') }}" alt="RentUs Logo"></a>
                     </div>
                     <h4 class="auth-title">Affiliate sign up</h4>
                     <p class="auth-subtitle">Register your account to manage your cars and property.</p>

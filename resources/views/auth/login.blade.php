@@ -547,7 +547,7 @@
     <div class="auth-right">
                 <div class="auth-form-box auth-card">
             <a href="{{ url('/') }}">
-                <img src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs" class="auth-logo">
+                <img src="{{ asset('images/rentus.png') }}" alt="RentUs" class="auth-logo">
             </a>
             <h1 class="auth-title">Welcome back</h1>
             <p class="auth-subtitle">Sign in to complete your booking</p>
@@ -612,7 +612,7 @@
     <div class="auth-right">
         <div class="auth-form-box">
             <a href="{{ url('/') }}">
-                <img src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs" class="auth-logo">
+                <img src="{{ asset('images/rentus.png') }}" alt="RentUs" class="auth-logo">
             </a>
             <h1 class="auth-title">Welcome back</h1>
             <p class="auth-subtitle">Sign in to your account</p>

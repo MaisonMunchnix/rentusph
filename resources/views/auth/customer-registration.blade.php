@@ -549,7 +549,7 @@
         <div class="auth-right">
           <div class="auth-form-box">
             <a href="{{ url('/') }}">
-              <img src="{{ asset('images/rentus-logo.svg') }}" alt="RentUs" class="auth-logo">
+              <img src="{{ asset('images/rentus.png') }}" alt="RentUs" class="auth-logo">
             </a>
             <h1 class="auth-title">Create your account</h1>
             <p class="auth-subtitle">Join RentUs today</p>
