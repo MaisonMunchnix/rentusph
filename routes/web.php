@@ -35,6 +35,10 @@ Route::get('/about', function () {
 
 // Authentication Views
 Route::get('/login', function (\Illuminate\Http\Request $request) {
+  // Clear intent if user explicitly navigates to general login/register
+  if ($request->has('clear_intent')) {
+      session()->forget('pending_car_id');
+  }
   // Store car_id in session if coming from a car booking intent
   if ($request->car_id) {
     session(['pending_car_id' => (int) $request->car_id]);
@@ -44,7 +48,12 @@ Route::get('/login', function (\Illuminate\Http\Request $request) {
     : null;
   return view('auth.login', compact('selectedCar'));
 })->name('login');
+
 Route::get('/register/customer', function (\Illuminate\Http\Request $request) {
+  // Clear intent if user explicitly navigates to general login/register
+  if ($request->has('clear_intent')) {
+      session()->forget('pending_car_id');
+  }
   // Store car_id in session if coming from a car booking intent
   if ($request->car_id) {
     session(['pending_car_id' => (int) $request->car_id]);

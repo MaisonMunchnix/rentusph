@@ -407,22 +407,35 @@
             font-size: 0.9rem;
         }
         /* --- Header & Navigation --- */
-        .nav-header {
-            background-color: #0a0a0a !important;
-            width: 250px;
-            border: none !important;
-            box-shadow: none !important;
-        }
-
         .header {
             background-color: #0a0a0a !important;
-            padding-left: 250px;
+            padding: 0 !important;
             border: none !important;
             box-shadow: none !important;
+            position: relative;
+            z-index: 1000;
         }
 
-        .header-content {
-            padding-left: 0;
+        .header .navbar {
+            padding: 1rem 0;
+        }
+
+        @media (max-width: 991px) {
+            .navbar-collapse, .collapsing {
+                background-color: #0a0a0a !important;
+                padding: 1rem;
+                border-radius: 8px;
+                margin-top: 0.5rem;
+            }
+            .header-cta-group {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+            .header-cta-group .btn {
+                margin-bottom: 0.5rem;
+                width: 100%;
+                text-align: center;
+            }
         }
 
         .nav-links li a, 
@@ -595,44 +608,36 @@
 <body>
 
     <!--**********************************
-        Nav header start
-    ***********************************-->
-    <div class="nav-header">
-        <a href="{{ url('/') }}" class="brand-logo" style="justify-content: flex-start; padding-left: 1.5rem;">
-            <img src="{{ asset('images/rentus.png') }}" alt="RentUs Logo" style="height: 50px; width: auto; object-fit: contain;">
-        </a>
-    </div>
-    <!--**********************************
-        Nav header end
-    ***********************************-->
-
-    <!--**********************************
         Header start
     ***********************************-->
-    <div class="header">
-        <div class="header-content">
-            <nav class="navbar navbar-expand" style="border: none !important; box-shadow: none !important;">
-                <div class="collapse navbar-collapse justify-content-between">
-                    <div class="header-left">
-                        <ul class="nav-links flex-row d-md-flex d-none" style="list-style: none; gap: 2rem; margin-bottom: 0; padding-left: 1rem;">
-                            <li><a href="#fleet" style="font-weight: 600; font-size: 1.1rem;">Our Fleet</a></li>
-                            <li><a href="#properties" style="font-weight: 600; font-size: 1.1rem;">Properties</a></li>
-                            <li><a href="#how-it-works" style="font-weight: 600; font-size: 1.1rem;">How it Works</a></li>
-                            <li><a href="#footer" style="font-weight: 600; font-size: 1.1rem;">Reach Us</a></li>
-                            <li><a href="{{ route('public.about') }}" style="font-weight: 600; font-size: 1.1rem;">About Us</a></li>
-                        </ul>
-                    </div>
-                    <div class="header-right d-flex align-items-center">
-                        <div class="header-cta-group ms-auto">
-                            <a href="{{ route('register.affiliate') }}" class="btn btn-outline btn-sm">Be a Partner</a>
-                            <a href="{{ route('register.customer') }}" class="btn btn-primary btn-sm">Register</a>
-                            <a href="{{ route('login') }}" class="btn btn-outline btn-sm">Log in</a>
-                        </div>
+    <header class="header">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid px-3 px-md-5">
+                <a href="{{ url('/') }}" class="navbar-brand">
+                    <img src="{{ asset('images/rentus.png') }}" alt="RentUs Logo" style="height: 50px; width: auto; object-fit: contain;">
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#welcomeNavbar" aria-controls="welcomeNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="welcomeNavbar">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0 nav-links" style="gap: 1.5rem;">
+                        <li class="nav-item"><a class="nav-link" href="#fleet" style="font-weight: 600; font-size: 1.1rem;">Our Fleet</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#properties" style="font-weight: 600; font-size: 1.1rem;">Properties</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#how-it-works" style="font-weight: 600; font-size: 1.1rem;">How it Works</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#footer" style="font-weight: 600; font-size: 1.1rem;">Reach Us</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('public.about') }}" style="font-weight: 600; font-size: 1.1rem;">About Us</a></li>
+                    </ul>
+                    <div class="d-flex align-items-lg-center header-cta-group mt-3 mt-lg-0" style="gap: 1rem;">
+                        <a href="{{ route('register.affiliate') }}" class="btn btn-outline btn-sm">Be a Partner</a>
+                        <a href="{{ route('register.customer', ['clear_intent' => 1]) }}" class="btn btn-primary btn-sm">Register</a>
+                        <a href="{{ route('login', ['clear_intent' => 1]) }}" class="btn btn-outline btn-sm">Log in</a>
                     </div>
                 </div>
-            </nav>
-        </div>
-    </div>
+            </div>
+        </nav>
+    </header>
     <!--**********************************
         Header end
     ***********************************-->
@@ -650,7 +655,7 @@
             </h1>
             <p class="hero-subtitle">Effortless Renting. Endless Possibilities</p>
             <div class="hero-actions">
-                <a href="{{ route('register.customer') }}" class="btn btn-primary">Book Now</a>
+                <a href="{{ route('register.customer', ['clear_intent' => 1]) }}" class="btn btn-primary">Book Now</a>
                 <a href="#how-it-works" class="btn btn-outline">Learn More</a>
             </div>
         </div>
@@ -749,7 +754,7 @@
                     <div class="car-price">
                         <span>₱{{ number_format($property->monthly_rate, 2) }}</span><small>/night</small>
                     </div>
-                    <a href="{{ route('login') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book Stay</a>
+                    <a href="{{ route('login', ['clear_intent' => 1]) }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book Stay</a>
                 </div>
             </div>
             @empty

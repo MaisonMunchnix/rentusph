@@ -216,7 +216,7 @@ class BookingController extends Controller
         $securityDeposit = $bookable->security_deposit ?? 3000.00;
         $totalPrice = $rentalAmount + $securityDeposit;
 
-        Booking::create([
+        $booking = Booking::create([
             'user_id' => Auth::id(),
             'bookable_id' => $request->bookable_id,
             'bookable_type' => $request->bookable_type,
@@ -239,7 +239,10 @@ class BookingController extends Controller
             Auth::user()->update(['address' => $request->customer_address]);
         }
 
-        return redirect()->back()->with('success', 'Booking submitted successfully!')->with('booking_success', true);
+        return redirect()->back()
+            ->with('booking_success', true)
+            ->with('new_booking_id', $booking->id)
+            ->with('new_booking_total', number_format($totalPrice, 2));
     }
 
     public function update(Request $request, Booking $booking)

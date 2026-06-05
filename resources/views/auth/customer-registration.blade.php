@@ -183,7 +183,7 @@
 
         .auth-form-box {
             width: 100%;
-            max-width: 480px;
+            max-width: 550px;
         }
 
         .auth-logo {
@@ -292,19 +292,41 @@
 
         /* ── No-car default: center the form on dark bg ── */
         .auth-split.no-car {
-            background: #0f172a;
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(234, 179, 8, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(15, 23, 42, 1) 0px, transparent 50%);
             justify-content: center;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 2rem;
         }
+        
+        .auth-split.no-car::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+        }
+
         .auth-split.no-car .auth-right {
             background: transparent;
-            max-width: 520px;
+            max-width: 650px;
             width: 100%;
+            z-index: 10;
         }
         .auth-split.no-car .auth-form-box {
-            background: #1e293b;
-            border-radius: 20px;
-            padding: 2.5rem 2rem;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 3.5rem 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.02) inset;
         }
         .auth-split.no-car .auth-title { color: #f1f5f9; }
         .auth-split.no-car .auth-subtitle { color: #94a3b8; }

@@ -505,38 +505,123 @@
         </div>
     </div>
 
-    <!-- Booking Success Modal -->
-    <div class="modal fade" id="bookingSuccessModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content overflow-hidden border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-body text-center p-5">
-                    <div class="mb-4">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle shadow-sm" style="width: 80px; height: 80px; font-size: 2.5rem;">
-                            <i class="fas fa-check"></i>
+    <!-- Payment Upload Modal (shown after booking is saved) -->
+    <div class="modal fade" id="paymentUploadModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 overflow-hidden" style="border-radius: 20px;">
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+
+                        <!-- LEFT: Payment Instructions -->
+                        <div class="col-md-5" style="background: linear-gradient(160deg, #0f172a 0%, #1e293b 100%); padding: 2rem;">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <div class="d-flex align-items-center justify-content-center bg-warning rounded-circle" style="width:36px;height:36px;min-width:36px;">
+                                    <i class="fas fa-check text-dark" style="font-size:0.85rem;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;">Booking Saved</div>
+                                    <div style="font-size:0.95rem;font-weight:700;color:#fff;">
+                                        #<span class="js-booking-id">—</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" style="padding:0.75rem 1rem;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:10px;">
+                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Total Amount to Pay</div>
+                                <div style="font-size:1.5rem;font-weight:900;color:#eab308;">₱<span class="js-booking-total">—</span></div>
+                                <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);">Rental + Refundable Deposit</div>
+                            </div>
+
+                            <p style="font-size:0.82rem;color:rgba(255,255,255,0.6);margin-bottom:1.25rem;">
+                                Transfer to any of these accounts, then upload your proof below so we can confirm your booking.
+                            </p>
+
+                            <!-- Payment accounts -->
+                            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+
+                                <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem 1rem;">
+                                    <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#eab308;margin-bottom:0.25rem;">GCash</div>
+                                    <div style="font-size:0.9rem;font-weight:700;color:#fff;">09276736974</div>
+                                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Fatima Stephen</div>
+                                </div>
+
+                                <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem 1rem;">
+                                    <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#eab308;margin-bottom:0.25rem;">BDO</div>
+                                    <div style="font-size:0.9rem;font-weight:700;color:#fff;">005090310115</div>
+                                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Fatima M Stephen</div>
+                                </div>
+
+                                <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem 1rem;">
+                                    <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#eab308;margin-bottom:0.25rem;">BPI</div>
+                                    <div style="font-size:0.9rem;font-weight:700;color:#fff;">2469187481</div>
+                                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Fatima M Stephen</div>
+                                </div>
+
+                                <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem 1rem;">
+                                    <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#eab308;margin-bottom:0.25rem;">Maya / Maribank</div>
+                                    <div style="font-size:0.9rem;font-weight:700;color:#fff;">10907332744</div>
+                                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Fatima M Stephen</div>
+                                </div>
+
+                            </div>
                         </div>
+
+                        <!-- RIGHT: Upload Form -->
+                        <div class="col-md-7 p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-0">Upload Proof of Payment</h5>
+                                    <p class="text-muted small mb-0">Screenshot, photo, or PDF of your transfer receipt</p>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <form id="paymentProofForm" action="" method="POST" enctype="multipart/form-data">
+                                @csrf
+
+                                <!-- Drop zone -->
+                                <div id="dropZone" style="border:2px dashed #e2e8f0;border-radius:14px;padding:2.5rem 1rem;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:1rem;" onclick="document.getElementById('proofFileInput').click()">
+                                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                    <p class="mb-0 text-muted" style="font-size:0.875rem;">Click to browse or drag & drop your file here</p>
+                                    <p class="mb-0 text-muted" style="font-size:0.75rem;">JPG, PNG, PDF — max 5MB</p>
+                                </div>
+                                <input type="file" id="proofFileInput" name="proof_of_payment" class="d-none" accept="image/*,.pdf" required>
+
+                                <!-- Preview -->
+                                <div id="filePreview" class="d-none mb-3" style="border:1px solid #e2e8f0;border-radius:10px;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.75rem;">
+                                    <i class="fas fa-file-image text-warning fa-lg"></i>
+                                    <div class="flex-grow-1">
+                                        <div id="fileName" style="font-size:0.85rem;font-weight:600;color:#0f172a;"></div>
+                                        <div id="fileSize" style="font-size:0.75rem;color:#64748b;"></div>
+                                    </div>
+                                    <button type="button" onclick="clearFile()" class="btn-close btn-sm"></button>
+                                </div>
+
+                                <button type="submit" class="btn btn-warning fw-bold w-100 py-2 mb-2" id="submitProofBtn" style="border-radius:10px;color:#0f172a;">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Proof of Payment
+                                </button>
+
+                                <button type="button" class="btn btn-light w-100 py-2" data-bs-dismiss="modal" style="border-radius:10px;font-size:0.85rem;color:#64748b;">
+                                    I'll upload this later from My Bookings
+                                </button>
+                            </form>
+
+                            <div class="mt-3 p-3" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;font-size:0.8rem;color:#166534;">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Your booking is reserved. Once we verify your payment, we'll confirm it via email.
+                            </div>
+
+                            <div class="mt-2 p-3" style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;font-size:0.8rem;color:#92400e;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Skipping?</strong> You can come back to this page anytime, or go to
+                                <a href="{{ route('bookings.index') }}" style="color:#b45309;font-weight:600;text-decoration:underline;">
+                                    My Bookings
+                                </a>
+                                to find the <strong>"Upload Proof"</strong> button next to your pending booking.
+                            </div>
+                        </div>
+
                     </div>
-                    <h2 class="font-w700 text-dark mb-3">Booking Submitted!</h2>
-                    <p class="text-muted mb-4 fs-5">Your booking is currently pending. Please stay tuned as our team reviews your request.</p>
-                    
-                    <div class="bg-light p-4 rounded-4 text-start mb-4 border border-1 border-opacity-10 border-dark" style="border-radius: 15px;">
-                        <h6 class="font-w700 text-dark mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Next Steps:</h6>
-                        <ul class="list-unstyled mb-0 d-grid gap-3">
-                            <li class="d-flex align-items-start gap-3">
-                                <span class="badge badge-primary rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; min-width: 24px;">1</span>
-                                <span class="small text-dark fw-600">Wait for our team to contact you or confirm your booking via email.</span>
-                            </li>
-                            <li class="d-flex align-items-start gap-3">
-                                <span class="badge badge-primary rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; min-width: 24px;">2</span>
-                                <span class="small text-dark fw-600">Prepare the total amount (Rental Fees + Security Deposit) for payment.</span>
-                            </li>
-                            <li class="d-flex align-items-start gap-3">
-                                <span class="badge badge-primary rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; min-width: 24px;">3</span>
-                                <span class="small text-dark fw-600">You can track your booking status in your <a href="{{ route('customer.profile') }}" class="text-primary text-decoration-underline">Profile</a>.</span>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <button type="button" class="btn btn-primary w-100 py-3 rounded-pill font-w600 shadow-sm" data-bs-dismiss="modal">Got it, thanks!</button>
                 </div>
             </div>
         </div>
@@ -547,8 +632,17 @@
     <script>
         @if(session('booking_success'))
             $(document).ready(function() {
-                var successModal = new bootstrap.Modal(document.getElementById('bookingSuccessModal'));
-                successModal.show();
+                // Populate booking details into the payment modal
+                const bookingId    = '{{ session("new_booking_id") }}';
+                const bookingTotal = '{{ session("new_booking_total") }}';
+                const proofRoute   = '{{ url("bookings") }}/' + bookingId + '/proof';
+
+                document.querySelectorAll('.js-booking-id').forEach(el => el.textContent = bookingId);
+                document.querySelectorAll('.js-booking-total').forEach(el => el.textContent = bookingTotal);
+                document.getElementById('paymentProofForm').action = proofRoute;
+
+                var paymentModal = new bootstrap.Modal(document.getElementById('paymentUploadModal'));
+                paymentModal.show();
             });
         @endif
 
@@ -763,6 +857,53 @@
                 }
             });
         });
+    </script>
+    <script>
+        // ── Payment proof file preview & drag-drop ──
+        const proofInput = document.getElementById('proofFileInput');
+        const dropZone   = document.getElementById('dropZone');
+
+        if (proofInput) {
+            proofInput.addEventListener('change', function() {
+                showFilePreview(this.files[0]);
+            });
+        }
+
+        if (dropZone) {
+            dropZone.addEventListener('dragover', e => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#eab308';
+                dropZone.style.background  = 'rgba(234,179,8,0.04)';
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.borderColor = '#e2e8f0';
+                dropZone.style.background  = '';
+            });
+            dropZone.addEventListener('drop', e => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#e2e8f0';
+                dropZone.style.background  = '';
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    proofInput.files = e.dataTransfer.files;
+                    showFilePreview(file);
+                }
+            });
+        }
+
+        function showFilePreview(file) {
+            if (!file) return;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+            document.getElementById('dropZone').classList.add('d-none');
+            document.getElementById('filePreview').classList.remove('d-none');
+        }
+
+        function clearFile() {
+            document.getElementById('proofFileInput').value = '';
+            document.getElementById('filePreview').classList.add('d-none');
+            document.getElementById('dropZone').classList.remove('d-none');
+        }
     </script>
     </x-slot>
     @if(isset($intentCar) && $intentCar && !session('booking_success'))

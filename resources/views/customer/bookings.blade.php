@@ -104,7 +104,7 @@
                                                 <!-- Edit Modal -->
                                                 <div class="modal fade" id="viewBookingModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
                                                     <div class="modal-dialog modal-lg text-start">
-                                                        <div class="modal-content">
+                                                        <div class="modal-content" style="white-space: normal;">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title">Edit Booking Details - #{{ $booking->id }}</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -225,27 +225,90 @@
 
                                                 <!-- Upload Proof Modal -->
                                                 <div class="modal fade" id="uploadProofModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
-                                                    <div class="modal-dialog text-start">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Upload Proof of Payment</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <form action="{{ route('bookings.proof', $booking->id) }}" method="POST" enctype="multipart/form-data">
-                                                                @csrf
-                                                                <div class="modal-body">
-                                                                    <p class="small text-muted mb-3">Please upload an image or PDF of your bank transfer, G-Cash screenshot, or deposit slip.</p>
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label font-w600 text-dark">Select File</label>
-                                                                        <input type="file" name="proof_of_payment" class="form-control" required accept="image/*,.pdf">
-                                                                        <div class="form-text mt-2">Max file size: 5MB. Accepted formats: JPG, PNG, PDF.</div>
+                                                    <div class="modal-dialog modal-lg modal-dialog-centered text-start">
+                                                        <div class="modal-content border-0 overflow-hidden" style="border-radius:20px; white-space: normal;">
+                                                            <div class="modal-body p-0">
+                                                                <div class="row g-0">
+
+                                                                    <!-- LEFT: Payment info -->
+                                                                    <div class="col-md-5" style="background:linear-gradient(160deg,#0f172a 0%,#1e293b 100%);padding:2rem;">
+                                                                        <div class="d-flex align-items-center gap-2 mb-3">
+                                                                            <div class="d-flex align-items-center justify-content-center bg-warning rounded-circle" style="width:36px;height:36px;min-width:36px;">
+                                                                                <i class="fas fa-receipt text-dark" style="font-size:0.85rem;"></i>
+                                                                            </div>
+                                                                            <div>
+                                                                                <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;">Booking</div>
+                                                                                <div style="font-size:0.95rem;font-weight:700;color:#fff;">#{{ $booking->id }}</div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="mb-3" style="padding:0.75rem 1rem;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:10px;">
+                                                                            <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Total Amount to Pay</div>
+                                                                            <div style="font-size:1.5rem;font-weight:900;color:#eab308;">&#8369;{{ number_format($booking->total_price, 2) }}</div>
+                                                                            <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);">Rental + Refundable Deposit</div>
+                                                                        </div>
+
+                                                                        <p style="font-size:0.82rem;color:rgba(255,255,255,0.6);margin-bottom:1.25rem;">
+                                                                            Transfer to any of these accounts, then upload your proof below.
+                                                                        </p>
+
+                                                                        <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                                                                            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem 1rem;">
+                                                                                <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#eab308;margin-bottom:0.25rem;">GCash</div>
+                                                                                <div style="font-size:0.9rem;font-weight:700;color:#fff;">09276736974</div>
+                                                                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Fatima Stephen</div>
+                                                                            </div>
+                                                                            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem 1rem;">
+                                                                                <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#eab308;margin-bottom:0.25rem;">BDO</div>
+                                                                                <div style="font-size:0.9rem;font-weight:700;color:#fff;">005090310115</div>
+                                                                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Fatima M Stephen</div>
+                                                                            </div>
+                                                                            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem 1rem;">
+                                                                                <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#eab308;margin-bottom:0.25rem;">BPI</div>
+                                                                                <div style="font-size:0.9rem;font-weight:700;color:#fff;">2469187481</div>
+                                                                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Fatima M Stephen</div>
+                                                                            </div>
+                                                                            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem 1rem;">
+                                                                                <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#eab308;margin-bottom:0.25rem;">Maya / Maribank</div>
+                                                                                <div style="font-size:0.9rem;font-weight:700;color:#fff;">10907332744</div>
+                                                                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Fatima M Stephen</div>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
+
+                                                                    <!-- RIGHT: Upload form -->
+                                                                    <div class="col-md-7 p-4">
+                                                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                                                            <div>
+                                                                                <h5 class="fw-bold text-dark mb-0">Upload Proof of Payment</h5>
+                                                                                <p class="text-muted small mb-0">Screenshot, photo, or PDF of your transfer receipt</p>
+                                                                            </div>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+
+                                                                        <form action="{{ route('bookings.proof', $booking->id) }}" method="POST" enctype="multipart/form-data">
+                                                                            @csrf
+                                                                            <div class="mb-3">
+                                                                                <label class="form-label font-w600 text-dark">Select File</label>
+                                                                                <input type="file" name="proof_of_payment" class="form-control" required accept="image/*,.pdf">
+                                                                                <div class="form-text mt-2">Max file size: 5MB. Accepted formats: JPG, PNG, PDF.</div>
+                                                                            </div>
+                                                                            <button type="submit" class="btn btn-warning fw-bold w-100 py-2 mb-2" style="border-radius:10px;color:#0f172a;">
+                                                                                <i class="fas fa-paper-plane me-2"></i>Submit Proof of Payment
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-light w-100 py-2" data-bs-dismiss="modal" style="border-radius:10px;font-size:0.85rem;color:#64748b;">
+                                                                                Cancel
+                                                                            </button>
+                                                                        </form>
+
+                                                                        <div class="mt-3 p-3" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;font-size:0.8rem;color:#166534;">
+                                                                            <i class="fas fa-info-circle me-2"></i>
+                                                                            Once we verify your payment, we'll confirm your booking via email.
+                                                                        </div>
+                                                                    </div>
+
                                                                 </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                                                                    <button type="submit" class="btn btn-primary">Upload Now</button>
-                                                                </div>
-                                                            </form>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -280,7 +343,7 @@
                                                 @if($booking->status === 'pending')
                                                 <div class="modal fade" id="cancelBookingModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
                                                     <div class="modal-dialog text-start">
-                                                        <div class="modal-content">
+                                                        <div class="modal-content" style="white-space: normal;">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title">Cancel Booking</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
