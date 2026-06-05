@@ -696,7 +696,7 @@
                     <div class="car-price">
                         <span>₱{{ number_format($car->daily_rate, 2) }}</span><small>/day</small>
                     </div>
-                    <a href="{{ route('login') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
+                    <a href="{{ route('register.customer', ['car_id' => $car->id]) }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Book</a>
                 </div>
             </div>
             @empty

@@ -765,4 +765,33 @@
         });
     </script>
     </x-slot>
+    @if(isset($intentCar) && $intentCar && !session('booking_success'))
+        <!-- Hidden button to trigger booking modal via JS if intent exists -->
+        <button id="intent-book-btn" class="btn-book d-none" 
+            data-id="{{ $intentCar->id }}" 
+            data-type="App\Models\Car" 
+            data-name="{{ $intentCar->brand }} {{ $intentCar->model }}" 
+            data-security_deposit="{{ $intentCar->security_deposit }}"
+            data-rate="₱{{ number_format($intentCar->daily_rate) }}/day"></button>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(() => {
+                    const btn = document.getElementById('intent-book-btn');
+                    if (btn) {
+                        $(btn).trigger('click');
+                    }
+                }, 500);
+            });
+            
+            // Clean up the URL only AFTER the modal is closed manually
+            // This ensures if there are validation errors on form submit, it still pops up
+            $('#bookingModal').on('hidden.bs.modal', function () {
+                if (window.history.replaceState) {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('intent_car');
+                    window.history.replaceState(null, '', url.toString());
+                }
+            });
+        </script>
+    @endif
 </x-layouts.customer>

@@ -88,9 +88,15 @@ class ListingController extends Controller
             'query' => $request->query(),
         ]);
 
+        $intentCar = null;
+        if ($request->has('intent_car')) {
+            $intentCar = Car::find($request->intent_car);
+        }
+
         return view('customer.explore-listings', [
             'listings' => $paginatedListings,
-            'type' => $type
+            'type' => $type,
+            'intentCar' => $intentCar
         ]);
     }
 }

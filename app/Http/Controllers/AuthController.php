@@ -43,8 +43,16 @@ class AuthController extends Controller
 
         Auth::login($user);
 
+        // Check for pending car booking intent
+        $pendingCarId = session('pending_car_id');
+        session()->forget('pending_car_id');
+
         if ($user->role === 'affiliate') {
             return redirect('/pending-review');
+        }
+
+        if ($pendingCarId) {
+            return redirect()->route('customer.explore', ['intent_car' => $pendingCarId]);
         }
 
         return redirect()->intended('/dashboard');
@@ -59,6 +67,14 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('email', 'password'))) {
             $request->session()->regenerate();
+
+            // Check for pending car booking intent
+            $pendingCarId = session('pending_car_id');
+            session()->forget('pending_car_id');
+
+            if ($pendingCarId && Auth::user()->role === 'customer') {
+                return redirect()->route('customer.explore', ['intent_car' => $pendingCarId]);
+            }
 
             return redirect()->intended('/dashboard');
         }

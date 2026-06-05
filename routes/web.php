@@ -34,11 +34,25 @@ Route::get('/about', function () {
 })->name('public.about');
 
 // Authentication Views
-Route::get('/login', function () {
-  return view('auth.login');
+Route::get('/login', function (\Illuminate\Http\Request $request) {
+  // Store car_id in session if coming from a car booking intent
+  if ($request->car_id) {
+    session(['pending_car_id' => (int) $request->car_id]);
+  }
+  $selectedCar = session('pending_car_id')
+    ? \App\Models\Car::find(session('pending_car_id'))
+    : null;
+  return view('auth.login', compact('selectedCar'));
 })->name('login');
-Route::get('/register/customer', function () {
-  return view('auth.customer-registration');
+Route::get('/register/customer', function (\Illuminate\Http\Request $request) {
+  // Store car_id in session if coming from a car booking intent
+  if ($request->car_id) {
+    session(['pending_car_id' => (int) $request->car_id]);
+  }
+  $selectedCar = session('pending_car_id')
+    ? \App\Models\Car::find(session('pending_car_id'))
+    : null;
+  return view('auth.customer-registration', compact('selectedCar'));
 })->name('register.customer');
 Route::get('/register/affiliate', function () {
   return view('auth.affiliate-registration');
