@@ -125,18 +125,17 @@
                             <!-- Left Column: Image & Basic Info -->
                             <div class="col-xl-5 border-end">
                                 <div class="form-group mb-4 text-center">
-                                    <label class="text-black font-w600 d-block mb-3">Vehicle Photography</label>
+                                    <label class="text-black font-w600 d-block mb-3">Vehicle Photography (Cover)</label>
                                     <div class="image-placeholder mb-3">
                                         <img id="add_image_preview" src="#" alt="Preview" class="d-none w-100 shadow-sm" style="height: 220px; object-fit: cover; border-radius: 15px;">
                                         <div id="add_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center shadow-inner" style="height: 220px; border: 2px dashed #cbd5e1;">
                                             <div class="text-center">
                                                 <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-2"></i>
-                                                <p class="mb-0 text-muted font-w500">Upload Car Image</p>
-                                                <small class="text-muted">(JPG, PNG max 2MB)</small>
+                                                <p class="mb-0 text-muted font-w500">Upload Cover Photo</p>
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="file" name="image" class="form-control" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')" style="cursor: pointer;">
+                                    <input type="file" name="image" class="form-control mb-4" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')" style="cursor: pointer;" required>
                                 </div>
 
                                 @if(auth()->user()->role !== 'admin')
@@ -264,18 +263,33 @@
                             <!-- Left Column: Image -->
                             <div class="col-xl-5 border-end">
                                 <div class="form-group mb-4 text-center">
-                                    <label class="text-black font-w600 d-block mb-3">Vehicle Photography</label>
+                                    <label class="text-black font-w600 d-block mb-3">Cover Photo</label>
                                     <div class="image-placeholder mb-3">
                                         <img id="edit_image_preview" src="#" alt="Preview" class="d-none w-100 shadow-sm" style="height: 220px; object-fit: cover; border-radius: 15px;">
                                         <div id="edit_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center shadow-inner" style="height: 220px; border: 2px dashed #cbd5e1;">
                                             <div class="text-center">
                                                 <i class="fas fa-image fa-3x text-muted mb-2"></i>
-                                                <p class="mb-0 text-muted font-w500">Vehicle Photo</p>
+                                                <p class="mb-0 text-muted font-w500">Cover Photo</p>
                                             </div>
                                         </div>
                                     </div>
                                     <input type="file" name="image" class="form-control" onchange="previewImage(this, 'edit_image_preview', 'edit_image_icon')" style="cursor: pointer;">
-                                    <small class="text-muted d-block mt-2">Upload a new image to replace the current one.</small>
+                                    <small class="text-muted d-block mt-2">Upload a new image to replace the current cover.</small>
+                                </div>
+
+                                <hr class="my-3 opacity-50">
+                                <h6 class="text-primary font-w700 mb-3"><i class="fas fa-images me-2"></i>Photo Gallery</h6>
+                                <div class="form-group mb-4">
+                                    <label class="text-black font-w600">Upload Gallery Photos</label>
+                                    <input type="file" id="gallery_upload_input" class="form-control mb-2" accept="image/*" multiple style="cursor: pointer;">
+                                    <small class="text-muted d-block mb-3">Select multiple photos. Images are automatically compressed.</small>
+                                    <button type="button" class="btn btn-sm btn-outline-primary w-100" onclick="uploadGalleryPhotos()">
+                                        <i class="fas fa-upload me-1"></i> Upload Photos
+                                    </button>
+                                </div>
+
+                                <div class="gallery-preview-container d-flex flex-wrap gap-2 mb-4" id="edit_gallery_preview">
+                                    <!-- Gallery items injected here via JS -->
                                 </div>
 
                                 @if(auth()->user()->role !== 'admin')
@@ -444,7 +458,10 @@
             });
         @endif
 
+        let currentEditCarId = null;
+
         function populateEditModal(car) {
+            currentEditCarId = car.id;
             document.getElementById('edit_brand').value = car.brand;
             document.getElementById('edit_model').value = car.model;
             document.getElementById('edit_year').value = car.year;
@@ -470,6 +487,24 @@
                 preview.classList.add('d-none');
                 icon.classList.remove('d-none');
             }
+
+            // Populate Gallery
+            const galleryContainer = document.getElementById('edit_gallery_preview');
+            galleryContainer.innerHTML = '';
+            if (car.gallery_images && car.gallery_images.length > 0) {
+                car.gallery_images.forEach(img => {
+                    galleryContainer.innerHTML += `
+                        <div class="position-relative d-inline-block">
+                            <img src="/${img.path}" class="rounded shadow-sm" style="width: 80px; height: 60px; object-fit: cover;">
+                            <button type="button" class="btn btn-danger btn-xs sharp position-absolute" style="top: -5px; right: -5px; width: 20px; height: 20px; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 10;" onclick="deleteGalleryImage(${img.id})">
+                                <i class="fas fa-times" style="font-size: 10px;"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+            } else {
+                galleryContainer.innerHTML = '<p class="text-muted small mb-0 w-100 text-center py-2 bg-light rounded">No gallery photos yet.</p>';
+            }
         }
 
         function previewImage(input, previewId, iconId) {
@@ -484,6 +519,63 @@
                     icon.classList.add('d-none');
                 }
                 reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function uploadGalleryPhotos() {
+            const input = document.getElementById('gallery_upload_input');
+            if (!input.files || input.files.length === 0) {
+                Swal.fire('No files', 'Please select at least one photo.', 'warning');
+                return;
+            }
+
+            const formData = new FormData();
+            for (let i = 0; i < input.files.length; i++) {
+                formData.append('photos[]', input.files[i]);
+            }
+
+            const btn = document.querySelector('button[onclick="uploadGalleryPhotos()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/cars/${currentEditCarId}/gallery`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const data = await response.json();
+                    Swal.fire('Error', data.message || 'Upload failed.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'An error occurred during upload.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function deleteGalleryImage(imageId) {
+            if (!confirm('Are you sure you want to delete this photo?')) return;
+
+            try {
+                const response = await fetch(`/cars/gallery/${imageId}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    Swal.fire('Error', 'Failed to delete photo.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'An error occurred.', 'error');
             }
         }
         </script>

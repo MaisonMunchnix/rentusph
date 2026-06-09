@@ -10,6 +10,11 @@ class Property extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public function galleryImages()
+    {
+        return $this->hasMany(PropertyImage::class)->orderBy('order');
+    }
+
     protected $fillable = [
         'user_id',
         'title',

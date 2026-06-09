@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Car;
+use App\Models\CarImage;
+use App\Helpers\ImageHelper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -14,10 +16,10 @@ class CarController extends Controller
     {
         $user = Auth::user();
         if ($user->role === 'admin') {
-            $cars = Car::with('user')->where('verification_status', 'approved')->get();
+            $cars = Car::with(['user', 'galleryImages'])->where('verification_status', 'approved')->get();
             $pendingCarsCount = Car::where('verification_status', 'pending')->count();
         } else {
-            $cars = Car::where('user_id', $user->id)->get();
+            $cars = Car::with('galleryImages')->where('user_id', $user->id)->get();
             $pendingCarsCount = 0;
         }
 
@@ -215,6 +217,57 @@ class CarController extends Controller
         $car->save();
 
         return redirect()->back()->with('success', 'Car status updated.');
+    }
+
+    // ── Public detail page (no auth required) ─────────────────────────────────
+    public function publicShow(Car $car)
+    {
+        abort_if(! $car->is_available || $car->verification_status !== 'approved', 404);
+        $car->load('galleryImages');
+        return view('cars.show', compact('car'));
+    }
+
+    // ── Gallery upload (affiliate / admin, authenticated) ──────────────────────
+    public function storeGallery(Request $request, Car $car)
+    {
+        if (Auth::user()->role !== 'admin' && $car->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'photos'   => 'required|array',
+            'photos.*' => 'required|image|mimes:jpeg,png,jpg,webp',
+        ]);
+
+        $nextOrder = $car->galleryImages()->max('order') + 1;
+
+        foreach ($request->file('photos') as $photo) {
+            $path = ImageHelper::storeAndCompress($photo, 'images/cars/gallery');
+            CarImage::create([
+                'car_id' => $car->id,
+                'path'   => $path,
+                'order'  => $nextOrder++,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Photos uploaded successfully.');
+    }
+
+    // ── Delete a single gallery photo ──────────────────────────────────────────
+    public function destroyGalleryImage(CarImage $image)
+    {
+        $car = $image->car;
+        if (Auth::user()->role !== 'admin' && $car->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $filePath = public_path($image->path);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        $image->delete();
+
+        return redirect()->back()->with('success', 'Photo removed.');
     }
 
     public function destroy(Car $car)

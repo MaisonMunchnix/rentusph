@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Property;
+use App\Models\PropertyImage;
+use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,9 +15,9 @@ class PropertyController extends Controller
     {
         $user = Auth::user();
         if ($user->role === 'admin') {
-            $properties = Property::with('user')->get();
+            $properties = Property::with(['user', 'galleryImages'])->get();
         } else {
-            $properties = Property::where('user_id', $user->id)->get();
+            $properties = Property::with('galleryImages')->where('user_id', $user->id)->get();
         }
 
         return view('properties.index', compact('properties'));
@@ -125,6 +127,57 @@ class PropertyController extends Controller
         $property->save();
 
         return redirect()->back()->with('success', 'Property status updated.');
+    }
+
+    // ── Public detail page (no auth required) ─────────────────────────────────
+    public function publicShow(Property $property)
+    {
+        abort_if(! $property->is_available, 404);
+        $property->load('galleryImages');
+        return view('properties.show', compact('property'));
+    }
+
+    // ── Gallery upload (affiliate / admin, authenticated) ──────────────────────
+    public function storeGallery(Request $request, Property $property)
+    {
+        if (Auth::user()->role !== 'admin' && $property->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'photos'   => 'required|array',
+            'photos.*' => 'required|image|mimes:jpeg,png,jpg,webp',
+        ]);
+
+        $nextOrder = $property->galleryImages()->max('order') + 1;
+
+        foreach ($request->file('photos') as $photo) {
+            $path = ImageHelper::storeAndCompress($photo, 'images/properties/gallery');
+            PropertyImage::create([
+                'property_id' => $property->id,
+                'path'        => $path,
+                'order'       => $nextOrder++,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Photos uploaded successfully.');
+    }
+
+    // ── Delete a single gallery photo ──────────────────────────────────────────
+    public function destroyGalleryImage(PropertyImage $image)
+    {
+        $property = $image->property;
+        if (Auth::user()->role !== 'admin' && $property->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $filePath = public_path($image->path);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        $image->delete();
+
+        return redirect()->back()->with('success', 'Photo removed.');
     }
 
     public function destroy(Property $property)

@@ -242,17 +242,22 @@
                                 {{ $item->fuel_type }}
                             </span>
                         </div>
-                        <div class="listing-footer">
-                            <div class="listing-price">
-                                <span>₱{{ number_format($item->daily_rate) }}</span><small>/day</small>
-                                <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱{{ number_format($item->security_deposit) }} refundable deposit</div>
+                        <div class="listing-footer" style="flex-direction: column; align-items: stretch; gap: 0.75rem;">
+                            <div class="listing-price d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span>₱{{ number_format($item->daily_rate) }}</span><small>/day</small>
+                                    <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱{{ number_format($item->security_deposit) }} refundable deposit</div>
+                                </div>
                             </div>
-                            <a href="javascript:void(0);" class="btn btn-primary btn-book shadow-none" 
-                                data-id="{{ $item->id }}" 
-                                data-type="App\Models\Car" 
-                                data-name="{{ $item->brand }} {{ $item->model }}" 
-                                data-security_deposit="{{ $item->security_deposit }}"
-                                data-rate="₱{{ number_format($item->daily_rate) }}/day">Book Now</a>
+                            <div class="d-flex gap-2 w-100 mt-2">
+                                <a href="{{ route('public.cars.show', $item->id) }}" class="btn btn-outline-dark btn-sm w-50 shadow-none text-center" style="border-radius: 50px;">Details</a>
+                                <button type="button" class="btn btn-primary btn-book btn-sm w-50 shadow-none" 
+                                    data-id="{{ $item->id }}" 
+                                    data-type="App\Models\Car" 
+                                    data-name="{{ $item->brand }} {{ $item->model }}" 
+                                    data-security_deposit="{{ $item->security_deposit }}"
+                                    data-rate="₱{{ number_format($item->daily_rate) }}/day">Book Now</button>
+                            </div>
                         </div>
                     @else
                         <h3 class="listing-title text-truncate">{{ $item->title }}</h3>
@@ -274,17 +279,22 @@
                                 {{ $item->bathrooms }} BA
                             </span>
                         </div>
-                        <div class="listing-footer">
-                            <div class="listing-price">
-                                <span>₱{{ number_format($item->monthly_rate) }}</span><small>/mo</small>
-                                <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱{{ number_format($item->security_deposit) }} refundable deposit</div>
+                        <div class="listing-footer" style="flex-direction: column; align-items: stretch; gap: 0.75rem;">
+                            <div class="listing-price d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span>₱{{ number_format($item->monthly_rate) }}</span><small>/{{ $item->rate_type == 'daily' ? 'night' : 'mo' }}</small>
+                                    <div class="text-primary font-w600" style="font-size: 0.75rem;">+ ₱{{ number_format($item->security_deposit) }} refundable deposit</div>
+                                </div>
                             </div>
-                            <a href="javascript:void(0);" class="btn btn-success btn-book shadow-none" 
-                                data-id="{{ $item->id }}" 
-                                data-type="App\Models\Property" 
-                                data-name="{{ $item->title }}" 
-                                data-security_deposit="{{ $item->security_deposit }}"
-                                data-rate="₱{{ number_format($item->monthly_rate) }}/mo">Book Stay</a>
+                            <div class="d-flex gap-2 w-100 mt-2">
+                                <a href="{{ route('public.properties.show', $item->id) }}" class="btn btn-outline-dark btn-sm w-50 shadow-none text-center" style="border-radius: 50px;">Details</a>
+                                <button type="button" class="btn btn-success btn-book btn-sm w-50 shadow-none" 
+                                    data-id="{{ $item->id }}" 
+                                    data-type="App\Models\Property" 
+                                    data-name="{{ $item->title }}" 
+                                    data-security_deposit="{{ $item->security_deposit }}"
+                                    data-rate="₱{{ number_format($item->monthly_rate) }}/mo">Book Stay</button>
+                            </div>
                         </div>
                     @endif
                 </div>

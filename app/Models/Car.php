@@ -10,6 +10,11 @@ class Car extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public function galleryImages()
+    {
+        return $this->hasMany(CarImage::class)->orderBy('order');
+    }
+
     protected $fillable = [
         'user_id',
         'brand',

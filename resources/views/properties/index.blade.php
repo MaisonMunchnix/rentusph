@@ -103,15 +103,15 @@
                             <!-- Left Column: Image and Basic Info -->
                             <div class="col-md-5 border-end">
                                 <div class="form-group mb-4 text-center">
-                                    <label class="text-black fw-600 d-block mb-2">Property Photo</label>
+                                    <label class="text-black fw-600 d-block mb-2">Property Photo (Cover)</label>
                                     <div class="image-placeholder mb-3 position-relative overflow-hidden rounded-lg shadow-sm" style="height: 200px; background: #f8f9fa;">
                                         <img id="add_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
                                         <div id="add_image_icon" class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
                                             <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
-                                            <small>Click to upload image</small>
+                                            <small>Click to upload cover photo</small>
                                         </div>
                                     </div>
-                                    <input type="file" name="image" class="form-control" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')">
+                                    <input type="file" name="image" class="form-control mb-4" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')" required>
                                 </div>
 
                                 <div class="form-group mb-3">
@@ -234,15 +234,31 @@
                             <!-- Left Column -->
                             <div class="col-md-5 border-end">
                                 <div class="form-group mb-4 text-center">
-                                    <label class="text-black fw-600 d-block mb-2">Property Photo</label>
+                                    <label class="text-black fw-600 d-block mb-2">Cover Photo</label>
                                     <div class="image-placeholder mb-3 position-relative overflow-hidden rounded-lg shadow-sm" style="height: 200px; background: #f8f9fa;">
                                         <img id="edit_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
                                         <div id="edit_image_icon" class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
                                             <i class="fas fa-image fa-3x mb-2"></i>
-                                            <small>No image uploaded</small>
+                                            <small>No cover uploaded</small>
                                         </div>
                                     </div>
                                     <input type="file" name="image" class="form-control" onchange="previewImage(this, 'edit_image_preview', 'edit_image_icon')">
+                                    <small class="text-muted d-block mt-2">Upload a new image to replace the current cover.</small>
+                                </div>
+
+                                <hr class="my-3 opacity-50">
+                                <h6 class="text-primary font-w700 mb-3"><i class="fas fa-images me-2"></i>Photo Gallery</h6>
+                                <div class="form-group mb-4">
+                                    <label class="text-black font-w600">Upload Gallery Photos</label>
+                                    <input type="file" id="property_gallery_upload_input" class="form-control mb-2" accept="image/*" multiple style="cursor: pointer;">
+                                    <small class="text-muted d-block mb-3">Select multiple photos. Images are automatically compressed.</small>
+                                    <button type="button" class="btn btn-sm btn-outline-primary w-100" onclick="uploadPropertyGalleryPhotos()">
+                                        <i class="fas fa-upload me-1"></i> Upload Photos
+                                    </button>
+                                </div>
+
+                                <div class="gallery-preview-container d-flex flex-wrap gap-2 mb-4" id="edit_property_gallery_preview">
+                                    <!-- Gallery items injected here via JS -->
                                 </div>
 
                                 <div class="form-group mb-3">
@@ -349,8 +365,10 @@
 
     
     <script>
+    let currentEditPropertyId = null;
 
     function populateEditModal(property) {
+        currentEditPropertyId = property.id;
         document.getElementById('edit_title').value = property.title;
         document.getElementById('edit_type').value = property.type;
         document.getElementById('edit_address').value = property.address;
@@ -379,6 +397,24 @@
             preview.classList.add('d-none');
             icon.classList.remove('d-none');
         }
+
+        // Populate Gallery
+        const galleryContainer = document.getElementById('edit_property_gallery_preview');
+        galleryContainer.innerHTML = '';
+        if (property.gallery_images && property.gallery_images.length > 0) {
+            property.gallery_images.forEach(img => {
+                galleryContainer.innerHTML += `
+                    <div class="position-relative d-inline-block">
+                        <img src="/${img.path}" class="rounded shadow-sm" style="width: 80px; height: 60px; object-fit: cover;">
+                        <button type="button" class="btn btn-danger btn-xs sharp position-absolute" style="top: -5px; right: -5px; width: 20px; height: 20px; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 10;" onclick="deletePropertyGalleryImage(${img.id})">
+                            <i class="fas fa-times" style="font-size: 10px;"></i>
+                        </button>
+                    </div>
+                `;
+            });
+        } else {
+            galleryContainer.innerHTML = '<p class="text-muted small mb-0 w-100 text-center py-2 bg-light rounded">No gallery photos yet.</p>';
+        }
     }
 
     function previewImage(input, previewId, iconId) {
@@ -393,6 +429,63 @@
                 icon.classList.add('d-none');
             }
             reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    async function uploadPropertyGalleryPhotos() {
+        const input = document.getElementById('property_gallery_upload_input');
+        if (!input.files || input.files.length === 0) {
+            alert('Please select at least one photo.');
+            return;
+        }
+
+        const formData = new FormData();
+        for (let i = 0; i < input.files.length; i++) {
+            formData.append('photos[]', input.files[i]);
+        }
+
+        const btn = document.querySelector('button[onclick="uploadPropertyGalleryPhotos()"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`/properties/${currentEditPropertyId}/gallery`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: formData
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Upload failed.');
+            }
+        } catch (err) {
+            alert('An error occurred during upload.');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    async function deletePropertyGalleryImage(imageId) {
+        if (!confirm('Are you sure you want to delete this photo?')) return;
+
+        try {
+            const response = await fetch(`/properties/gallery/${imageId}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Failed to delete photo.');
+            }
+        } catch (err) {
+            alert('An error occurred.');
         }
     }
     @if(session('success'))

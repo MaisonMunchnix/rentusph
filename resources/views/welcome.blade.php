@@ -306,6 +306,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
 
     .car-price span {
@@ -754,8 +756,12 @@
             <div class="car-price">
               <span>₱{{ number_format($car->daily_rate, 2) }}</span><small>/day</small>
             </div>
-            <a href="{{ route('register.customer', ['car_id' => $car->id]) }}" class="btn btn-outline"
-              style="padding: 0.5rem 1rem;">Book</a>
+            <div class="d-flex gap-2">
+              <a href="{{ route('public.cars.show', $car) }}" class="btn btn-outline"
+                style="padding: 0.5rem 1rem;">View Details</a>
+              <a href="{{ route('register.customer', ['car_id' => $car->id]) }}" class="btn btn-outline"
+                style="padding: 0.5rem 1rem;">Book</a>
+            </div>
           </div>
         </div>
       @empty
@@ -822,8 +828,12 @@
             <div class="car-price">
               <span>₱{{ number_format($property->monthly_rate, 2) }}</span><small>/night</small>
             </div>
-            <a href="{{ route('login', ['clear_intent' => 1]) }}" class="btn btn-outline"
-              style="padding: 0.5rem 1rem;">Book Stay</a>
+            <div class="d-flex gap-2">
+              <a href="{{ route('public.properties.show', $property) }}" class="btn btn-outline"
+                style="padding: 0.5rem 1rem;">View Details</a>
+              <a href="{{ route('login', ['clear_intent' => 1]) }}" class="btn btn-outline"
+                style="padding: 0.5rem 1rem;">Book Stay</a>
+            </div>
           </div>
         </div>
       @empty

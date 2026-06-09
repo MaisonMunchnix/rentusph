@@ -24,10 +24,14 @@ Route::get('/public/cars', function () {
   return view('cars', compact('cars'));
 })->name('public.cars');
 
+Route::get('/public/cars/{car}', [\App\Http\Controllers\CarController::class, 'publicShow'])->name('public.cars.show');
+
 Route::get('/public/properties', function () {
   $properties = \App\Models\Property::where('is_available', true)->latest()->paginate(12);
   return view('properties', compact('properties'));
 })->name('public.properties');
+
+Route::get('/public/properties/{property}', [\App\Http\Controllers\PropertyController::class, 'publicShow'])->name('public.properties.show');
 
 Route::get('/about', function () {
   return view('about');
@@ -98,6 +102,8 @@ Route::middleware(['auth'])->group(function () {
   Route::patch('/cars/{car}/toggle-status', [\App\Http\Controllers\CarController::class, 'toggleStatus'])->name('cars.toggle-status');
   Route::get('/admin/car-verification', [\App\Http\Controllers\CarController::class, 'verificationIndex'])->name('admin.car-verification');
   Route::patch('/cars/{car}/verify', [\App\Http\Controllers\CarController::class, 'verify'])->name('cars.verify');
+  Route::post('/cars/{car}/gallery', [\App\Http\Controllers\CarController::class, 'storeGallery'])->name('cars.gallery.store');
+  Route::delete('/cars/gallery/{image}', [\App\Http\Controllers\CarController::class, 'destroyGalleryImage'])->name('cars.gallery.destroy');
 
   // Property Management
   Route::get('/properties', [\App\Http\Controllers\PropertyController::class, 'index'])->name('properties.index');
@@ -105,6 +111,8 @@ Route::middleware(['auth'])->group(function () {
   Route::put('/properties/{property}', [\App\Http\Controllers\PropertyController::class, 'update'])->name('properties.update');
   Route::delete('/properties/{property}', [\App\Http\Controllers\PropertyController::class, 'destroy'])->name('properties.destroy');
   Route::patch('/properties/{property}/toggle-status', [\App\Http\Controllers\PropertyController::class, 'toggleStatus'])->name('properties.toggle-status');
+  Route::post('/properties/{property}/gallery', [\App\Http\Controllers\PropertyController::class, 'storeGallery'])->name('properties.gallery.store');
+  Route::delete('/properties/gallery/{image}', [\App\Http\Controllers\PropertyController::class, 'destroyGalleryImage'])->name('properties.gallery.destroy');
 
   // Booking Management
   Route::get('/bookings', [\App\Http\Controllers\BookingController::class, 'index'])->name('bookings.index');
