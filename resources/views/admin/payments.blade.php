@@ -24,6 +24,9 @@
                 display: inline-block;
                 margin-right: 5px;
             }
+            .footer {
+                display: none !important;
+            }
         </style>
     </x-slot>
 
