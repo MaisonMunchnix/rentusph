@@ -126,16 +126,24 @@
                             <div class="col-xl-5 border-end">
                                 <div class="form-group mb-4 text-center">
                                     <label class="text-black font-w600 d-block mb-3">Vehicle Photography (Cover)</label>
-                                    <div class="image-placeholder mb-3">
-                                        <img id="add_image_preview" src="#" alt="Preview" class="d-none w-100 shadow-sm" style="height: 220px; object-fit: cover; border-radius: 15px;">
-                                        <div id="add_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center shadow-inner" style="height: 220px; border: 2px dashed #cbd5e1;">
+                                    <div class="image-placeholder mb-4">
+                                        <img id="add_image_preview" src="#" alt="Preview" class="d-none w-100 shadow-sm" style="height: 220px; object-fit: cover; border-radius: 15px; cursor: pointer;" onclick="document.getElementById('add_image_input').click()">
+                                        <div id="add_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center shadow-inner" style="height: 220px; border: 2px dashed #cbd5e1; cursor: pointer;" onclick="document.getElementById('add_image_input').click()">
                                             <div class="text-center">
                                                 <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-2"></i>
                                                 <p class="mb-0 text-muted font-w500">Upload Cover Photo</p>
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="file" name="image" class="form-control mb-4" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')" style="cursor: pointer;" required>
+                                    <input type="file" id="add_image_input" name="image" class="d-none" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')" accept="image/*" required>
+                                </div>
+
+                                <hr class="my-3 opacity-50">
+                                <h6 class="text-primary font-w700 mb-3"><i class="fas fa-images me-2"></i>Photo Gallery</h6>
+                                <div class="form-group mb-4">
+                                    <label class="text-black font-w600">Upload Gallery Photos</label>
+                                    <input type="file" name="gallery_photos[]" class="form-control mb-2" accept="image/*" multiple style="cursor: pointer;">
+                                    <small class="text-muted d-block">Select multiple photos. Images are automatically compressed.</small>
                                 </div>
 
                                 @if(auth()->user()->role !== 'admin')
@@ -265,15 +273,15 @@
                                 <div class="form-group mb-4 text-center">
                                     <label class="text-black font-w600 d-block mb-3">Cover Photo</label>
                                     <div class="image-placeholder mb-3">
-                                        <img id="edit_image_preview" src="#" alt="Preview" class="d-none w-100 shadow-sm" style="height: 220px; object-fit: cover; border-radius: 15px;">
-                                        <div id="edit_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center shadow-inner" style="height: 220px; border: 2px dashed #cbd5e1;">
+                                        <img id="edit_image_preview" src="#" alt="Preview" class="d-none w-100 shadow-sm" style="height: 220px; object-fit: cover; border-radius: 15px; cursor: pointer;" onclick="document.getElementById('edit_image_input').click()">
+                                        <div id="edit_image_icon" class="bg-light rounded d-flex align-items-center justify-content-center shadow-inner" style="height: 220px; border: 2px dashed #cbd5e1; cursor: pointer;" onclick="document.getElementById('edit_image_input').click()">
                                             <div class="text-center">
                                                 <i class="fas fa-image fa-3x text-muted mb-2"></i>
                                                 <p class="mb-0 text-muted font-w500">Cover Photo</p>
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="file" name="image" class="form-control" onchange="previewImage(this, 'edit_image_preview', 'edit_image_icon')" style="cursor: pointer;">
+                                    <input type="file" id="edit_image_input" name="image" class="d-none" onchange="previewImage(this, 'edit_image_preview', 'edit_image_icon')" accept="image/*">
                                     <small class="text-muted d-block mt-2">Upload a new image to replace the current cover.</small>
                                 </div>
 

@@ -72,14 +72,23 @@ class CarController extends Controller
             'security_deposit' => 'required|numeric|min:1000|max:50000',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'gallery_photos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'or_file' => (Auth::user()->role === 'admin') ? 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120' : 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
             'cr_file' => (Auth::user()->role === 'admin') ? 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120' : 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
 
-        $data = $request->except(['image', 'or_file', 'cr_file']);
+        $data = $request->except(['image', 'or_file', 'cr_file', 'gallery_photos']);
         $data['user_id'] = Auth::id();
-        $data['is_available'] = false; // Unavailable until verified
-        $data['verification_status'] = 'pending';
+
+        if (Auth::user()->role === 'admin') {
+            // Admin adds car directly — no approval needed
+            $data['verification_status'] = 'approved';
+            $data['is_available'] = true;
+        } else {
+            // Affiliate submits car — must go through admin verification
+            $data['verification_status'] = 'pending';
+            $data['is_available'] = false;
+        }
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
@@ -95,9 +104,25 @@ class CarController extends Controller
             $data['cr_file'] = $request->file('cr_file')->store('car-docs', 'public');
         }
 
-        Car::create($data);
+        $car = Car::create($data);
 
-        return redirect()->back()->with('success', 'Car listing submitted for admin verification.');
+        if ($request->hasFile('gallery_photos')) {
+            $nextOrder = 1;
+            foreach ($request->file('gallery_photos') as $photo) {
+                $path = ImageHelper::storeAndCompress($photo, 'images/cars/gallery');
+                CarImage::create([
+                    'car_id' => $car->id,
+                    'path'   => $path,
+                    'order'  => $nextOrder++,
+                ]);
+            }
+        }
+
+        $message = Auth::user()->role === 'admin'
+            ? 'Car listing added and published successfully.'
+            : 'Car listing submitted for admin verification.';
+
+        return redirect()->back()->with('success', $message);
     }
 
     public function update(Request $request, Car $car)

@@ -757,10 +757,8 @@
               <span>₱{{ number_format($car->daily_rate, 2) }}</span><small>/day</small>
             </div>
             <div class="d-flex gap-2">
-              <a href="{{ route('public.cars.show', $car) }}" class="btn btn-outline"
-                style="padding: 0.5rem 1rem;">View Details</a>
-              <a href="{{ route('register.customer', ['car_id' => $car->id]) }}" class="btn btn-outline"
-                style="padding: 0.5rem 1rem;">Book</a>
+              <a href="{{ route('public.cars.show', $car) }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">View
+                Details</a>
             </div>
           </div>
         </div>
