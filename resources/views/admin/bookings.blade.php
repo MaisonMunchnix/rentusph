@@ -180,18 +180,86 @@
                 background-color: #3065D0 !important;
                 color: #fff !important;
             }
+            
+            /* FullCalendar Toolbar */
+            .fc .fc-toolbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            /* ── List View Minimal Overrides ── */
+            .fc-list-table {
+                width: 100% !important;
+            }
+            .fc-list-event {
+                cursor: pointer;
+            }
+            .fc-list-event-title,
+            .fc-list-event-title a {
+                white-space: normal !important;
+                word-wrap: break-word !important;
+                text-align: left !important;
+            }
+            .fc-list-event-graphic {
+                padding-right: 4px !important; /* Bring dot closer to text */
+            }
+            .fc-list-table th.fc-list-event-time, 
+            .fc-list-table td.fc-list-event-time {
+                display: none !important; /* Safely hide the empty Time column */
+            }
+
+            /* ── Mobile tweaks (toolbar only — grid view is disabled on mobile) ── */
+            @media (max-width: 767.98px) {
+                .fc .fc-toolbar {
+                    flex-direction: column;
+                    align-items: center;
+                }
+                .fc .fc-toolbar-chunk {
+                    display: flex;
+                    justify-content: center;
+                    width: 100%;
+                    margin-bottom: 0.25rem;
+                }
+                .fc .fc-toolbar-title {
+                    font-size: 1.1rem !important;
+                    text-align: center;
+                }
+                .fc-button-group {
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+                /* Modal column stacking */
+                .modal-body .border-start {
+                    border-left: none !important;
+                    border-top: 1px solid #dee2e6 !important;
+                    padding-top: 1rem !important;
+                    margin-top: 1rem !important;
+                }
+            }
+            @media (max-width: 575.98px) {
+                #bookingDetailModal .item-image-container { min-height: 130px !important; }
+                #bookingDetailModal .col-6.payment-input-group {
+                    width: 100%; flex: 0 0 100%; max-width: 100%;
+                }
+                .condition-btn { font-size: 0.75rem; padding: 6px 4px; }
+                #bookingDetailModal .modal-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+                #bookingDetailModal .modal-header .btn-close { position: absolute; top: 12px; right: 12px; }
+                #manualBookingModal .p-3.bg-light.rounded-3 { flex-direction: column !important; gap: 12px; }
+                #manualBookingModal .flex-grow-1.me-3,
+                #manualBookingModal .flex-grow-1 { margin-right: 0 !important; width: 100%; }
+            }
         </style>
     </x-slot>
 
     <div class="row">
-        <div class="col-xl-9 col-xxl-8">
-            <div class="card">
-                <div class="card-body">
+        <div class="col-12 col-xl-9 col-xxl-8 mb-4 mb-xl-0">
+            <div class="card h-100">
+                <div class="card-body p-2 p-md-4" style="overflow-x: auto;">
                     <div id="calendar" class="app-fullcalendar"></div>
                 </div>
             </div>
         </div>
-          <div class="col-xl-3 col-xxl-4">
+          <div class="col-12 col-xl-3 col-xxl-4">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-intro-title">Booking Status</h4>
@@ -242,7 +310,7 @@
 
     {{-- Booking Detail Modal --}}
     <div class="modal fade" id="bookingDetailModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
             <div class="modal-content">
                 <div class="modal-header pb-0">
                     <div>
@@ -454,7 +522,7 @@
 
     {{-- Manual Booking Modal --}}
     <div class="modal fade" id="manualBookingModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-700"><i class="fas fa-plus-circle me-2 text-primary"></i>New Manual Booking</h5>
@@ -611,13 +679,14 @@
                 var calendarEl = document.getElementById('calendar');
                 const statusFeedback = document.getElementById('statusFeedback');
 
+                let isMobile = window.innerWidth < 768;
                 var calendar = new FullCalendar.Calendar(calendarEl, {
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                    },
-                    initialView: 'dayGridMonth',
+                    headerToolbar: isMobile
+                        ? { left: 'prev,next', center: 'title', right: 'listMonth,dayGridMonth' }
+                        : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+                    initialView: isMobile ? 'listMonth' : 'dayGridMonth',
+                    height: 'auto',
+                    contentHeight: 'auto',
                     displayEventTime: false,
                     navLinks: true,
                     editable: false,
@@ -806,6 +875,26 @@
                 });
 
                 calendar.render();
+
+                // Force FullCalendar to recalculate its size after the admin
+                // layout (sidebar, margins) has fully settled. Without this,
+                // the grid initializes at the wrong width and shows only ~3 cols.
+                setTimeout(function() { calendar.updateSize(); }, 100);
+                setTimeout(function() { calendar.updateSize(); }, 400);
+                window.addEventListener('resize', function() {
+                    const mobileNow = window.innerWidth < 768;
+                    if (mobileNow !== isMobile) {
+                        isMobile = mobileNow;
+                        if (mobileNow) {
+                            calendar.setOption('headerToolbar', { left: 'prev,next', center: 'title', right: 'listMonth,dayGridMonth' });
+                            calendar.changeView('listMonth');
+                        } else {
+                            calendar.setOption('headerToolbar', { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' });
+                            calendar.changeView('dayGridMonth');
+                        }
+                    }
+                    calendar.updateSize();
+                });
 
                 // Handle car filter change
                 const filterEl = document.getElementById('carFilter');

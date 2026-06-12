@@ -653,6 +653,14 @@
 
                 var paymentModal = new bootstrap.Modal(document.getElementById('paymentUploadModal'));
                 paymentModal.show();
+
+                // Clean up the URL to prevent the booking modal from reopening on refresh
+                if (window.history.replaceState) {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('intent_car');
+                    url.searchParams.delete('intent_property');
+                    window.history.replaceState(null, '', url.toString());
+                }
             });
         @endif
 
@@ -940,6 +948,34 @@
                 if (window.history.replaceState) {
                     const url = new URL(window.location);
                     url.searchParams.delete('intent_car');
+                    window.history.replaceState(null, '', url.toString());
+                }
+            });
+        </script>
+    @elseif(isset($intentProperty) && $intentProperty && !session('booking_success'))
+        <!-- Hidden button to trigger booking modal via JS if intent exists -->
+        <button id="intent-book-btn" class="btn-book d-none" 
+            data-id="{{ $intentProperty->id }}" 
+            data-type="App\Models\Property" 
+            data-name="{{ $intentProperty->title }}" 
+            data-security_deposit="{{ $intentProperty->security_deposit }}"
+            data-rate="₱{{ number_format($intentProperty->monthly_rate) }}/mo"></button>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(() => {
+                    const btn = document.getElementById('intent-book-btn');
+                    if (btn) {
+                        $(btn).trigger('click');
+                    }
+                }, 500);
+            });
+            
+            // Clean up the URL only AFTER the modal is closed manually
+            // This ensures if there are validation errors on form submit, it still pops up
+            $('#bookingModal').on('hidden.bs.modal', function () {
+                if (window.history.replaceState) {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('intent_property');
                     window.history.replaceState(null, '', url.toString());
                 }
             });

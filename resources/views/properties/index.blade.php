@@ -104,14 +104,22 @@
                             <div class="col-md-5 border-end">
                                 <div class="form-group mb-4 text-center">
                                     <label class="text-black fw-600 d-block mb-2">Property Photo (Cover)</label>
-                                    <div class="image-placeholder mb-3 position-relative overflow-hidden rounded-lg shadow-sm" style="height: 200px; background: #f8f9fa;">
+                                    <div class="image-placeholder mb-3 position-relative overflow-hidden rounded-lg shadow-sm" style="height: 200px; background: #f8f9fa; cursor: pointer;" onclick="document.getElementById('add_image_input').click()">
                                         <img id="add_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
                                         <div id="add_image_icon" class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
                                             <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
                                             <small>Click to upload cover photo</small>
                                         </div>
                                     </div>
-                                    <input type="file" name="image" class="form-control mb-4" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')" required>
+                                    <input type="file" id="add_image_input" name="image" class="form-control mb-4" onchange="previewImage(this, 'add_image_preview', 'add_image_icon')" required>
+                                </div>
+
+                                <hr class="my-3 opacity-50">
+                                <h6 class="text-primary fw-700 mb-3"><i class="fas fa-images me-2"></i>Photo Gallery</h6>
+                                <div class="form-group mb-4">
+                                    <label class="text-black fw-600 mb-1">Upload Gallery Photos</label>
+                                    <input type="file" name="gallery_photos[]" class="form-control mb-2" accept="image/*" multiple style="cursor: pointer;">
+                                    <small class="text-muted d-block">Select multiple photos. Images are automatically compressed.</small>
                                 </div>
 
                                 <div class="form-group mb-3">
@@ -235,14 +243,14 @@
                             <div class="col-md-5 border-end">
                                 <div class="form-group mb-4 text-center">
                                     <label class="text-black fw-600 d-block mb-2">Cover Photo</label>
-                                    <div class="image-placeholder mb-3 position-relative overflow-hidden rounded-lg shadow-sm" style="height: 200px; background: #f8f9fa;">
+                                    <div class="image-placeholder mb-3 position-relative overflow-hidden rounded-lg shadow-sm" style="height: 200px; background: #f8f9fa; cursor: pointer;" onclick="document.getElementById('edit_image_input').click()">
                                         <img id="edit_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
                                         <div id="edit_image_icon" class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
                                             <i class="fas fa-image fa-3x mb-2"></i>
                                             <small>No cover uploaded</small>
                                         </div>
                                     </div>
-                                    <input type="file" name="image" class="form-control" onchange="previewImage(this, 'edit_image_preview', 'edit_image_icon')">
+                                    <input type="file" id="edit_image_input" name="image" class="form-control" onchange="previewImage(this, 'edit_image_preview', 'edit_image_icon')">
                                     <small class="text-muted d-block mt-2">Upload a new image to replace the current cover.</small>
                                 </div>
 
@@ -488,6 +496,14 @@
             alert('An error occurred.');
         }
     }
+    @if($errors->any())
+        let errorMessages = '';
+        @foreach ($errors->all() as $error)
+            errorMessages += '{{ $error }}<br>';
+        @endforeach
+        alert('Validation Error:\n' + errorMessages.replace(/<br>/g, '\n'));
+    @endif
+
     @if(session('success'))
         document.addEventListener('DOMContentLoaded', function() {
             const modalEl = document.getElementById('successModal');

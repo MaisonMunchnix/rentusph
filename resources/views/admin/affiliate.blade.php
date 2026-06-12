@@ -8,8 +8,10 @@
             <h4 class="card-title">Affiliates</h4>
           </div>
           <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-responsive-md">
+            <!-- Desktop Table View -->
+            <div id="aff-table-view">
+              <div class="table-responsive">
+                <table class="table table-responsive-md">
                 <thead>
                   <tr>
                     <th style="width:80px;"><strong>#</strong></th>
@@ -22,7 +24,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @foreach($affiliates as $affiliate)
+                  @forelse($affiliates as $affiliate)
                     <tr>
                       <td><strong>{{ $loop->iteration }}</strong></td>
                       <td>{{ $affiliate->name }}</td>
@@ -50,11 +52,6 @@
                       <td>{{ $affiliate->address ?? 'N/A' }}</td>
                       <td class="text-center">
                         <div class="d-flex justify-content-center">
-                          @php
-                            $detail = $affiliate->affiliateDetail;
-                            $status = $detail ? $detail->status : 'pending';
-                          @endphp
-
                           <button type="button" class="btn btn-primary btn-xs px-3 me-2" data-bs-toggle="modal"
                             data-bs-target="#reviewModal{{ $affiliate->id }}">
                             Review
@@ -67,15 +64,115 @@
                         </div>
                       </td>
                     </tr>
-
-                  @endforeach
+                  @empty
+                    <tr>
+                        <td colspan="7" class="text-center">No affiliates found.</td>
+                    </tr>
+                  @endforelse
                 </tbody>
               </table>
+              </div>
+            </div>
+
+            <!-- Mobile/Tablet Card View -->
+            <div id="aff-card-view">
+                <div class="row">
+                    @forelse($affiliates as $affiliate)
+                    <div class="col-md-6 col-12 mb-4">
+                        <div class="card border shadow-sm h-100 mb-0">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                        <i class="fas fa-user-tie text-primary fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1 text-primary">{{ $affiliate->name }}</h5>
+                                        <span class="text-muted d-block fs-14">
+                                            @php
+                                              $detail = $affiliate->affiliateDetail;
+                                              $status = $detail ? $detail->status : 'pending';
+                                            @endphp
+                                            @if($status === 'approved')
+                                              <span class="badge light badge-success badge-sm">Approved</span>
+                                            @elseif($status === 'rejected')
+                                              <span class="badge light badge-danger badge-sm">Rejected</span>
+                                            @else
+                                              <span class="badge light badge-warning badge-sm">Pending</span>
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-start mb-2">
+                                        <i class="fas fa-envelope text-muted mt-1 me-2" style="width: 20px;"></i>
+                                        <span class="text-dark">{{ $affiliate->email }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-start mb-2">
+                                        <i class="fas fa-phone-alt text-muted mt-1 me-2" style="width: 20px;"></i>
+                                        <span class="text-dark">{{ $affiliate->phone ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-start mb-2">
+                                        <i class="fas fa-map-marker-alt text-muted mt-1 me-2" style="width: 20px;"></i>
+                                        <span class="text-dark">{{ $affiliate->address ?? 'N/A' }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <small class="text-muted d-block mb-1">Application Status</small>
+                                    @if($status === 'pending')
+                                      @if($detail && $detail->vehicles_submitted)
+                                        <span class="text-success fs-14"><i class="fas fa-check-circle me-1"></i> Vehicles Sent</span>
+                                      @else
+                                        <span class="text-warning fs-14"><i class="fas fa-clock me-1"></i> Awaiting Vehicles</span>
+                                      @endif
+                                    @elseif($status === 'approved')
+                                        <span class="text-success fs-14"><i class="fas fa-check-circle me-1"></i> Active Affiliate</span>
+                                    @else
+                                        <span class="text-danger fs-14"><i class="fas fa-times-circle me-1"></i> Rejected</span>
+                                    @endif
+                                </div>
+                                
+                                <div class="d-flex gap-2 pt-3 border-top">
+                                    <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" data-bs-toggle="modal" data-bs-target="#reviewModal{{ $affiliate->id }}">
+                                        <i class="fas fa-search me-1"></i> Review
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm flex-grow-1" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $affiliate->id }}">
+                                        <i class="fas fa-trash me-1"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No affiliates found.</h5>
+                    </div>
+                    @endforelse
+                </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <script>
+        function applyAffiliateResponsiveView() {
+            var tableView = document.getElementById('aff-table-view');
+            var cardView = document.getElementById('aff-card-view');
+            if (!tableView || !cardView) return;
+            if (window.innerWidth >= 992) {
+                tableView.style.setProperty('display', 'block', 'important');
+                cardView.style.setProperty('display', 'none', 'important');
+            } else {
+                tableView.style.setProperty('display', 'none', 'important');
+                cardView.style.setProperty('display', 'block', 'important');
+            }
+        }
+        applyAffiliateResponsiveView();
+        window.addEventListener('resize', applyAffiliateResponsiveView);
+    </script>
 
     @foreach($affiliates as $affiliate)
       @php

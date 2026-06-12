@@ -23,7 +23,8 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <!-- Desktop Table View -->
+                    <div class="table-responsive d-none d-lg-block">
                         <table class="table table-responsive-md">
                             <thead>
                                 <tr>
@@ -104,6 +105,100 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile/Tablet Card View -->
+                    <div class="d-lg-none">
+                        <div class="row">
+                            @forelse($cars as $car)
+                            <div class="col-md-6 col-12 mb-4">
+                                <div class="card border shadow-sm h-100 mb-0">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            @if($car->image)
+                                                <img src="{{ asset($car->image) }}" class="rounded-lg me-3 shadow-sm" width="70" height="70" alt="" style="object-fit: cover;">
+                                            @else
+                                                <div class="bg-light rounded-lg me-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 70px; height: 70px;">
+                                                    <i class="fas fa-car text-muted fa-2x"></i>
+                                                </div>
+                                            @endif
+                                            <div>
+                                                <h5 class="mb-1 text-primary">{{ $car->brand }} {{ $car->model }}</h5>
+                                                <span class="text-muted d-block fs-14">
+                                                    <i class="fas fa-hashtag me-1"></i>{{ $car->plate_number }} &nbsp;•&nbsp; 
+                                                    <i class="far fa-calendar-alt me-1"></i>{{ $car->year }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3 bg-light rounded p-2 mx-0">
+                                            <div class="col-6 px-2 border-end">
+                                                <small class="text-muted d-block mb-1">Daily Rate</small>
+                                                <span class="text-black font-w600 fs-15">₱{{ number_format($car->daily_rate, 2) }}</span>
+                                            </div>
+                                            <div class="col-6 px-2">
+                                                <small class="text-muted d-block mb-1">Security Deposit</small>
+                                                <span class="text-black font-w600 fs-15">₱{{ number_format($car->security_deposit, 2) }}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <small class="text-muted d-block mb-1">Specifications</small>
+                                                <span class="text-black fs-14"><i class="fas fa-users me-1 text-muted"></i>{{ $car->capacity }} Pax</span><br>
+                                                <span class="text-black fs-14"><i class="fas fa-cogs me-1 text-muted"></i>{{ $car->transmission }}</span>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block mb-1">Status</small>
+                                                <div class="mb-1">
+                                                    @if($car->is_available)
+                                                        <span class="badge light badge-success badge-sm">Available</span>
+                                                    @else
+                                                        <span class="badge light badge-warning badge-sm">Unavailable</span>
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    @php
+                                                        $vClasses = [
+                                                            'pending'  => 'badge-warning',
+                                                            'approved' => 'badge-success',
+                                                            'rejected' => 'badge-danger',
+                                                        ];
+                                                    @endphp
+                                                    <span class="badge light {{ $vClasses[$car->verification_status] ?? 'badge-secondary' }} badge-sm">
+                                                        {{ ucfirst($car->verification_status ?? 'pending') }}
+                                                    </span>
+                                                </div>
+                                                @if($car->verification_status === 'rejected' && $car->rejection_reason)
+                                                    <small class="text-danger d-block mt-1" style="font-size:0.75rem; line-height: 1.2;">{{ Str::limit($car->rejection_reason, 40) }}</small>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        @if(auth()->user() && auth()->user()->role == 'admin')
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block mb-1">Owner</small>
+                                            <span class="text-black fs-14"><i class="fas fa-user-circle me-1 text-muted"></i>{{ $car->user->name ?? 'N/A' }}</span>
+                                        </div>
+                                        @endif
+                                        
+                                        <div class="d-flex gap-2 pt-2 border-top">
+                                            <a href="#" class="btn btn-outline-primary btn-sm flex-grow-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editCarModal" onclick="populateEditModal({{ json_encode($car) }})"><i class="fas fa-pencil-alt me-1"></i> Edit</a>
+                                            <a href="#" class="btn btn-outline-warning btn-sm flex-grow-1" title="{{ $car->is_available ? 'Deactivate' : 'Activate' }} Car" data-bs-toggle="modal" data-bs-target="#statusModal{{ $car->id }}"><i class="fas fa-power-off me-1"></i> Status</a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm flex-grow-1" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $car->id }}">
+                                                <i class="fa fa-trash me-1"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @empty
+                            <div class="col-12 text-center py-5">
+                                <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No cars found.</h5>
+                            </div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
             </div>

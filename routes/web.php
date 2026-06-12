@@ -19,19 +19,19 @@ Route::get('/', function () {
   return view('welcome', compact('cars', 'properties'));
 });
 
-Route::get('/public/cars', function () {
+Route::get('/fleet', function () {
   $cars = \App\Models\Car::where('is_available', true)->latest()->paginate(12);
   return view('cars', compact('cars'));
 })->name('public.cars');
 
-Route::get('/public/cars/{car}', [\App\Http\Controllers\CarController::class, 'publicShow'])->name('public.cars.show');
+Route::get('/fleet/{car}', [\App\Http\Controllers\CarController::class, 'publicShow'])->name('public.cars.show');
 
-Route::get('/public/properties', function () {
+Route::get('/our-properties', function () {
   $properties = \App\Models\Property::where('is_available', true)->latest()->paginate(12);
   return view('properties', compact('properties'));
 })->name('public.properties');
 
-Route::get('/public/properties/{property}', [\App\Http\Controllers\PropertyController::class, 'publicShow'])->name('public.properties.show');
+Route::get('/our-properties/{property}', [\App\Http\Controllers\PropertyController::class, 'publicShow'])->name('public.properties.show');
 
 Route::get('/about', function () {
   return view('about');
@@ -42,30 +42,48 @@ Route::get('/login', function (\Illuminate\Http\Request $request) {
   // Clear intent if user explicitly navigates to general login/register
   if ($request->has('clear_intent')) {
       session()->forget('pending_car_id');
+      session()->forget('pending_property_id');
   }
-  // Store car_id in session if coming from a car booking intent
+  // Store car_id or property_id in session if coming from a booking intent
   if ($request->car_id) {
     session(['pending_car_id' => (int) $request->car_id]);
+    session()->forget('pending_property_id');
+  }
+  if ($request->property_id) {
+    session(['pending_property_id' => (int) $request->property_id]);
+    session()->forget('pending_car_id');
   }
   $selectedCar = session('pending_car_id')
     ? \App\Models\Car::find(session('pending_car_id'))
     : null;
-  return view('auth.login', compact('selectedCar'));
+  $selectedProperty = session('pending_property_id')
+    ? \App\Models\Property::find(session('pending_property_id'))
+    : null;
+  return view('auth.login', compact('selectedCar', 'selectedProperty'));
 })->name('login');
 
 Route::get('/register/customer', function (\Illuminate\Http\Request $request) {
   // Clear intent if user explicitly navigates to general login/register
   if ($request->has('clear_intent')) {
       session()->forget('pending_car_id');
+      session()->forget('pending_property_id');
   }
-  // Store car_id in session if coming from a car booking intent
+  // Store car_id or property_id in session if coming from a booking intent
   if ($request->car_id) {
     session(['pending_car_id' => (int) $request->car_id]);
+    session()->forget('pending_property_id');
+  }
+  if ($request->property_id) {
+    session(['pending_property_id' => (int) $request->property_id]);
+    session()->forget('pending_car_id');
   }
   $selectedCar = session('pending_car_id')
     ? \App\Models\Car::find(session('pending_car_id'))
     : null;
-  return view('auth.customer-registration', compact('selectedCar'));
+  $selectedProperty = session('pending_property_id')
+    ? \App\Models\Property::find(session('pending_property_id'))
+    : null;
+  return view('auth.customer-registration', compact('selectedCar', 'selectedProperty'));
 })->name('register.customer');
 Route::get('/register/affiliate', function () {
   return view('auth.affiliate-registration');
@@ -73,6 +91,9 @@ Route::get('/register/affiliate', function () {
 Route::get('/forgot-password', function () {
   return view('auth.forgot-password');
 })->name('password.request');
+Route::post('/forgot-password', [\App\Http\Controllers\AuthController::class, 'forgotPassword'])->name('password.email');
+Route::get('/reset-password', [\App\Http\Controllers\AuthController::class, 'showResetForm'])->name('password.reset.form');
+Route::post('/reset-password', [\App\Http\Controllers\AuthController::class, 'resetPassword'])->name('password.update');
 
 // Role-based Dashboard
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'affiliate.status']);

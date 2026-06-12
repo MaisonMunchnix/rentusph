@@ -560,11 +560,11 @@
 <body class="auth-page">
   <div class="fix-wrapper">
 
-    @if($selectedCar)
+    @if($selectedCar || isset($selectedProperty))
       {{-- ════ SPLIT LAYOUT ════ --}}
       <div class="auth-split">
 
-        {{-- ── LEFT: Car Preview ── --}}
+        {{-- ── LEFT: Preview ── --}}
         <div class="auth-left">
           <a href="{{ url('/') }}" class="auth-back">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -573,49 +573,97 @@
             Back to home
           </a>
 
-          <div class="badge-tag">{{ $selectedCar->brand }}</div>
+          @if($selectedCar)
+            <div class="badge-tag">{{ $selectedCar->brand }}</div>
 
-          @if($selectedCar->image)
-            <img src="{{ asset($selectedCar->image) }}" alt="{{ $selectedCar->brand }} {{ $selectedCar->model }}"
-              class="car-preview-img">
+            @if($selectedCar->image)
+              <img src="{{ asset($selectedCar->image) }}" alt="{{ $selectedCar->brand }} {{ $selectedCar->model }}"
+                class="car-preview-img">
+            @else
+              <div class="car-placeholder"><i class="fas fa-car"></i></div>
+            @endif
+
+            <h2 class="car-name">{{ $selectedCar->brand }} {{ $selectedCar->model }}</h2>
+
+            <div class="car-meta">
+              <span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                {{ $selectedCar->transmission }}
+              </span>
+              <span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                </svg>
+                {{ $selectedCar->capacity }} Seats
+              </span>
+              <span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+                  <polyline points="13 2 13 9 20 9" />
+                </svg>
+                {{ $selectedCar->type }}
+              </span>
+            </div>
+
+            <div class="car-rate">
+              ₱{{ number_format($selectedCar->daily_rate, 2) }}
+              <small>/day</small>
+            </div>
+
+            <div class="intent-box">
+              <strong>You're about to book this car</strong>
+              <span>Sign in to complete your reservation.</span>
+            </div>
           @else
-            <div class="car-placeholder"><i class="fas fa-car"></i></div>
+            <div class="badge-tag">{{ $selectedProperty->type }}</div>
+
+            @if($selectedProperty->image)
+              <img src="{{ asset($selectedProperty->image) }}" alt="{{ $selectedProperty->title }}"
+                class="car-preview-img">
+            @else
+              <div class="car-placeholder"><i class="fas fa-home"></i></div>
+            @endif
+
+            <h2 class="car-name">{{ $selectedProperty->title }}</h2>
+
+            <div class="car-meta">
+              <span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                {{ $selectedProperty->bedrooms ?: 'N/A' }} Beds
+              </span>
+              <span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21.54 15H17M17 15V19M17 15L21.5 19.5" />
+                  <path d="M2.46 9H7M7 9V5M7 9L2.5 4.5" />
+                  <rect x="7" y="9" width="10" height="10" />
+                </svg>
+                {{ $selectedProperty->bathrooms ?: 'N/A' }} Baths
+              </span>
+              <span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                {{ $selectedProperty->city }}
+              </span>
+            </div>
+
+            <div class="car-rate">
+              ₱{{ number_format($selectedProperty->monthly_rate, 2) }}
+              <small>/{{ $selectedProperty->rate_type }}</small>
+            </div>
+
+            <div class="intent-box">
+              <strong>You're about to book this stay</strong>
+              <span>Sign in to complete your reservation.</span>
+            </div>
           @endif
-
-          <h2 class="car-name">{{ $selectedCar->brand }} {{ $selectedCar->model }}</h2>
-
-          <div class="car-meta">
-            <span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-              {{ $selectedCar->transmission }}
-            </span>
-            <span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-              </svg>
-              {{ $selectedCar->capacity }} Seats
-            </span>
-            <span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
-                <polyline points="13 2 13 9 20 9" />
-              </svg>
-              {{ $selectedCar->type }}
-            </span>
-          </div>
-
-          <div class="car-rate">
-            ₱{{ number_format($selectedCar->daily_rate, 2) }}
-            <small>/day</small>
-          </div>
-
-          <div class="intent-box">
-            <strong>You're about to book this car</strong>
-            <span>Sign in to complete your reservation.</span>
-          </div>
         </div>
 
         {{-- ── RIGHT: Login Form ── --}}
@@ -627,6 +675,11 @@
             <h1 class="auth-title">Welcome back</h1>
             <p class="auth-subtitle">Sign in to complete your booking</p>
 
+            @if (session('status'))
+              <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#86efac;border-radius:12px;padding:1rem;font-size:0.85rem;margin-bottom:1.5rem;">
+                {{ session('status') }}
+              </div>
+            @endif
             @if($errors->any())
               <div class="alert-danger">
                 <ul class="mb-0" style="padding-left:1rem;">
@@ -674,7 +727,7 @@
             <p class="auth-footer-link">
               Don't have an account? <br>
               <a
-                href="{{ route('register.customer', session('pending_car_id') ? ['car_id' => session('pending_car_id')] : []) }}">Sign
+                href="{{ route('register.customer', session('pending_car_id') ? ['car_id' => session('pending_car_id')] : (session('pending_property_id') ? ['property_id' => session('pending_property_id')] : [])) }}">Sign
                 up as Customer</a> &nbsp;|&nbsp;
               <a href="{{ url('register/affiliate') }}">Sign up as Affiliate</a>
             </p>
@@ -694,6 +747,11 @@
             <h1 class="auth-title">Welcome back</h1>
             <p class="auth-subtitle">Sign in to your account</p>
 
+            @if (session('status'))
+              <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#86efac;border-radius:12px;padding:1rem;font-size:0.85rem;margin-bottom:1.5rem;">
+                {{ session('status') }}
+              </div>
+            @endif
             @if($errors->any())
               <div class="alert-danger">
                 <ul class="mb-0" style="padding-left:1rem;">

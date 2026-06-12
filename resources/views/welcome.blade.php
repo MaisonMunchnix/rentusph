@@ -829,8 +829,6 @@
             <div class="d-flex gap-2">
               <a href="{{ route('public.properties.show', $property) }}" class="btn btn-outline"
                 style="padding: 0.5rem 1rem;">View Details</a>
-              <a href="{{ route('login', ['clear_intent' => 1]) }}" class="btn btn-outline"
-                style="padding: 0.5rem 1rem;">Book Stay</a>
             </div>
           </div>
         </div>

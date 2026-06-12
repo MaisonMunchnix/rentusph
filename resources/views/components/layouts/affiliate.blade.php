@@ -155,6 +155,16 @@
         .dlabnav .metismenu > li > a {
             transition: all 0.2s ease;
         }
+
+        /* Mobile Responsiveness Fixes */
+        @media (max-width: 991.98px) {
+            .d-none.d-lg-block { display: none !important; }
+            .d-lg-none { display: block !important; }
+        }
+        @media (min-width: 992px) {
+            .d-none.d-lg-block { display: block !important; }
+            .d-lg-none { display: none !important; }
+        }
     </style>
     {{ $styles ?? '' }}
 </head>

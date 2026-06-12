@@ -66,9 +66,10 @@ class PropertyController extends Controller
             'security_deposit' => 'required|numeric',
             'rate_type' => 'required|string|in:daily,monthly',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'gallery_photos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
-        $data = $request->except('image');
+        $data = $request->except(['image', 'gallery_photos']);
         $data['user_id'] = Auth::id();
 
         if ($request->hasFile('image')) {
@@ -77,7 +78,19 @@ class PropertyController extends Controller
             $data['image'] = 'images/properties/' . $imageName;
         }
 
-        Property::create($data);
+        $property = Property::create($data);
+
+        if ($request->hasFile('gallery_photos')) {
+            $nextOrder = 1;
+            foreach ($request->file('gallery_photos') as $photo) {
+                $path = ImageHelper::storeAndCompress($photo, 'images/properties/gallery');
+                PropertyImage::create([
+                    'property_id' => $property->id,
+                    'path'        => $path,
+                    'order'       => $nextOrder++,
+                ]);
+            }
+        }
 
         return redirect()->back()->with('success', 'Property added successfully.');
     }

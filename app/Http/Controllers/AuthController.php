@@ -43,9 +43,11 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        // Check for pending car booking intent
+        // Check for pending car or property booking intent
         $pendingCarId = session('pending_car_id');
+        $pendingPropertyId = session('pending_property_id');
         session()->forget('pending_car_id');
+        session()->forget('pending_property_id');
 
         if ($user->role === 'affiliate') {
             return redirect('/pending-review');
@@ -53,6 +55,10 @@ class AuthController extends Controller
 
         if ($pendingCarId) {
             return redirect()->route('customer.explore', ['intent_car' => $pendingCarId]);
+        }
+        
+        if ($pendingPropertyId) {
+            return redirect()->route('customer.explore', ['intent_property' => $pendingPropertyId]);
         }
 
         return redirect()->intended('/dashboard');
@@ -68,12 +74,20 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             $request->session()->regenerate();
 
-            // Check for pending car booking intent
+            // Check for pending car or property booking intent
             $pendingCarId = session('pending_car_id');
+            $pendingPropertyId = session('pending_property_id');
             session()->forget('pending_car_id');
+            session()->forget('pending_property_id');
 
-            if ($pendingCarId && Auth::user()->role === 'customer') {
-                return redirect()->route('customer.explore', ['intent_car' => $pendingCarId]);
+            if (Auth::user()->role === 'customer') {
+                if ($pendingCarId) {
+                    return redirect()->route('customer.explore', ['intent_car' => $pendingCarId]);
+                }
+                
+                if ($pendingPropertyId) {
+                    return redirect()->route('customer.explore', ['intent_property' => $pendingPropertyId]);
+                }
             }
 
             return redirect()->intended('/dashboard');
@@ -92,5 +106,63 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    /**
+     * Step 1: Verify the email exists, then store it in session and
+     * redirect to the set-new-password form. No email is sent.
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()
+                ->withErrors(['email' => 'No account found with that email address.'])
+                ->withInput();
+        }
+
+        // Store the verified email in session so the reset form can use it
+        session(['reset_email' => $user->email]);
+
+        return redirect()->route('password.reset.form');
+    }
+
+    /**
+     * Step 2: Show the set-new-password form.
+     * Guard against direct access without going through Step 1.
+     */
+    public function showResetForm()
+    {
+        if (!session('reset_email')) {
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'Please enter your email first.']);
+        }
+
+        return view('auth.reset-password');
+    }
+
+    /**
+     * Step 3: Update the password directly in the database.
+     */
+    public function resetPassword(Request $request)
+    {
+        if (!session('reset_email')) {
+            return redirect()->route('password.request');
+        }
+
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        User::where('email', session('reset_email'))
+            ->update(['password' => Hash::make($request->password)]);
+
+        session()->forget('reset_email');
+
+        return redirect()->route('login')
+            ->with('status', 'Password updated successfully. You can now sign in.');
     }
 }

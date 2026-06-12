@@ -41,8 +41,10 @@
 
             <div class="card">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-responsive-md text-nowrap">
+                    <!-- Desktop Table View -->
+                    <div id="pay-table-view">
+                        <div class="table-responsive">
+                            <table class="table table-responsive-md text-nowrap">
                             <thead>
                                 <tr>
                                     <th><strong>ID</strong></th>
@@ -165,6 +167,124 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        </div>
+                    </div>
+
+                    <!-- Mobile/Tablet Card View -->
+                    <div id="pay-card-view">
+                        <div class="row">
+                            @forelse($bookings as $booking)
+                            <div class="col-md-6 col-12 mb-4">
+                                <div class="card border shadow-sm h-100 mb-0">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="mb-0 text-primary">Booking #{{ $booking->id }}</h6>
+                                            @php
+                                                $statusColor = match($booking->status) {
+                                                    'pending' => '#eab308',
+                                                    'confirmed' => '#22c55e',
+                                                    'cancelled' => '#ef4444',
+                                                    'completed' => '#3b82f6',
+                                                    default => '#6b7280'
+                                                };
+                                            @endphp
+                                            <span class="badge light" style="background-color: {{ $statusColor }}22; color: {{ $statusColor }};">
+                                                <span class="status-dot" style="background-color: {{ $statusColor }};"></span>
+                                                {{ ucfirst($booking->status) }}
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                <i class="fas fa-user text-primary fa-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="fs-15 mb-0">{{ $booking->customer_name }}</h5>
+                                                <p class="fs-13 mb-0 text-muted">{{ $booking->customer_email }}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3 bg-light rounded p-2 mx-0">
+                                            <div class="col-6 px-2 border-end">
+                                                <small class="text-muted d-block mb-1">Item</small>
+                                                @if($booking->bookable_type === 'App\Models\Car')
+                                                    <span class="badge badge-outline-primary btn-xs mb-1">Car</span>
+                                                    <div class="fs-13 font-w600 text-dark">{{ $booking->bookable->brand ?? 'N/A' }} {{ $booking->bookable->model ?? '' }}</div>
+                                                @else
+                                                    <span class="badge badge-outline-secondary btn-xs mb-1">Property</span>
+                                                    <div class="fs-13 font-w600 text-dark">{{ $booking->bookable->title ?? 'N/A' }}</div>
+                                                @endif
+                                            </div>
+                                            <div class="col-6 px-2">
+                                                <small class="text-muted d-block mb-1">Total Price</small>
+                                                <strong class="text-dark">₱{{ number_format($booking->total_price, 2) }}</strong>
+                                                <small class="text-muted d-block" style="font-size: 0.65rem;">
+                                                    R: ₱{{ number_format($booking->rental_amount, 2) }}<br>D: ₱{{ number_format($booking->security_deposit, 2) }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        @if($booking->status === 'completed')
+                                            <div class="mb-3 px-2">
+                                                <small class="text-success fw-bold d-block" style="font-size: 0.75rem;">Refunded: ₱{{ number_format($booking->deposit_refunded, 2) }}</small>
+                                                @if($booking->deposit_deducted > 0)
+                                                    <small class="text-danger d-block" style="font-size: 0.75rem;">Deducted: ₱{{ number_format($booking->deposit_deducted, 2) }}</small>
+                                                @endif
+                                            </div>
+                                        @endif
+                                        
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block mb-2">Proof of Payment</small>
+                                            @if($booking->proof_of_payment)
+                                                <div class="d-flex align-items-center">
+                                                    @if(Str::endsWith($booking->proof_of_payment, '.pdf'))
+                                                        <a href="{{ asset('storage/' . $booking->proof_of_payment) }}" target="_blank" class="btn btn-outline-danger btn-sm flex-grow-1">
+                                                            <i class="fas fa-file-pdf me-1"></i> View PDF
+                                                        </a>
+                                                    @else
+                                                        <img src="{{ asset('storage/' . $booking->proof_of_payment) }}" class="proof-preview me-3 border" alt="Proof" data-bs-toggle="modal" data-bs-target="#viewProofModal{{ $booking->id }}">
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm flex-grow-1" data-bs-toggle="modal" data-bs-target="#viewProofModal{{ $booking->id }}">
+                                                            <i class="fas fa-eye me-1"></i> View Image
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            @else
+                                                <span class="text-white fs-14 bg-danger-light p-2 rounded d-block text-center"><i class="fas fa-times-circle me-1"></i> Not Uploaded</span>
+                                            @endif
+                                        </div>
+                                        
+                                        <div class="d-flex gap-2 pt-3 border-top">
+                                            <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" data-bs-toggle="modal" data-bs-target="#bookingDetailsModal{{ $booking->id }}">
+                                                <i class="fas fa-info-circle me-1"></i> Details
+                                            </button>
+                                            
+                                            @if($booking->status === 'pending')
+                                                @if($booking->proof_of_payment)
+                                                    <form action="{{ route('bookings.status', $booking->id) }}" method="POST" class="flex-grow-1 m-0">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="status" value="confirmed">
+                                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                                            <i class="fas fa-check-circle me-1"></i> Confirm
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <button type="button" class="btn btn-warning btn-sm flex-grow-1" data-bs-toggle="modal" data-bs-target="#paymentWarningModal{{ $booking->id }}">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i> Confirm
+                                                    </button>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @empty
+                            <div class="col-12 text-center py-5">
+                                <i class="fas fa-credit-card fa-3x text-muted mb-3 d-block"></i>
+                                <h5 class="text-muted">No payments found.</h5>
+                            </div>
+                            @endforelse
+                        </div>
                     </div>
                     <div class="mt-3">
                         {{ $bookings->links() }}
@@ -173,6 +293,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function applyPaymentsResponsiveView() {
+            var tableView = document.getElementById('pay-table-view');
+            var cardView = document.getElementById('pay-card-view');
+            if (!tableView || !cardView) return;
+            if (window.innerWidth >= 992) {
+                tableView.style.setProperty('display', 'block', 'important');
+                cardView.style.setProperty('display', 'none', 'important');
+            } else {
+                tableView.style.setProperty('display', 'none', 'important');
+                cardView.style.setProperty('display', 'block', 'important');
+            }
+        }
+        applyPaymentsResponsiveView();
+        window.addEventListener('resize', applyPaymentsResponsiveView);
+    </script>
 
     @foreach($bookings as $booking)
         <!-- Payment Warning Modal -->

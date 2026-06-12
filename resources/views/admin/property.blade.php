@@ -13,8 +13,10 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-responsive-md">
+                    <!-- Desktop Table View -->
+                    <div id="prop-table-view">
+                        <div class="table-responsive">
+                            <table class="table table-responsive-md">
                             <thead>
                                 <tr>
                                     <th><strong>TITLE & TYPE</strong></th>
@@ -78,11 +80,110 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        </div>
+                    </div>
+
+                    <!-- Mobile/Tablet Card View -->
+                    <div id="prop-card-view">
+                        <div class="row">
+                            @forelse($properties as $property)
+                            <div class="col-md-6 col-12 mb-4">
+                                <div class="card border shadow-sm h-100 mb-0">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            @if($property->image)
+                                                <img src="{{ asset($property->image) }}" class="rounded-lg me-3 shadow-sm" width="70" height="70" alt="" style="object-fit: cover;">
+                                            @else
+                                                <div class="bg-light rounded-lg me-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 70px; height: 70px;">
+                                                    <i class="fas fa-building text-muted fa-2x"></i>
+                                                </div>
+                                            @endif
+                                            <div>
+                                                <h5 class="mb-1 text-primary">{{ $property->title }}</h5>
+                                                <span class="text-muted d-block fs-14">
+                                                    <i class="fas fa-home me-1"></i>{{ $property->type }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-start mb-1">
+                                                <i class="fas fa-map-marker-alt text-muted mt-1 me-2" style="width: 15px;"></i>
+                                                <span class="text-dark fs-14">{{ $property->city }}, {{ $property->region }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-start">
+                                                <i class="fas fa-bed text-muted mt-1 me-2" style="width: 15px;"></i>
+                                                <span class="text-dark fs-14">{{ $property->bedrooms }} BR | {{ $property->bathrooms }} BA | {{ $property->floor_area }} sqm</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3 bg-light rounded p-2 mx-0">
+                                            <div class="col-6 px-2 border-end">
+                                                <small class="text-muted d-block mb-1">{{ ucfirst($property->rate_type ?? 'daily') }} Rate</small>
+                                                <span class="text-black font-w600 fs-15">₱{{ number_format($property->monthly_rate, 2) }}</span>
+                                            </div>
+                                            <div class="col-6 px-2">
+                                                <small class="text-muted d-block mb-1">Security Deposit</small>
+                                                <span class="text-black font-w600 fs-15">₱{{ number_format($property->security_deposit, 2) }}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <small class="text-muted d-block mb-1">Status</small>
+                                                @if($property->is_available)
+                                                    <span class="badge light badge-success badge-sm">Available</span>
+                                                @else
+                                                    <span class="badge light badge-warning badge-sm">Unavailable</span>
+                                                @endif
+                                            </div>
+                                            @if(auth()->user() && auth()->user()->role == 'admin')
+                                            <div class="col-6">
+                                                <small class="text-muted d-block mb-1">Owner</small>
+                                                <span class="text-black fs-14"><i class="fas fa-user-circle me-1 text-muted"></i>{{ $property->user->name ?? 'N/A' }}</span>
+                                            </div>
+                                            @endif
+                                        </div>
+                                        
+                                        <div class="d-flex gap-2 pt-2 border-top">
+                                            <a href="#" class="btn btn-outline-primary btn-sm flex-grow-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editPropertyModal" onclick="populateEditModal({{ json_encode($property) }})"><i class="fas fa-pencil-alt me-1"></i> Edit</a>
+                                            <a href="#" class="btn btn-outline-warning btn-sm flex-grow-1" title="Toggle Status" onclick="event.preventDefault(); document.getElementById('toggle-status-{{ $property->id }}').submit();"><i class="fas fa-power-off me-1"></i> Status</a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm flex-grow-1" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $property->id }}">
+                                                <i class="fa fa-trash me-1"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @empty
+                            <div class="col-12 text-center py-5">
+                                <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No properties found.</h5>
+                            </div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        function applyPropertyResponsiveView() {
+            var tableView = document.getElementById('prop-table-view');
+            var cardView = document.getElementById('prop-card-view');
+            if (!tableView || !cardView) return;
+            if (window.innerWidth >= 992) {
+                tableView.style.setProperty('display', 'block', 'important');
+                cardView.style.setProperty('display', 'none', 'important');
+            } else {
+                tableView.style.setProperty('display', 'none', 'important');
+                cardView.style.setProperty('display', 'block', 'important');
+            }
+        }
+        applyPropertyResponsiveView();
+        window.addEventListener('resize', applyPropertyResponsiveView);
+    </script>
 
     <!-- Add Property Modal -->
     <div class="modal fade" id="addPropertyModal">
@@ -319,6 +420,12 @@
     }
     </script>
     @foreach($properties as $property)
+    <!-- Toggle Status Form -->
+    <form id="toggle-status-{{ $property->id }}" action="{{ route('properties.toggle-status', $property) }}" method="POST" class="d-none">
+        @csrf
+        @method('PATCH')
+    </form>
+
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal{{ $property->id }}">
         <div class="modal-dialog modal-dialog-centered" role="document">
