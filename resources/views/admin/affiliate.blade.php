@@ -8,8 +8,8 @@
             <h4 class="card-title">Affiliates</h4>
           </div>
             <div class="card-body">
-              <!-- Affiliates Filter Bar -->
-              <div class="d-none d-lg-flex align-items-center gap-3 mb-3 flex-wrap" id="aff-filter-bar">
+              <!-- Affiliates Filter Bar (all screens) -->
+              <div class="d-flex align-items-center gap-3 mb-3 flex-wrap" id="aff-filter-bar">
                 <div class="d-flex align-items-center gap-2">
                   <label class="text-muted small fw-600 mb-0" style="white-space:nowrap;"><i class="fas fa-circle me-1"></i>Status</label>
                   <select id="aff-filter-status" class="form-select form-select-sm" style="min-width:140px; border-radius:0.5rem; font-size:0.82rem;">
@@ -93,9 +93,31 @@
 
             <!-- Mobile/Tablet Card View -->
             <div id="aff-card-view">
+                <!-- Mobile Search & Filter Bar -->
+                <div class="d-lg-none mb-3">
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="aff-mobile-search" class="form-control" placeholder="Search affiliates..." style="border-left:0;">
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <select id="aff-mobile-filter-status" class="form-select form-select-sm flex-grow-1" style="border-radius:0.5rem; font-size:0.82rem;">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <button id="aff-mobile-filter-reset" class="btn btn-outline-secondary btn-sm" style="border-radius:0.5rem; font-size:0.82rem;">
+                            <i class="fas fa-times me-1"></i>Reset
+                        </button>
+                    </div>
+                </div>
                 <div class="row">
                     @forelse($affiliates as $affiliate)
-                    <div class="col-md-6 col-12 mb-4">
+                    @php
+                      $detail = $affiliate->affiliateDetail;
+                      $status = $detail ? $detail->status : 'pending';
+                    @endphp
+                    <div class="col-md-6 col-12 mb-4" data-card-status="{{ $status }}">
                         <div class="card border shadow-sm h-100 mb-0">
                             <div class="card-body p-4">
                                 <div class="d-flex align-items-center mb-3">
@@ -189,6 +211,61 @@
         }
         applyAffiliateResponsiveView();
         window.addEventListener('resize', applyAffiliateResponsiveView);
+
+        // Mobile card filtering
+        function filterAffiliateCards() {
+            var status = document.getElementById('aff-mobile-filter-status') ? document.getElementById('aff-mobile-filter-status').value.toLowerCase() : '';
+            var search = document.getElementById('aff-mobile-search') ? document.getElementById('aff-mobile-search').value.toLowerCase() : '';
+
+            var cards = document.querySelectorAll('#aff-card-view .col-md-6.col-12.mb-4[data-card-status]');
+            var visibleCount = 0;
+            cards.forEach(function(card) {
+                var cardStatus = (card.dataset.cardStatus || '').toLowerCase();
+                var cardText = card.textContent.toLowerCase();
+
+                var statusMatch = !status || cardStatus === status;
+                var searchMatch = !search || cardText.indexOf(search) !== -1;
+
+                if (statusMatch && searchMatch) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            var emptyEl = document.getElementById('aff-mobile-empty');
+            if (visibleCount === 0) {
+                if (!emptyEl) {
+                    var row = document.querySelector('#aff-card-view .row');
+                    if (row) {
+                        var div = document.createElement('div');
+                        div.id = 'aff-mobile-empty';
+                        div.className = 'col-12 text-center py-4';
+                        div.innerHTML = '<i class="fas fa-users-slash fa-2x text-muted mb-2 d-block"></i><p class="text-muted mb-0">No affiliates match your search.</p>';
+                        row.appendChild(div);
+                    }
+                }
+            } else if (emptyEl) {
+                emptyEl.remove();
+            }
+        }
+
+        ['aff-mobile-search', 'aff-mobile-filter-status'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('input', filterAffiliateCards);
+        });
+
+        var affMobileResetBtn = document.getElementById('aff-mobile-filter-reset');
+        if (affMobileResetBtn) {
+            affMobileResetBtn.addEventListener('click', function() {
+                var s = document.getElementById('aff-mobile-search');
+                var fs = document.getElementById('aff-mobile-filter-status');
+                if (s) s.value = '';
+                if (fs) fs.value = '';
+                filterAffiliateCards();
+            });
+        }
     </script>
 
     @foreach($affiliates as $affiliate)
@@ -377,12 +454,20 @@
 
         $('#aff-filter-status').on('change', function() {
             filterStatus = $(this).val();
+            // Sync mobile filter
+            var mf = document.getElementById('aff-mobile-filter-status');
+            if (mf) { mf.value = $(this).val(); if (typeof filterAffiliateCards === 'function') filterAffiliateCards(); }
             affTable.draw();
         });
 
         $('#aff-filter-reset').on('click', function() {
             filterStatus = '';
             $('#aff-filter-status').val('');
+            var mf = document.getElementById('aff-mobile-filter-status');
+            var ms = document.getElementById('aff-mobile-search');
+            if (mf) mf.value = '';
+            if (ms) ms.value = '';
+            if (typeof filterAffiliateCards === 'function') filterAffiliateCards();
             affTable.draw();
         });
     });

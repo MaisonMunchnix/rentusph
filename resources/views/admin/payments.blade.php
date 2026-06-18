@@ -197,9 +197,33 @@
 
                     <!-- Mobile/Tablet Card View -->
                     <div id="pay-card-view">
+                        <!-- Mobile Search & Filter Bar -->
+                        <div class="d-lg-none mb-3">
+                            <div class="input-group mb-2">
+                                <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" id="pay-mobile-search" class="form-control" placeholder="Search payments..." style="border-left:0;">
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <select id="pay-mobile-filter-item" class="form-select form-select-sm flex-grow-1" style="border-radius:0.5rem; font-size:0.82rem;">
+                                    <option value="">All Items</option>
+                                    <option value="car">Car</option>
+                                    <option value="property">Property</option>
+                                </select>
+                                <select id="pay-mobile-filter-status" class="form-select form-select-sm flex-grow-1" style="border-radius:0.5rem; font-size:0.82rem;">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                                <button id="pay-mobile-filter-reset" class="btn btn-outline-secondary btn-sm" style="border-radius:0.5rem; font-size:0.82rem;">
+                                    <i class="fas fa-times me-1"></i>Reset
+                                </button>
+                            </div>
+                        </div>
                         <div class="row">
                             @forelse($bookings as $booking)
-                            <div class="col-md-6 col-12 mb-4">
+                            <div class="col-md-6 col-12 mb-4" data-card-item="{{ $booking->bookable_type === 'App\Models\Car' ? 'car' : 'property' }}" data-card-status="{{ $booking->status }}">
                                 <div class="card border shadow-sm h-100 mb-0">
                                     <div class="card-body p-4">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -332,6 +356,66 @@
         }
         applyPaymentsResponsiveView();
         window.addEventListener('resize', applyPaymentsResponsiveView);
+
+        // Mobile card filtering
+        function filterPaymentCards() {
+            var item = document.getElementById('pay-mobile-filter-item') ? document.getElementById('pay-mobile-filter-item').value.toLowerCase() : '';
+            var status = document.getElementById('pay-mobile-filter-status') ? document.getElementById('pay-mobile-filter-status').value.toLowerCase() : '';
+            var search = document.getElementById('pay-mobile-search') ? document.getElementById('pay-mobile-search').value.toLowerCase() : '';
+
+            var cards = document.querySelectorAll('#pay-card-view .col-md-6.col-12.mb-4[data-card-status]');
+            var visibleCount = 0;
+            cards.forEach(function(card) {
+                var cardItem = (card.dataset.cardItem || '').toLowerCase();
+                var cardStatus = (card.dataset.cardStatus || '').toLowerCase();
+                var cardText = card.textContent.toLowerCase();
+
+                var itemMatch = !item || cardItem === item;
+                var statusMatch = !status || cardStatus === status;
+                var searchMatch = !search || cardText.indexOf(search) !== -1;
+
+                if (itemMatch && statusMatch && searchMatch) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            var emptyEl = document.getElementById('pay-mobile-empty');
+            if (visibleCount === 0) {
+                if (!emptyEl) {
+                    var row = document.querySelector('#pay-card-view .row');
+                    if (row) {
+                        var div = document.createElement('div');
+                        div.id = 'pay-mobile-empty';
+                        div.className = 'col-12 text-center py-4';
+                        div.innerHTML = '<i class="fas fa-credit-card fa-2x text-muted mb-2 d-block"></i><p class="text-muted mb-0">No payments match your search.</p>';
+                        row.appendChild(div);
+                    }
+                }
+            } else if (emptyEl) {
+                emptyEl.remove();
+            }
+        }
+
+        ['pay-mobile-search', 'pay-mobile-filter-item', 'pay-mobile-filter-status'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('input', filterPaymentCards);
+        });
+
+        var payResetBtn = document.getElementById('pay-mobile-filter-reset');
+        if (payResetBtn) {
+            payResetBtn.addEventListener('click', function() {
+                var s = document.getElementById('pay-mobile-search');
+                var fi = document.getElementById('pay-mobile-filter-item');
+                var fs = document.getElementById('pay-mobile-filter-status');
+                if (s) s.value = '';
+                if (fi) fi.value = '';
+                if (fs) fs.value = '';
+                filterPaymentCards();
+            });
+        }
     </script>
 
     @foreach($bookings as $booking)
@@ -481,11 +565,15 @@
 
         $('#pay-filter-item').on('change', function() {
             filterItem = $(this).val();
+            var mf = document.getElementById('pay-mobile-filter-item');
+            if (mf) { mf.value = $(this).val(); if (typeof filterPaymentCards === 'function') filterPaymentCards(); }
             payTable.draw();
         });
 
         $('#pay-filter-status').on('change', function() {
             filterStatus = $(this).val();
+            var mf = document.getElementById('pay-mobile-filter-status');
+            if (mf) { mf.value = $(this).val(); if (typeof filterPaymentCards === 'function') filterPaymentCards(); }
             payTable.draw();
         });
 
@@ -494,6 +582,13 @@
             filterStatus = '';
             $('#pay-filter-item').val('');
             $('#pay-filter-status').val('');
+            var ms = document.getElementById('pay-mobile-search');
+            var mfi = document.getElementById('pay-mobile-filter-item');
+            var mfs = document.getElementById('pay-mobile-filter-status');
+            if (ms) ms.value = '';
+            if (mfi) mfi.value = '';
+            if (mfs) mfs.value = '';
+            if (typeof filterPaymentCards === 'function') filterPaymentCards();
             payTable.draw();
         });
     });

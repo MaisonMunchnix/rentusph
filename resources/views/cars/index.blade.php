@@ -23,8 +23,8 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <!-- Cars Filter Bar -->
-                    <div class="d-none d-lg-flex align-items-center gap-3 mb-3 flex-wrap" id="cars-filter-bar">
+                    <!-- Cars Filter Bar (all screens) -->
+                    <div class="d-flex align-items-center gap-3 mb-3 flex-wrap" id="cars-filter-bar">
                         <div class="d-flex align-items-center gap-2">
                             <label class="text-muted small fw-600 mb-0" style="white-space:nowrap;"><i class="fas fa-circle me-1"></i>Status</label>
                             <select id="cars-filter-status" class="form-select form-select-sm" style="min-width:130px; border-radius:0.5rem; font-size:0.82rem;">
@@ -45,6 +45,14 @@
                         <button id="cars-filter-reset" class="btn btn-outline-secondary btn-sm" style="border-radius:0.5rem; font-size:0.82rem;">
                             <i class="fas fa-times me-1"></i>Reset
                         </button>
+                    </div>
+
+                    <!-- Mobile Search Bar (visible on small screens only) -->
+                    <div class="d-lg-none mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" id="cars-mobile-search" class="form-control" placeholder="Search cars..." style="border-left:0;">
+                        </div>
                     </div>
 
                     <!-- Desktop Table View -->
@@ -135,7 +143,7 @@
                     <div class="d-lg-none">
                         <div class="row">
                             @forelse($cars as $car)
-                            <div class="col-md-6 col-12 mb-4">
+                            <div class="col-md-6 col-12 mb-4" data-card-status="{{ $car->is_available ? 'available' : 'unavailable' }}" data-card-verification="{{ $car->verification_status ?? 'pending' }}">
                                 <div class="card border shadow-sm h-100 mb-0">
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-3">
@@ -869,11 +877,13 @@
         $('#cars-filter-status').on('change', function() {
             filterStatus = $(this).val();
             carsTable.draw();
+            filterMobileCards();
         });
 
         $('#cars-filter-verification').on('change', function() {
             filterVerification = $(this).val();
             carsTable.draw();
+            filterMobileCards();
         });
 
         $('#cars-filter-reset').on('click', function() {
@@ -881,7 +891,48 @@
             filterVerification = '';
             $('#cars-filter-status').val('');
             $('#cars-filter-verification').val('');
+            $('#cars-mobile-search').val('');
             carsTable.draw();
+            filterMobileCards();
+        });
+
+        // Mobile card view filtering
+        function filterMobileCards() {
+            var status = $('#cars-filter-status').val().toLowerCase();
+            var verification = $('#cars-filter-verification').val().toLowerCase();
+            var search = $('#cars-mobile-search').val().toLowerCase();
+
+            $('.d-lg-none .col-md-6.col-12.mb-4').each(function() {
+                var card = $(this);
+                var cardStatus = card.find('[data-card-status]').data('card-status') || '';
+                var cardVerification = card.find('[data-card-verification]').data('card-verification') || '';
+                var cardText = card.text().toLowerCase();
+
+                var statusMatch = !status || cardStatus === status;
+                var verificationMatch = !verification || cardVerification === verification;
+                var searchMatch = !search || cardText.indexOf(search) !== -1;
+
+                if (statusMatch && verificationMatch && searchMatch) {
+                    card.show();
+                } else {
+                    card.hide();
+                }
+            });
+
+            // Show empty state if no visible cards
+            var visibleCards = $('.d-lg-none .col-md-6.col-12.mb-4:visible').length;
+            var emptyState = $('#cars-mobile-empty');
+            if (visibleCards === 0) {
+                if (!emptyState.length) {
+                    $('.d-lg-none .row').append('<div id="cars-mobile-empty" class="col-12 text-center py-4"><i class="fas fa-car fa-2x text-muted mb-2 d-block"></i><p class="text-muted mb-0">No cars match your search.</p></div>');
+                }
+            } else {
+                emptyState.remove();
+            }
+        }
+
+        $('#cars-mobile-search').on('input', function() {
+            filterMobileCards();
         });
     });
     </script>

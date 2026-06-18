@@ -322,3 +322,102 @@ table.dataTable thead .sorting_desc::after {
     color: #334155;
 }
 
+/* ============================================================
+   Mobile Card View: Search & Filter Bars
+   ============================================================ */
+
+/* Mobile search input-group styling */
+.d-lg-none .input-group .input-group-text {
+    border-color: #e2e8f0;
+    border-right: 0;
+    border-radius: 0.5rem 0 0 0.5rem;
+    color: #94a3b8;
+    background: #ffffff;
+}
+
+.d-lg-none .input-group .form-control {
+    border-color: #e2e8f0;
+    border-left: 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+    font-size: 0.875rem;
+    color: #0f172a;
+    padding-left: 0.5rem;
+    box-shadow: none;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.d-lg-none .input-group .form-control:focus {
+    border-color: #eab308;
+    box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.15);
+    outline: none;
+}
+
+.d-lg-none .input-group:focus-within .input-group-text {
+    border-color: #eab308;
+}
+
+/* Mobile filter row selects */
+.d-lg-none .form-select.form-select-sm,
+#pay-card-view .form-select.form-select-sm,
+#aff-card-view .form-select.form-select-sm {
+    border-color: #e2e8f0;
+    font-size: 0.82rem;
+    color: #0f172a;
+    background-color: #ffffff;
+    border-radius: 0.5rem !important;
+    padding: 0.35rem 1.75rem 0.35rem 0.65rem;
+    box-shadow: none;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.d-lg-none .form-select.form-select-sm:focus,
+#pay-card-view .form-select.form-select-sm:focus,
+#aff-card-view .form-select.form-select-sm:focus {
+    border-color: #eab308;
+    box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.15);
+    outline: none;
+}
+
+/* Mobile filter reset button */
+.d-lg-none .btn-outline-secondary,
+#pay-card-view .btn-outline-secondary,
+#aff-card-view .btn-outline-secondary {
+    border-color: #e2e8f0 !important;
+    color: #64748b !important;
+    font-size: 0.78rem !important;
+    border-radius: 0.5rem !important;
+    padding: 0.35rem 0.75rem !important;
+    transition: all 0.15s ease-in-out;
+}
+
+.d-lg-none .btn-outline-secondary:hover,
+#pay-card-view .btn-outline-secondary:hover,
+#aff-card-view .btn-outline-secondary:hover {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: #334155 !important;
+}
+
+/* Mobile filter panel wrapper */
+.d-lg-none > .mb-3,
+#pay-card-view .d-lg-none,
+#aff-card-view .d-lg-none {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.625rem;
+    padding: 0.75rem !important;
+}
+
+/* Mobile empty state */
+#cars-mobile-empty,
+#pay-mobile-empty,
+#aff-mobile-empty,
+#cust-mobile-empty {
+    color: #94a3b8;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

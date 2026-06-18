@@ -55,9 +55,16 @@
 
             <!-- Mobile/Tablet Card View -->
             <div class="d-lg-none">
-              <div class="row">
+              <!-- Mobile Search Bar -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                  <input type="text" id="cust-mobile-search" class="form-control" placeholder="Search customers..." style="border-left:0;">
+                </div>
+              </div>
+              <div class="row" id="cust-card-row">
                 @forelse($customers as $customer)
-                  <div class="col-md-6 col-12 mb-4">
+                  <div class="col-md-6 col-12 mb-4" data-cust-name="{{ strtolower($customer->name) }}" data-cust-email="{{ strtolower($customer->email) }}" data-cust-phone="{{ strtolower($customer->phone ?? '') }}" data-cust-address="{{ strtolower($customer->address ?? '') }}">
                     <div class="card border shadow-sm h-100 mb-0">
                       <div class="card-body p-4">
                         <div class="d-flex align-items-center mb-3">
@@ -223,4 +230,58 @@
       </div>
     </div>
   @endforeach
+
+  <x-slot name="scripts">
+  <script>
+  // Mobile customer card search
+  document.addEventListener('DOMContentLoaded', function() {
+      var searchInput = document.getElementById('cust-mobile-search');
+      if (!searchInput) return;
+
+      searchInput.addEventListener('input', function() {
+          var query = this.value.toLowerCase().trim();
+          var cards = document.querySelectorAll('#cust-card-row .col-md-6.col-12.mb-4[data-cust-name]');
+          var visibleCount = 0;
+
+          cards.forEach(function(card) {
+              var name    = (card.dataset.custName    || '').toLowerCase();
+              var email   = (card.dataset.custEmail   || '').toLowerCase();
+              var phone   = (card.dataset.custPhone   || '').toLowerCase();
+              var address = (card.dataset.custAddress || '').toLowerCase();
+
+              var match = !query ||
+                  name.indexOf(query)    !== -1 ||
+                  email.indexOf(query)   !== -1 ||
+                  phone.indexOf(query)   !== -1 ||
+                  address.indexOf(query) !== -1;
+
+              if (match) {
+                  card.style.display = '';
+                  visibleCount++;
+              } else {
+                  card.style.display = 'none';
+              }
+          });
+
+          // Show/hide empty state
+          var emptyEl = document.getElementById('cust-mobile-empty');
+          if (visibleCount === 0) {
+              if (!emptyEl) {
+                  var row = document.getElementById('cust-card-row');
+                  if (row) {
+                      var div = document.createElement('div');
+                      div.id = 'cust-mobile-empty';
+                      div.className = 'col-12 text-center py-4';
+                      div.innerHTML = '<i class="fas fa-user-slash fa-2x text-muted mb-2 d-block"></i><p class="text-muted mb-0">No customers match your search.</p>';
+                      row.appendChild(div);
+                  }
+              }
+          } else if (emptyEl) {
+              emptyEl.remove();
+          }
+      });
+  });
+  </script>
+  </x-slot>
+
 </x-layouts.admin>
