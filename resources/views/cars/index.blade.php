@@ -23,6 +23,30 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <!-- Cars Filter Bar -->
+                    <div class="d-none d-lg-flex align-items-center gap-3 mb-3 flex-wrap" id="cars-filter-bar">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-muted small fw-600 mb-0" style="white-space:nowrap;"><i class="fas fa-circle me-1"></i>Status</label>
+                            <select id="cars-filter-status" class="form-select form-select-sm" style="min-width:130px; border-radius:0.5rem; font-size:0.82rem;">
+                                <option value="">All Status</option>
+                                <option value="available">Available</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-muted small fw-600 mb-0" style="white-space:nowrap;"><i class="fas fa-shield-alt me-1"></i>Verification</label>
+                            <select id="cars-filter-verification" class="form-select form-select-sm" style="min-width:140px; border-radius:0.5rem; font-size:0.82rem;">
+                                <option value="">All Verification</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <button id="cars-filter-reset" class="btn btn-outline-secondary btn-sm" style="border-radius:0.5rem; font-size:0.82rem;">
+                            <i class="fas fa-times me-1"></i>Reset
+                        </button>
+                    </div>
+
                     <!-- Desktop Table View -->
                     <div class="table-responsive d-none d-lg-block">
                         <table id="carsTable" class="table table-responsive-md datatable-enabled">
@@ -62,14 +86,14 @@
                                     <td>{{ $car->capacity }} Pax / {{ $car->transmission }}</td>
                                     <td>₱{{ number_format($car->daily_rate, 2) }}</td>
                                     <td>₱{{ number_format($car->security_deposit, 2) }}</td>
-                                    <td>
+                                    <td data-filter-status="{{ $car->is_available ? 'available' : 'unavailable' }}">
                                         @if($car->is_available)
                                             <span class="badge light badge-success">Available</span>
                                         @else
                                             <span class="badge light badge-warning">Unavailable</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    <td data-filter-verification="{{ $car->verification_status ?? 'pending' }}">
                                         @php
                                             $vClasses = [
                                                 'pending'  => 'badge-warning',
@@ -821,4 +845,45 @@
         </div>
     </div>
     @endforeach
+
+    <x-slot name="scripts">
+    <script>
+    $(document).ready(function() {
+        // Cars table filter by Status & Verification
+        var carsTable = $('#carsTable').DataTable();
+        if (!carsTable) return;
+
+        var filterStatus = '';
+        var filterVerification = '';
+
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            if (settings.nTable.id !== 'carsTable') return true;
+            var row = $(carsTable.row(dataIndex).node());
+            var rowStatus = row.find('td[data-filter-status]').data('filter-status') || '';
+            var rowVerification = row.find('td[data-filter-verification]').data('filter-verification') || '';
+            var statusOk = filterStatus === '' || rowStatus === filterStatus;
+            var verificationOk = filterVerification === '' || rowVerification === filterVerification;
+            return statusOk && verificationOk;
+        });
+
+        $('#cars-filter-status').on('change', function() {
+            filterStatus = $(this).val();
+            carsTable.draw();
+        });
+
+        $('#cars-filter-verification').on('change', function() {
+            filterVerification = $(this).val();
+            carsTable.draw();
+        });
+
+        $('#cars-filter-reset').on('click', function() {
+            filterStatus = '';
+            filterVerification = '';
+            $('#cars-filter-status').val('');
+            $('#cars-filter-verification').val('');
+            carsTable.draw();
+        });
+    });
+    </script>
+    </x-slot>
 </x-dynamic-component>

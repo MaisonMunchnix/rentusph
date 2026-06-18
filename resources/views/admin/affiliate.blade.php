@@ -7,11 +7,27 @@
           <div class="card-header border-0 pb-0">
             <h4 class="card-title">Affiliates</h4>
           </div>
-          <div class="card-body">
-            <!-- Desktop Table View -->
-            <div id="aff-table-view">
-              <div class="table-responsive">
-                <table class="table table-responsive-md datatable-enabled">
+            <div class="card-body">
+              <!-- Affiliates Filter Bar -->
+              <div class="d-none d-lg-flex align-items-center gap-3 mb-3 flex-wrap" id="aff-filter-bar">
+                <div class="d-flex align-items-center gap-2">
+                  <label class="text-muted small fw-600 mb-0" style="white-space:nowrap;"><i class="fas fa-circle me-1"></i>Status</label>
+                  <select id="aff-filter-status" class="form-select form-select-sm" style="min-width:140px; border-radius:0.5rem; font-size:0.82rem;">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+                <button id="aff-filter-reset" class="btn btn-outline-secondary btn-sm" style="border-radius:0.5rem; font-size:0.82rem;">
+                  <i class="fas fa-times me-1"></i>Reset
+                </button>
+              </div>
+
+              <!-- Desktop Table View -->
+              <div id="aff-table-view">
+                <div class="table-responsive">
+                  <table id="affiliatesTable" class="table table-responsive-md datatable-enabled">
                 <thead>
                   <tr>
                     <th style="width:80px;"><strong>#</strong></th>
@@ -25,15 +41,15 @@
                 </thead>
                 <tbody>
                   @forelse($affiliates as $affiliate)
+                    @php
+                      $detail = $affiliate->affiliateDetail;
+                      $status = $detail ? $detail->status : 'pending';
+                    @endphp
                     <tr>
                       <td><strong>{{ $loop->iteration }}</strong></td>
                       <td>{{ $affiliate->name }}</td>
                       <td>{{ $affiliate->email }}</td>
-                      <td class="text-center">
-                        @php
-                          $detail = $affiliate->affiliateDetail;
-                          $status = $detail ? $detail->status : 'pending';
-                        @endphp
+                      <td class="text-center" data-filter-status="{{ $status }}">
                         @if($status === 'approved')
                           <span class="badge light badge-success">Approved</span>
                         @elseif($status === 'rejected')
@@ -48,6 +64,7 @@
                           @endif
                         @endif
                       </td>
+
                       <td>{{ $affiliate->phone ?? 'N/A' }}</td>
                       <td>{{ $affiliate->address ?? 'N/A' }}</td>
                       <td class="text-center">
@@ -342,5 +359,34 @@
         </div>
       </div>
     @endforeach
+
+    <x-slot name="scripts">
+    <script>
+    $(document).ready(function() {
+        var affTable = $('#affiliatesTable').DataTable();
+        if (!affTable) return;
+
+        var filterStatus = '';
+
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            if (settings.nTable.id !== 'affiliatesTable') return true;
+            var row = $(affTable.row(dataIndex).node());
+            var rowStatus = row.find('td[data-filter-status]').data('filter-status') || '';
+            return filterStatus === '' || rowStatus === filterStatus;
+        });
+
+        $('#aff-filter-status').on('change', function() {
+            filterStatus = $(this).val();
+            affTable.draw();
+        });
+
+        $('#aff-filter-reset').on('click', function() {
+            filterStatus = '';
+            $('#aff-filter-status').val('');
+            affTable.draw();
+        });
+    });
+    </script>
+    </x-slot>
   </div>
 </x-layouts.admin>

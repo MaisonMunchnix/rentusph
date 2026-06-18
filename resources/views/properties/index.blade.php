@@ -13,8 +13,32 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    <!-- Properties Filter Bar -->
+                    <div class="d-flex align-items-center gap-3 mb-3 flex-wrap" id="props-filter-bar">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-muted small fw-600 mb-0" style="white-space:nowrap;"><i class="fas fa-tag me-1"></i>Rate Type</label>
+                            <select id="props-filter-ratetype" class="form-select form-select-sm" style="min-width:130px; border-radius:0.5rem; font-size:0.82rem;">
+                                <option value="">All Types</option>
+                                <option value="daily">Daily</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="weekly">Weekly</option>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-muted small fw-600 mb-0" style="white-space:nowrap;"><i class="fas fa-circle me-1"></i>Status</label>
+                            <select id="props-filter-status" class="form-select form-select-sm" style="min-width:130px; border-radius:0.5rem; font-size:0.82rem;">
+                                <option value="">All Status</option>
+                                <option value="available">Available</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <button id="props-filter-reset" class="btn btn-outline-secondary btn-sm" style="border-radius:0.5rem; font-size:0.82rem;">
+                            <i class="fas fa-times me-1"></i>Reset
+                        </button>
+                    </div>
+
                     <div class="table-responsive">
-                        <table class="table table-responsive-md datatable-enabled">
+                        <table id="propertiesTable" class="table table-responsive-md datatable-enabled">
                             <thead>
                                 <tr>
                                     <th><strong>TITLE & TYPE</strong></th>
@@ -46,9 +70,9 @@
                                     </td>
                                     <td>{{ $property->city }}, {{ $property->region }}</td>
                                     <td>{{ $property->bedrooms }} BR | {{ $property->bathrooms }} BA | {{ $property->floor_area }} sqm</td>
-                                    <td><span class="badge light badge-dark">{{ ucfirst($property->rate_type ?? 'daily') }}</span></td>
+                                    <td data-filter-ratetype="{{ strtolower($property->rate_type ?? 'daily') }}"><span class="badge light badge-dark">{{ ucfirst($property->rate_type ?? 'daily') }}</span></td>
                                     <td>₱{{ number_format($property->monthly_rate, 2) }}</td>
-                                    <td>
+                                    <td data-filter-status="{{ $property->is_available ? 'available' : 'unavailable' }}">
                                         @if($property->is_available)
                                             <span class="badge light badge-success">Available</span>
                                         @else
@@ -580,4 +604,44 @@
         </div>
     </div>
     @endforeach
+
+    <x-slot name="scripts">
+    <script>
+    $(document).ready(function() {
+        var propsTable = $('#propertiesTable').DataTable();
+        if (!propsTable) return;
+
+        var filterRateType = '';
+        var filterStatus = '';
+
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            if (settings.nTable.id !== 'propertiesTable') return true;
+            var row = $(propsTable.row(dataIndex).node());
+            var rowRateType = row.find('td[data-filter-ratetype]').data('filter-ratetype') || '';
+            var rowStatus   = row.find('td[data-filter-status]').data('filter-status') || '';
+            var rateOk   = filterRateType === '' || rowRateType === filterRateType;
+            var statusOk = filterStatus   === '' || rowStatus   === filterStatus;
+            return rateOk && statusOk;
+        });
+
+        $('#props-filter-ratetype').on('change', function() {
+            filterRateType = $(this).val();
+            propsTable.draw();
+        });
+
+        $('#props-filter-status').on('change', function() {
+            filterStatus = $(this).val();
+            propsTable.draw();
+        });
+
+        $('#props-filter-reset').on('click', function() {
+            filterRateType = '';
+            filterStatus = '';
+            $('#props-filter-ratetype').val('');
+            $('#props-filter-status').val('');
+            propsTable.draw();
+        });
+    });
+    </script>
+    </x-slot>
 </x-dynamic-component>

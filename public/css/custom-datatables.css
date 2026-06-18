@@ -265,3 +265,60 @@ table.dataTable thead .sorting_desc::after {
     clear: both;
     display: table;
 }
+
+/* ============================================================
+   Table Filter Bars
+   ============================================================ */
+[id$="-filter-bar"] {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.625rem;
+    padding: 0.625rem 1rem;
+    gap: 1rem !important;
+}
+
+[id$="-filter-bar"] label {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+}
+
+[id$="-filter-bar"] label i {
+    font-size: 0.6rem;
+    vertical-align: middle;
+}
+
+[id$="-filter-bar"] .form-select {
+    border-color: #e2e8f0;
+    color: #0f172a;
+    font-size: 0.82rem !important;
+    border-radius: 0.5rem !important;
+    padding: 0.3rem 1.75rem 0.3rem 0.65rem;
+    background-color: #ffffff;
+    box-shadow: none;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+[id$="-filter-bar"] .form-select:focus {
+    border-color: #eab308;
+    box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.15);
+    outline: none;
+}
+
+[id$="-filter-bar"] .btn-outline-secondary {
+    border-color: #e2e8f0;
+    color: #64748b;
+    font-size: 0.78rem !important;
+    border-radius: 0.5rem !important;
+    padding: 0.3rem 0.75rem;
+    transition: all 0.15s ease-in-out;
+}
+
+[id$="-filter-bar"] .btn-outline-secondary:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #334155;
+}
+

@@ -43,8 +43,33 @@
                 <div class="card-body">
                     <!-- Desktop Table View -->
                     <div id="pay-table-view">
+                        <!-- Payments Filter Bar -->
+                        <div class="d-flex align-items-center gap-3 mb-3 flex-wrap" id="pay-filter-bar">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted small fw-600 mb-0" style="white-space:nowrap;"><i class="fas fa-box me-1"></i>Item</label>
+                                <select id="pay-filter-item" class="form-select form-select-sm" style="min-width:130px; border-radius:0.5rem; font-size:0.82rem;">
+                                    <option value="">All Items</option>
+                                    <option value="car">Car</option>
+                                    <option value="property">Property</option>
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted small fw-600 mb-0" style="white-space:nowrap;"><i class="fas fa-circle me-1"></i>Booking Status</label>
+                                <select id="pay-filter-status" class="form-select form-select-sm" style="min-width:140px; border-radius:0.5rem; font-size:0.82rem;">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                            <button id="pay-filter-reset" class="btn btn-outline-secondary btn-sm" style="border-radius:0.5rem; font-size:0.82rem;">
+                                <i class="fas fa-times me-1"></i>Reset
+                            </button>
+                        </div>
+
                         <div class="table-responsive">
-                            <table class="table table-responsive-md text-nowrap datatable-enabled">
+                            <table id="paymentsTable" class="table table-responsive-md text-nowrap datatable-enabled">
                             <thead>
                                 <tr>
                                     <th><strong>ID</strong></th>
@@ -68,7 +93,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td data-filter-item="{{ $booking->bookable_type === 'App\Models\Car' ? 'car' : 'property' }}">
                                             @if($booking->bookable_type === 'App\Models\Car')
                                                 <span class="badge badge-outline-primary btn-xs mb-1">Car</span>
                                                 <div class="fs-13">{{ $booking->bookable->brand ?? 'N/A' }} {{ $booking->bookable->model ?? '' }}</div>
@@ -85,7 +110,7 @@
                                                 </small>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td data-filter-status="{{ $booking->status }}">
                                             @php
                                                 $statusColor = match($booking->status) {
                                                     'pending' => '#eab308',
@@ -434,4 +459,44 @@
             </div>
         </div>
     @endforeach
+
+    <x-slot name="scripts">
+    <script>
+    $(document).ready(function() {
+        var payTable = $('#paymentsTable').DataTable();
+        if (!payTable) return;
+
+        var filterItem = '';
+        var filterStatus = '';
+
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            if (settings.nTable.id !== 'paymentsTable') return true;
+            var row = $(payTable.row(dataIndex).node());
+            var rowItem   = row.find('td[data-filter-item]').data('filter-item')   || '';
+            var rowStatus = row.find('td[data-filter-status]').data('filter-status') || '';
+            var itemOk   = filterItem   === '' || rowItem   === filterItem;
+            var statusOk = filterStatus === '' || rowStatus === filterStatus;
+            return itemOk && statusOk;
+        });
+
+        $('#pay-filter-item').on('change', function() {
+            filterItem = $(this).val();
+            payTable.draw();
+        });
+
+        $('#pay-filter-status').on('change', function() {
+            filterStatus = $(this).val();
+            payTable.draw();
+        });
+
+        $('#pay-filter-reset').on('click', function() {
+            filterItem = '';
+            filterStatus = '';
+            $('#pay-filter-item').val('');
+            $('#pay-filter-status').val('');
+            payTable.draw();
+        });
+    });
+    </script>
+    </x-slot>
 </x-layouts.admin>
