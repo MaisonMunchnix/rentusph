@@ -11,7 +11,7 @@
             <!-- Desktop Table View -->
             <div id="aff-table-view">
               <div class="table-responsive">
-                <table class="table table-responsive-md">
+                <table class="table table-responsive-md datatable-enabled">
                 <thead>
                   <tr>
                     <th style="width:80px;"><strong>#</strong></th>

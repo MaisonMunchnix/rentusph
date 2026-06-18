@@ -43,7 +43,7 @@ class BookingController extends Controller
                     });
                 }
 
-                $bookings = $query->latest()->paginate(15);
+                $bookings = $query->latest()->get();
                 $cars = Car::orderBy('brand')->orderBy('model')->get();
                 $properties = Property::orderBy('title')->get();
                 $customers = User::where('role', 'customer')->orderBy('name')->get();
@@ -66,7 +66,7 @@ class BookingController extends Controller
                         $q->where('bookable_type', 'App\Models\Car')->whereIn('bookable_id', $carIds);
                     })->orWhere(function($q) use ($propertyIds) {
                         $q->where('bookable_type', 'App\Models\Property')->whereIn('bookable_id', $propertyIds);
-                    })->with('bookable')->latest()->paginate(15);
+                    })->with('bookable')->latest()->get();
 
                 return view('affiliate.bookings-list', compact('bookings'));
             }
@@ -454,7 +454,7 @@ class BookingController extends Controller
             abort(403);
         }
 
-        $bookings = Booking::with(['bookable', 'user'])->latest()->paginate(15);
+        $bookings = Booking::with(['bookable', 'user'])->latest()->get();
         return view('admin.payments', compact('bookings'));
     }
 

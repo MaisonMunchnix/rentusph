@@ -10,7 +10,7 @@
           <div class="card-body">
             <!-- Desktop Table View -->
             <div class="table-responsive d-none d-lg-block">
-              <table class="table table-responsive-md">
+              <table class="table table-responsive-md datatable-enabled">
                 <thead>
                   <tr>
                     <th style="width:80px;"><strong>#</strong></th>

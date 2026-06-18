@@ -71,7 +71,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-responsive-md">
+                            <table class="table table-responsive-md datatable-enabled">
                                 <thead>
                                     <tr>
                                         <th><strong>ID</strong></th>
@@ -115,9 +115,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="mt-3">
-                            {{ $earningsHistory->links() }}
-                        </div>
+                        <!-- Pagination handled by DataTables client-side -->
                     </div>
                 </div>
             </div>

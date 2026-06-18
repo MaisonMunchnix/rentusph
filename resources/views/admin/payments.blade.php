@@ -44,7 +44,7 @@
                     <!-- Desktop Table View -->
                     <div id="pay-table-view">
                         <div class="table-responsive">
-                            <table class="table table-responsive-md text-nowrap">
+                            <table class="table table-responsive-md text-nowrap datatable-enabled">
                             <thead>
                                 <tr>
                                     <th><strong>ID</strong></th>
@@ -286,9 +286,7 @@
                             @endforelse
                         </div>
                     </div>
-                    <div class="mt-3">
-                        {{ $bookings->links() }}
-                    </div>
+                    <!-- Pagination handled by DataTables client-side -->
                 </div>
             </div>
         </div>

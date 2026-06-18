@@ -25,7 +25,7 @@
                 <div class="card-body">
                     <!-- Desktop Table View -->
                     <div class="table-responsive d-none d-lg-block">
-                        <table id="carsTable" class="table table-responsive-md">
+                        <table id="carsTable" class="table table-responsive-md datatable-enabled">
                             <thead>
                                 <tr>
                                     <th><strong>BRAND & MODEL</strong></th>
@@ -547,11 +547,9 @@
     
     <x-slot name="styles">
         <link href="{{ asset('vendor/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     </x-slot>
 
     <x-slot name="scripts">
-        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}"></script>
         <script>
         function confirmToggleStatus(carId, isAvailable) {
@@ -737,8 +735,6 @@
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
-        }
-
         async function deleteGalleryImage(imageId) {
             if (!confirm('Are you sure you want to delete this photo?')) return;
 
@@ -757,12 +753,6 @@
                 Swal.fire('Error', 'An error occurred.', 'error');
             }
         }
-        // Initialize DataTable for cars list
-        $(function(){
-            if (typeof $.fn.DataTable !== 'undefined') {
-                $('#carsTable').DataTable({ responsive: true, pageLength: 25 });
-            }
-        });
         </script>
     </x-slot>
     @foreach($cars as $car)

@@ -51,7 +51,7 @@ class AffiliateEarningsController extends Controller
             })
             ->whereIn('status', ['confirmed', 'completed'])
             ->orderByDesc('updated_at')
-            ->paginate(10);
+            ->get();
 
         return view('affiliate.earnings', compact(
             'totalEarnings',

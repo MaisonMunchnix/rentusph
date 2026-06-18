@@ -62,7 +62,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-responsive-md">
+                        <table class="table table-responsive-md datatable-enabled">
                             <thead>
                                 <tr>
                                     <th><strong>BOOKING ID</strong></th>
@@ -176,9 +176,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-3">
-                        {{ $bookings->appends(request()->query())->links() }}
-                    </div>
+                    <!-- Pagination handled by DataTables client-side -->
                 </div>
             </div>
         </div>

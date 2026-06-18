@@ -16,7 +16,7 @@
                     <!-- Desktop Table View -->
                     <div id="prop-table-view">
                         <div class="table-responsive">
-                            <table class="table table-responsive-md">
+                            <table class="table table-responsive-md datatable-enabled">
                             <thead>
                                 <tr>
                                     <th><strong>TITLE & TYPE</strong></th>

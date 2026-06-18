@@ -166,6 +166,8 @@
             .d-lg-none { display: none !important; }
         }
     </style>
+    <link href="{{ asset('vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/custom-datatables.css') }}" rel="stylesheet">
     {{ $styles ?? '' }}
 </head>
 <body data-theme-version="light">
@@ -227,6 +229,8 @@
     <script src="{{ asset('vendor/apexchart/apexchart.js') }}"></script>
     <script src="{{ asset('js/custom.min.js') }}"></script>
     <script src="{{ asset('js/dlabnav-init.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('js/custom-datatables.js') }}"></script>
     {{ $scripts ?? '' }}
 </body>
 </html>

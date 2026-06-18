@@ -1,0 +1,267 @@
+/* Custom DataTables Styling to match RentUs premium aesthetics */
+
+.dataTables_wrapper {
+    position: relative;
+    padding: 1.5rem 0 0 0;
+}
+
+/* Control Row (Length and Search) */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 1.25rem;
+    color: #334155;
+    font-weight: 500;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: left;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    text-align: right;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.375rem 1.75rem 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    color: #0f172a;
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.dataTables_wrapper .dataTables_length select:focus {
+    border-color: #eab308;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    color: #0f172a;
+    background-color: #ffffff;
+    outline: none;
+    margin-left: 0.5rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    width: 250px;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #eab308;
+    box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.15);
+}
+
+/* Table overrides */
+table.dataTable {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin: 1.5rem 0 !important;
+    border: 1px solid #f1f5f9 !important;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+table.dataTable thead th {
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 1rem !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    position: relative;
+}
+
+table.dataTable tbody td {
+    padding: 1rem !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    color: #0f172a;
+    vertical-align: middle;
+    white-space: normal !important;
+}
+
+table.dataTable tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* Hover effect */
+table.dataTable tbody tr:hover {
+    background-color: #f8fafc !important;
+}
+
+/* Sorting Indicators */
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc {
+    background-image: none !important;
+    cursor: pointer;
+    padding-right: 1.5rem !important;
+}
+
+table.dataTable thead .sorting::after,
+table.dataTable thead .sorting_asc::after,
+table.dataTable thead .sorting_desc::after {
+    position: absolute;
+    right: 0.5rem;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 0.7rem;
+    opacity: 0.3;
+}
+
+table.dataTable thead .sorting::after {
+    content: "\f0dc";
+}
+
+table.dataTable thead .sorting_asc::after {
+    content: "\f0de";
+    opacity: 0.8;
+    color: #eab308;
+}
+
+table.dataTable thead .sorting_desc::after {
+    content: "\f0dd";
+    opacity: 0.8;
+    color: #eab308;
+}
+
+/* ============================================================
+   Footer: Info + Pagination row
+   style.css sets padding-top/bottom 0.75em on .dataTables_paginate
+   — we override that to keep it flush with the buttons.
+   ============================================================ */
+.dataTables_wrapper .dataTables_info {
+    float: left;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 28px;
+    margin-top: 0.75rem;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    float: right;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    text-align: right;
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px;
+    margin-top: 0.75rem;
+}
+
+/* ============================================================
+   Paginate buttons: override style.css which sets
+     height: 50px; width: 50px; color: var(--primary) [yellow]
+   on both `.paginate_button.previous/.next` and `span .paginate_button`.
+   We must match or exceed that specificity — use the span selector too.
+   ============================================================ */
+
+/* Previous / Next arrow buttons */
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next {
+    height: 28px !important;
+    width: 28px !important;
+    line-height: 1 !important;
+    font-size: 0.8rem !important;
+    padding: 0 !important;
+    margin: 0 2px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 0.375rem !important;
+    color: #334155 !important;
+    background: #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease-in-out !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous i,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next i {
+    font-size: 0.75rem !important;
+    line-height: 1 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next:hover {
+    color: #0f172a !important;
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous.disabled:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next.disabled:hover {
+    color: #cbd5e1 !important;
+    background: #f8fafc !important;
+    border-color: #f1f5f9 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+/* Number page buttons (inside <span> wrapper) — style.css targets
+   `span .paginate_button` with 50x50 yellow color. Override it. */
+.dataTables_wrapper .dataTables_paginate span .paginate_button {
+    height: 28px !important;
+    width: 28px !important;
+    line-height: 1 !important;
+    font-size: 0.8rem !important;
+    padding: 0 !important;
+    margin: 0 2px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 0.375rem !important;
+    color: #334155 !important;      /* dark slate — visible on white */
+    background: #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease-in-out !important;
+    text-align: center !important;
+    box-shadow: none !important;
+}
+
+/* Hover state for number buttons */
+.dataTables_wrapper .dataTables_paginate span .paginate_button:hover {
+    color: #0f172a !important;
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: none !important;
+}
+
+/* Active/current page */
+.dataTables_wrapper .dataTables_paginate span .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate span .paginate_button.current:hover,
+.dataTables_wrapper .dataTables_paginate span .paginate_button.current:hover:hover {
+    color: #ffffff !important;
+    background: #eab308 !important;
+    border-color: #eab308 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 3px rgba(234, 179, 8, 0.4) !important;
+}
+
+/* Ellipsis between page numbers */
+.dataTables_wrapper .dataTables_paginate .ellipsis {
+    color: #94a3b8;
+    padding: 0 4px;
+    line-height: 28px;
+    font-size: 0.8rem;
+}
+
+/* Clearfix */
+.dataTables_wrapper::after {
+    content: "";
+    clear: both;
+    display: table;
+}
