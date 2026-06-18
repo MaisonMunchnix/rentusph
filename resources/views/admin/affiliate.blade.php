@@ -218,49 +218,64 @@
                       @endif
                     </div>
                   @endif
+                  
+                  @php
+                    $insuredCars = $affiliate->cars->filter(function($c) { return !empty($c->comprehensive_insurance); });
+                  @endphp
+                  @if($insuredCars->isNotEmpty())
+                    <p class="mb-1 text-muted small mt-3">Comprehensive Insurance</p>
+                    <div class="d-flex gap-2 mb-0 flex-wrap">
+                      @foreach($insuredCars as $ic)
+                        <a href="{{ Storage::url($ic->comprehensive_insurance) }}" target="_blank"
+                          class="badge text-warning border text-decoration-none" style="font-size: 0.75rem;"><i
+                            class="fas fa-shield-alt me-1"></i> {{ $ic->brand }} {{ $ic->model }}</a>
+                      @endforeach
+                    </div>
+                  @endif
                 </div>
                 <div class="col-md-6 border-start">
                   <h6 class="fw-bold mb-3">Submitted Vehicles</h6>
+                  <div class="submitted-vehicles-list" style="max-height:300px; overflow-y:auto; padding-right:8px;">
                   @forelse($affiliate->cars as $car)
-                    <div class="card bg-light border-0 mb-3">
-                      <div class="card-body p-3">
-                        <div class="d-flex align-items-center mb-2">
+                    <div class="card bg-light border-0 mb-2">
+                      <div class="card-body p-2">
+                        <div class="d-flex align-items-center mb-1">
                           @if($car->image)
                             <img
                               src="{{ str_contains($car->image, '/') ? asset($car->image) : asset('images/cars/' . $car->image) }}"
-                              class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                              class="rounded me-2" style="width: 46px; height: 46px; object-fit: cover;">
                           @endif
                           <div>
-                            <p class="mb-0 fw-bold">{{ $car->brand }} {{ $car->model }} ({{ $car->year }})</p>
-                            <p class="mb-0 text-muted small">Plate: {{ $car->plate_number }}</p>
-                            <p class="mb-0 text-primary small">Daily Rate: ₱{{ number_format($car->daily_rate, 2) }}</p>
+                            <p class="mb-0 fw-bold" style="font-size:0.9rem;">{{ $car->brand }} {{ $car->model }} ({{ $car->year }})</p>
+                            <p class="mb-0 text-muted small" style="font-size:0.75rem;">Plate: {{ $car->plate_number }}</p>
                           </div>
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
                           @if($car->or_file)
                             <a href="{{ Storage::url($car->or_file) }}" target="_blank"
-                              class="badge text-secondary border text-decoration-none" style="font-size: 0.75rem;"><i
+                              class="badge text-secondary border text-decoration-none" style="font-size: 0.7rem;"><i
                                 class="fas fa-file-alt me-1"></i> View OR</a>
                           @endif
                           @if($car->cr_file)
                             <a href="{{ Storage::url($car->cr_file) }}" target="_blank"
-                              class="badge text-secondary border text-decoration-none" style="font-size: 0.75rem;"><i
+                              class="badge text-secondary border text-decoration-none" style="font-size: 0.7rem;"><i
                                 class="fas fa-file-alt me-1"></i> View CR</a>
                           @endif
                           @if($car->comprehensive_insurance)
                             <a href="{{ Storage::url($car->comprehensive_insurance) }}" target="_blank"
-                              class="badge text-warning border text-decoration-none" style="font-size: 0.75rem;"><i
+                              class="badge text-warning border text-decoration-none" style="font-size: 0.7rem;"><i
                                 class="fas fa-shield-alt me-1"></i> View Insurance</a>
                           @endif
                         </div>
                       </div>
                     </div>
                   @empty
-                    <div class="text-center py-4 bg-light rounded">
+                    <div class="text-center py-3 bg-light rounded">
                       <i class="fas fa-car-side fa-3x text-muted mb-2"></i>
                       <p class="text-muted mb-0">No vehicles submitted yet.</p>
                     </div>
                   @endforelse
+                  </div>
                 </div>
               </div>
             </div>

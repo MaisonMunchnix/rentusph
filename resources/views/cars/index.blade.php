@@ -25,7 +25,7 @@
                 <div class="card-body">
                     <!-- Desktop Table View -->
                     <div class="table-responsive d-none d-lg-block">
-                        <table class="table table-responsive-md">
+                        <table id="carsTable" class="table table-responsive-md">
                             <thead>
                                 <tr>
                                     <th><strong>BRAND & MODEL</strong></th>
@@ -89,7 +89,7 @@
                                     @endif
                                     <td>
                                         <div class="d-flex justify-content-end">
-                                            <a href="#" class="btn btn-primary shadow btn-xs sharp me-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editCarModal" onclick="populateEditModal({{ json_encode($car) }})"><i class="fas fa-pencil-alt"></i></a>
+                                            <a href="#" class="btn btn-primary shadow btn-xs sharp me-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editCarModal" onclick="populateEditModal({{ json_encode(array_merge($car->toArray(), ['affiliate' => optional($car->user->affiliateDetail)->toArray()])) }})"><i class="fas fa-pencil-alt"></i></a>
                                             <a href="#" class="btn btn-warning shadow btn-xs sharp me-1" title="{{ $car->is_available ? 'Deactivate' : 'Activate' }} Car" data-bs-toggle="modal" data-bs-target="#statusModal{{ $car->id }}"><i class="fas fa-power-off"></i></a>
                                             <button type="button" class="btn btn-danger shadow btn-xs sharp" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $car->id }}">
                                                 <i class="fa fa-trash"></i>
@@ -183,7 +183,7 @@
                                         @endif
                                         
                                         <div class="d-flex gap-2 pt-2 border-top">
-                                            <a href="#" class="btn btn-outline-primary btn-sm flex-grow-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editCarModal" onclick="populateEditModal({{ json_encode($car) }})"><i class="fas fa-pencil-alt me-1"></i> Edit</a>
+                                            <a href="#" class="btn btn-outline-primary btn-sm flex-grow-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editCarModal" onclick="populateEditModal({{ json_encode(array_merge($car->toArray(), ['affiliate' => optional($car->user->affiliateDetail)->toArray()])) }})"><i class="fas fa-pencil-alt me-1"></i> Edit</a>
                                             <a href="#" class="btn btn-outline-warning btn-sm flex-grow-1" title="{{ $car->is_available ? 'Deactivate' : 'Activate' }} Car" data-bs-toggle="modal" data-bs-target="#statusModal{{ $car->id }}"><i class="fas fa-power-off me-1"></i> Status</a>
                                             <button type="button" class="btn btn-outline-danger btn-sm flex-grow-1" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $car->id }}">
                                                 <i class="fa fa-trash me-1"></i> Delete
@@ -254,6 +254,24 @@
                                     <label class="text-black font-w600">Certificate of Registration (CR) <span class="text-danger">*</span></label>
                                     <input type="file" name="cr_file" class="form-control" accept="image/*,.pdf" required>
                                     <small class="text-muted">JPG, PNG, or PDF · Max 5MB</small>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="text-black font-w600">Comprehensive Insurance</label>
+                                    <input type="file" name="comprehensive_insurance" class="form-control" accept="image/*,.pdf">
+                                    <small class="text-muted">Upload copy of comprehensive insurance (optional, Max 5MB)</small>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group mb-3">
+                                        <label class="text-black font-w600">Government ID (Owner) 1</label>
+                                        <input type="file" name="owner_id_1" class="form-control" accept="image/*,.pdf">
+                                        <small class="text-muted">JPG, PNG, or PDF · Max 5MB</small>
+                                    </div>
+                                    <div class="col-md-6 form-group mb-3">
+                                        <label class="text-black font-w600">Government ID (Owner) 2</label>
+                                        <input type="file" name="owner_id_2" class="form-control" accept="image/*,.pdf">
+                                        <small class="text-muted">JPG, PNG, or PDF · Max 5MB</small>
+                                    </div>
                                 </div>
                                 @endif
 
@@ -405,11 +423,34 @@
                                     <label class="text-black font-w600">Official Receipt (OR)</label>
                                     <input type="file" name="or_file" class="form-control" accept="image/*,.pdf">
                                     <small class="text-muted">Upload only to update documents (Max 5MB)</small>
+                                    <div id="edit_or_preview" class="mt-2"></div>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label class="text-black font-w600">Certificate of Registration (CR)</label>
                                     <input type="file" name="cr_file" class="form-control" accept="image/*,.pdf">
                                     <small class="text-muted">Upload only to update documents (Max 5MB)</small>
+                                    <div id="edit_cr_preview" class="mt-2"></div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="text-black font-w600">Comprehensive Insurance</label>
+                                    <input type="file" name="comprehensive_insurance" class="form-control" accept="image/*,.pdf">
+                                    <small class="text-muted">Upload copy of comprehensive insurance (optional, Max 5MB)</small>
+                                    <div id="edit_insurance_preview" class="mt-2"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group mb-3">
+                                        <label class="text-black font-w600">Government ID (Owner) 1</label>
+                                        <input type="file" name="owner_id_1" class="form-control" accept="image/*,.pdf">
+                                        <small class="text-muted">JPG, PNG, or PDF · Max 5MB</small>
+                                        <div id="edit_owner1_preview" class="mt-2"></div>
+                                    </div>
+                                    <div class="col-md-6 form-group mb-3">
+                                        <label class="text-black font-w600">Government ID (Owner) 2</label>
+                                        <input type="file" name="owner_id_2" class="form-control" accept="image/*,.pdf">
+                                        <small class="text-muted">JPG, PNG, or PDF · Max 5MB</small>
+                                        <div id="edit_owner2_preview" class="mt-2"></div>
+                                    </div>
                                 </div>
                                 @endif
 
@@ -506,9 +547,11 @@
     
     <x-slot name="styles">
         <link href="{{ asset('vendor/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     </x-slot>
 
     <x-slot name="scripts">
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}"></script>
         <script>
         function confirmToggleStatus(carId, isAvailable) {
@@ -608,6 +651,39 @@
             } else {
                 galleryContainer.innerHTML = '<p class="text-muted small mb-0 w-100 text-center py-2 bg-light rounded">No gallery photos yet.</p>';
             }
+
+            // Populate LTO / document filename links (no image previews)
+            function setDocPreview(elId, path) {
+                const el = document.getElementById(elId);
+                if (!el) return;
+                if (!path) {
+                    el.innerHTML = '<p class="text-muted small mb-0">No file uploaded.</p>';
+                    return;
+                }
+                const url = path.startsWith('/') ? path : '/' + path;
+                const filename = path.split('/').pop();
+                const ext = filename.split('.').pop().toLowerCase();
+                let iconClass = 'fa-file-alt text-secondary';
+                if (ext === 'pdf') iconClass = 'fa-file-pdf text-danger';
+                else if (['jpg','jpeg','png','gif','webp'].includes(ext)) iconClass = 'fa-file-image text-primary';
+
+                el.innerHTML = `
+                    <a href="${url}" target="_blank" class="d-inline-flex align-items-center text-decoration-none">
+                        <i class="fas ${iconClass} fa-lg me-2"></i>
+                        <span class="small text-truncate" style="max-width:220px;display:inline-block;vertical-align:middle">${filename}</span>
+                    </a>
+                `;
+            }
+
+            // Car-level documents
+            setDocPreview('edit_or_preview', car.or_file);
+            setDocPreview('edit_cr_preview', car.cr_file);
+            setDocPreview('edit_insurance_preview', car.comprehensive_insurance);
+
+            // Owner IDs stored on affiliate (if provided by controller when opening modal)
+            const affiliate = car.affiliate || null;
+            setDocPreview('edit_owner1_preview', affiliate && affiliate.owner_id_1 ? affiliate.owner_id_1 : null);
+            setDocPreview('edit_owner2_preview', affiliate && affiliate.owner_id_2 ? affiliate.owner_id_2 : null);
         }
 
         function previewImage(input, previewId, iconId) {
@@ -681,6 +757,12 @@
                 Swal.fire('Error', 'An error occurred.', 'error');
             }
         }
+        // Initialize DataTable for cars list
+        $(function(){
+            if (typeof $.fn.DataTable !== 'undefined') {
+                $('#carsTable').DataTable({ responsive: true, pageLength: 25 });
+            }
+        });
         </script>
     </x-slot>
     @foreach($cars as $car)

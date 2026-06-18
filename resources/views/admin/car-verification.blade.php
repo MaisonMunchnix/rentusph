@@ -126,6 +126,10 @@
                             <span><strong>{{ $car->user->name ?? 'N/A' }}</strong> &middot; {{ $car->user->email ?? '' }}</span>
                           </div>
 
+                          <div class="small text-muted mb-3">
+                            <i class="fas fa-clock me-1"></i>
+                            Submitted: {{ $car->created_at ? $car->created_at->format('M d, Y g:i A') : 'N/A' }}
+                          </div>
                           {{-- Submitted Documents --}}
                           <div class="row g-2 mb-3">
                             <div class="col-4">
