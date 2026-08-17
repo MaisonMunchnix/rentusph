@@ -11,3 +11,22 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 settings.json
+
+# Laravel cache & compiled files
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+
+# Storage logs & user uploads
+/storage/logs/
+/storage/app/public/
+/public/uploads/
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+
+# Debug/test scripts
+fix.php
+test_gallery.php
