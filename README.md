@@ -1,3 +1,6 @@
+RentUs is a full-stack rental management web application developed using the Laravel PHP framework. The platform supports three user roles — Admin, Affiliate, and Customer — enabling affiliates to list cars and properties for rent, customers to browse listings and submit bookings, and admins to manage users, verify listings, approve affiliate registrations, and generate reports. Key features include multi-image listing uploads, booking management with proof-of-payment tracking, commission computation per booking, inspection records, and security deposit handling. Built as an OJT capstone project for 4th Year BSIT.
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">
